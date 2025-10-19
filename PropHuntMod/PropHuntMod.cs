@@ -12,6 +12,7 @@ using UnityEngineInternal;
 [BepInProcess("Hollow Knight Silksong.exe")]
 public class PropHuntMod : BaseUnityPlugin
 {
+    GameObject hornet;
     GameObject cover;
     private void Awake()
     {
@@ -23,25 +24,30 @@ public class PropHuntMod : BaseUnityPlugin
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
-            GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
-            HashSet<string> uniqueTags = new HashSet<string>();
+            hornet = GameObject.FindGameObjectWithTag("Player");
 
-            foreach (GameObject go in allGameObjects)
+            var position = hornet.transform;
+            Console.WriteLine(position.localPosition);
+
+            if (cover != null)
             {
-                if (!string.IsNullOrEmpty(go.tag) && go.tag != "Untagged")
-                {
-                    uniqueTags.Add(go.tag);
-                }
+                GameObject.Destroy(cover);
             }
 
-            tempLog("--- Found Unique Tags ---");
-            if (uniqueTags.Count > 0)
-            {
-                foreach (string tag in uniqueTags)
-                {
-                    tempLog($"- {tag}");
-                }
-            }
+            var clump = GameObject.Find("moss_clump_set (41)");
+            cover = GameObject.Instantiate(clump, hornet.transform.position, hornet.transform.rotation, hornet.transform);
+
+
+            //GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
+
+            //tempLog("--- Tags ---");
+            //if (allGameObjects.Length > 0)
+            //{
+            //    foreach (GameObject obj in allGameObjects)
+            //    {
+            //        tempLog($"- {obj.name} ({obj.tag})");
+            //    }
+            //}
         }
     }
 
