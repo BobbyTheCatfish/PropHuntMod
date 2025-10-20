@@ -61,7 +61,7 @@ public class PropHuntMod : BaseUnityPlugin
         // For some reason, the game updates the collision size automatically. not sure if theres a better way (or if i even want to do this at all)
         if (hitbox != null && currentHitboxSize != null && hitbox.size.x != currentHitboxSize.x)
         {
-            hitbox.size = new Vector3(currentHitboxSize.x, hitbox.size.y);
+            hitbox.size = new Vector3(currentHitboxSize.x, currentHitboxSize.y);
         }
 
         // TOGGLE VISIBILITY
@@ -70,7 +70,7 @@ public class PropHuntMod : BaseUnityPlugin
             ToggleHide();
             return;
         }
-        else if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P))
         {
 
             setHornet();
@@ -94,14 +94,16 @@ public class PropHuntMod : BaseUnityPlugin
             cover.transform.SetPositionY(cover.transform.position.y + prop.positionOffset.y);
             cover.transform.SetPositionZ(existing.transform.position.z);
 
-            var sprite = cover.GetComponent<SpriteRenderer>();
-            if (!sprite)
-            {
-                tempLog($"Couldn't get sprite for {cover.name}");
-                return;
-            }
-            var size = sprite.sprite.rect.size;
-            currentHitboxSize = new Vector3(size.x / 50, hitbox.size.y);
+
+            var size = GetTotalSize(cover);
+            //var sprite = cover.GetComponent<SpriteRenderer>();
+            //if (!sprite)
+            //{
+            //    tempLog($"Couldn't get sprite for {cover.name}");
+            //    return;
+            //}
+            //var size = sprite.sprite.rect.size;
+            currentHitboxSize = new Vector3(size.x, size.y);
             hitbox.size = currentHitboxSize;
 
 
@@ -125,6 +127,24 @@ public class PropHuntMod : BaseUnityPlugin
     private void tempLog(string msg)
     {
         Console.WriteLine(msg);
+    }
+
+    private Vector2 GetTotalSize(GameObject cover)
+    {
+        var sprites = cover.GetComponentsInChildren<SpriteRenderer>();
+        if (sprites.Length == 0)
+        {
+            tempLog($"No renderers on {cover.name}");
+            return Vector2.zero;
+        }
+
+        var totalBounds = sprites[0].bounds;
+        foreach (var sprite in sprites)
+        {
+            tempLog(sprite.name);
+            totalBounds.Encapsulate(sprite.bounds);
+        }
+        return (Vector2)totalBounds.size;
     }
     enum Direction { Left, Right, Up, Down };
     private void MoveProp(Direction direction, float distance = .1f)

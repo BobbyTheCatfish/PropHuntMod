@@ -24,10 +24,14 @@ internal class Props
 
     public void Initialize()
     {
-        boneBottom.Add(new Prop("moss_clump_set", new Vector3(0, 0, 0)));
-        boneBottom.Add(new Prop("tent_pillows", new Vector3(0, 0, 0)));
-        boneBottom.Add(new Prop("bone_bush_01", new Vector3(0, 0, 0)));
-        boneBottom.Add(new Prop("Bone_moss_house_moss_wall_02", new Vector3(0, 0, 0)));
-        boneBottom.Add(new Prop("grass_02", Vector3.zero));
+        boneBottom.Add(new Prop("Bonechurch_middle_bits_0002_sack", new Vector3(0, 0, 0)));
+        boneBottom.Add(new Prop("RestBench Control", new Vector3(0, 0, 0)));
+        boneBottom.Add(new Prop("bone_bush_FG_01 (4)", new Vector3(0, 0, 0)));
+        boneBottom.Add(new Prop("Bone_house_pieces_0001_9", new Vector3(0, 0, 0)));
+        boneBottom.Add(new Prop("Bone_house_breakable_point", Vector3.zero));
+        boneBottom.Add(new Prop("Bone_house_breakable_point (1)", Vector3.zero));
+        boneBottom.Add(new Prop("pilgrim_corpse_0003_1_moss_02", Vector3.zero));
+        boneBottom.Add(new Prop("grass_03", Vector3.zero));
+        boneBottom.Add(new Prop("moss_break_table", Vector3.zero));
     }
 }
