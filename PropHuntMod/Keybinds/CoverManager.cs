@@ -5,7 +5,7 @@ using static PropHuntMod.Logging.Logging;
 
 namespace PropHuntMod.Keybinds
 {
-    enum Direction { Left, Right, Up, Down }; 
+    enum Direction { Left, Right, Up, Down, Front, Back }; 
     internal class CoverManager
     {
         GameObject cover;
@@ -19,17 +19,20 @@ namespace PropHuntMod.Keybinds
 
             var x = cover.transform.position.x;
             var y = cover.transform.position.y;
+            var z = cover.transform.position.z;
             if (direction == Direction.Left) x -= distance;
             else if (direction == Direction.Right) x += distance;
             else if (direction == Direction.Up) y += distance;
             else if (direction == Direction.Down) y -= distance;
+            else if (direction == Direction.Front) z -= distance;
+            else if (direction == Direction.Back) z += distance;
             else
             {
                 TempLog("Invalid direction");
                 return;
             }
 
-            cover.transform.position = new Vector3(x, y, cover.transform.position.z);
+            cover.transform.position = new Vector3(x, y, z);
         }
 
         public void DisableProp(HornetManager manager)
@@ -55,7 +58,7 @@ namespace PropHuntMod.Keybinds
             var script = GetBreakableScript(cover);
             script.enabled = false;
 
-            cover.transform.SetPositionZ(existing.transform.position.z);
+            //cover.transform.SetPositionZ(existing.transform.position.z);
             hornet.ToggleHornet(false);
         }
         private List<GameObject> GetAllBreakables()

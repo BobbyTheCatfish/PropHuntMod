@@ -23,7 +23,6 @@ namespace PropHuntMod
         HornetManager hornet = new HornetManager();
         CoverManager cover = new CoverManager();
 
-
         private void Awake()
         {
             TempLog("Prop Hunt Loaded.");
@@ -43,16 +42,23 @@ namespace PropHuntMod
 				hornet.SetHornet();
 				hornet.ToggleHornet();
             }
+            // SET PROP
             if (Input.GetKeyDown(KeyCode.P))
             {
                 TempLog("P");
                 hornet.SetHornet();
                 cover.EnableProp(hornet);
             }
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                cover.DisableProp(hornet);
+            }
             if (Input.GetKey(KeyCode.Keypad2)) cover.MoveProp(Direction.Down);
             if (Input.GetKey(KeyCode.Keypad4)) cover.MoveProp(Direction.Left);
             if (Input.GetKey(KeyCode.Keypad6)) cover.MoveProp(Direction.Right);
             if (Input.GetKey(KeyCode.Keypad8)) cover.MoveProp(Direction.Up);
-        }
+			if (Input.GetKey(KeyCode.Keypad7)) cover.MoveProp(Direction.Front);
+			if (Input.GetKey(KeyCode.Keypad9)) cover.MoveProp(Direction.Back);
+		}
     }
 }
