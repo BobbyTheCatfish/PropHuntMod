@@ -34,4 +34,6 @@ internal class Props
         boneBottom.Add(new Prop("grass_03", Vector3.zero));
         boneBottom.Add(new Prop("moss_break_table", Vector3.zero));
     }
+
+    
 }
