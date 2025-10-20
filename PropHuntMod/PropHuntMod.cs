@@ -92,6 +92,7 @@ public class PropHuntMod : BaseUnityPlugin
             cover = GameObject.Instantiate(existing, hornet.transform.position, hornet.transform.rotation, hornet.transform);
             cover.transform.SetPositionX(cover.transform.position.x + prop.positionOffset.x);
             cover.transform.SetPositionY(cover.transform.position.y + prop.positionOffset.y);
+            cover.transform.SetPositionZ(existing.transform.position.z);
 
             var sprite = cover.GetComponent<SpriteRenderer>();
             if (!sprite)
@@ -115,10 +116,37 @@ public class PropHuntMod : BaseUnityPlugin
             //    }
             //}
         }
+        if (Input.GetKey(KeyCode.Keypad2)) MoveProp(Direction.Down);
+        if (Input.GetKey(KeyCode.Keypad4)) MoveProp(Direction.Left);
+        if (Input.GetKey(KeyCode.Keypad6)) MoveProp(Direction.Right);
+        if (Input.GetKey(KeyCode.Keypad8)) MoveProp(Direction.Up);
     }
 
     private void tempLog(string msg)
     {
         Console.WriteLine(msg);
+    }
+    enum Direction { Left, Right, Up, Down };
+    private void MoveProp(Direction direction, float distance = .1f)
+    {
+        if (!cover)
+        {
+            tempLog("No cover");
+            return;
+        }
+
+        var x = cover.transform.position.x;
+        var y = cover.transform.position.y;
+        if (direction == Direction.Left) x -= distance;
+        else if (direction == Direction.Right) x += distance;
+        else if (direction == Direction.Up) y += distance;
+        else if (direction == Direction.Down) y -= distance;
+        else
+        {
+            tempLog("Invalid direction");
+            return;
+        }
+
+        cover.transform.position = new Vector3(x, y, cover.transform.position.z);
     }
 }
