@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using GenericVariableExtension;
+using GlobalEnums;
 using HarmonyLib;
 using HarmonyLib.Tools;
 using PropHuntMod.Keybinds;
@@ -20,8 +21,8 @@ namespace PropHuntMod
     public class PropHuntMod : BaseUnityPlugin
     {
     
-        HornetManager hornet = new HornetManager();
-        CoverManager cover = new CoverManager();
+        static HornetManager hornet = new HornetManager();
+        static CoverManager cover = new CoverManager();
 
         private void Awake()
         {
@@ -60,5 +61,17 @@ namespace PropHuntMod
 			if (Input.GetKey(KeyCode.Keypad7)) cover.MoveProp(Direction.Front);
 			if (Input.GetKey(KeyCode.Keypad9)) cover.MoveProp(Direction.Back);
 		}
+
+        [HarmonyPrefix]
+		[HarmonyPatch(typeof(HeroController), "TakeDamage")]
+		public static void TakeDamage(HeroController __instance, GameObject go, CollisionSide damageSide, ref int damageAmount, HazardType hazardType, DamagePropertyFlags damagePropertyFlags = DamagePropertyFlags.None)
+        {
+            //if (go.name == "Bone Goomba") // Used for testing
+            if (go.tag == "Player" && cover != null)
+            {
+                damageAmount = 9000;
+            }
+            TempLog(go.name);
+        }
     }
 }
