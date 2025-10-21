@@ -99,4 +99,7 @@
     <Compile Include="Props.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "C:\Users\BobbyTC\source\repos\PropHuntMod\PropHuntMod\bin\Debug\PropHuntMod.dll" "H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\prophunt" /Y</PostBuildEvent>
+  </PropertyGroup>
 </Project>
