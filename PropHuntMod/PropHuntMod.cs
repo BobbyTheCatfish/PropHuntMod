@@ -72,7 +72,7 @@ namespace PropHuntMod
             {
                 damageAmount = 9000;
             }
-            else
+            else if (hazardType == HazardType.ENEMY)
             {
                 damageAmount = 0;
             }
