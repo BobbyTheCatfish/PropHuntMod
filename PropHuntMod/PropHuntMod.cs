@@ -62,6 +62,7 @@ namespace PropHuntMod
 			if (Input.GetKey(KeyCode.Keypad9)) cover.MoveProp(Direction.Back);
 		}
 
+        // Instakill for hiders
         [HarmonyPrefix]
 		[HarmonyPatch(typeof(HeroController), "TakeDamage")]
 		public static void TakeDamage(HeroController __instance, GameObject go, CollisionSide damageSide, ref int damageAmount, HazardType hazardType, DamagePropertyFlags damagePropertyFlags = DamagePropertyFlags.None)
@@ -70,6 +71,10 @@ namespace PropHuntMod
             if (go.tag == "Player" && cover != null)
             {
                 damageAmount = 9000;
+            }
+            else
+            {
+                damageAmount = 0;
             }
             TempLog(go.name);
         }
