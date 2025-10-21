@@ -1,13 +1,17 @@
 ﻿using HutongGames.PlayMaker.Actions;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using static PropHuntMod.Logging.Logging;
+using PropHuntMod.PropManager;
+using System.Linq;
 
 namespace PropHuntMod.Keybinds
 {
-    enum Direction { Left, Right, Up, Down, Front, Back }; 
+    enum Direction { Left, Right, Up, Down, Front, Back };
     internal class CoverManager
     {
+        Props props = new Props();
         GameObject cover;
         public void MoveProp(Direction direction, float distance = .1f)
         {
@@ -56,7 +60,8 @@ namespace PropHuntMod.Keybinds
             cover = GameObject.Instantiate(existing, transform.position, transform.rotation, transform);
 
             var script = GetBreakableScript(cover);
-            script.enabled = false;
+            if (script) Component.Destroy(script);
+            else TempLog("Breakable script not found");
 
             //cover.transform.SetPositionZ(existing.transform.position.z);
             hornet.ToggleHornet(false);
@@ -68,8 +73,7 @@ namespace PropHuntMod.Keybinds
 
             foreach (GameObject gameObject in allGameObjects)
             {
-                var script = GetBreakableScript(gameObject);
-                if (script != null)
+                if (GetBreakableScript(gameObject))
                 {
                     breakableObjects.Add(gameObject);
                 }
@@ -81,6 +85,41 @@ namespace PropHuntMod.Keybinds
         private Breakable GetBreakableScript(GameObject obj)
         {
             return obj.GetComponent<Breakable>();
+        }
+
+        private List<MonoBehaviour> GetBreakableScripts(GameObject obj)
+        {
+
+            List<MonoBehaviour> breakables = new List<MonoBehaviour>();
+            //var baseBreak = obj.GetComponent<Breakable>();
+            //var breakObj = obj.GetComponent<BreakableObject>();
+            //var breakPole = obj.GetComponent<BreakablePole>();
+            //var breakPoleSimple = obj.GetComponent<BreakablePoleSimple>();
+            //var breakPoleTopLand = obj.GetComponent<BreakablePoleTopLand>();
+
+
+            List<string> uniqueStrings = new List<string>();
+            Console.WriteLine($"Scripts: {obj.GetComponentsInChildren<MonoBehaviour>().Length}");
+            foreach (MonoBehaviour script in obj.GetComponentsInChildren<MonoBehaviour>())
+            {
+                var name = script.GetType().Name;
+                if (props.breakableScriptNames.Contains(name))
+                {
+                    breakables.Add(script);
+                    if (!uniqueStrings.Contains(name))
+                    {
+                        uniqueStrings.Add(name);
+                        TempLog($"{name} - {obj.name}");
+                    }
+                }
+                else
+                {
+                    TempLog($"Script {name} - N/A");
+                }
+            }
+            return breakables;
+            //obj.GetComponent<BreakOnHazard>();
+            //return obj.GetComponent<Breakable>();
         }
     }
 }
