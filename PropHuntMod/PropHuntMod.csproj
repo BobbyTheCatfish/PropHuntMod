@@ -93,10 +93,10 @@
     <Compile Include="Keybinds\HornetManager.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Keybinds\CoverManager.cs" />
+    <Compile Include="NoRepeat.cs" />
     <Compile Include="PropHuntMod.cs" />
     <Content Include="PropHuntModOld.txt" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Props.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
