@@ -13,6 +13,21 @@ using UnityEditor;
 using UnityEngine;
 using static PropHuntMod.Logging.Logging;
 
+/**
+ * FEATURE LIST
+ * Hide/Show Hornet
+ * Spawn and attach a game object (prop) to hornet
+ * Move the prop in x/y/z
+ * Dynamically get game objects in current scene
+ *
+ * 
+ * TODO:
+ * Add more props other than breakable ones (corpses, enemies?, etc)
+ * Integrate with multiplayer mod
+ *  - Find out which player is which
+ *  - Send prop information packets
+ * 
+ */
 
 namespace PropHuntMod
 {
