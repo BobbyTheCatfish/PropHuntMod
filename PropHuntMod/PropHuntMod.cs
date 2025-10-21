@@ -78,5 +78,21 @@ namespace PropHuntMod
             }
             TempLog(go.name);
         }
-    }
+
+        // Prevent detection by enemies
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(AlertRange), "OnEnable")]
+        public static bool OnEnable(AlertRange __instance)
+        {
+            __instance.enabled = false;
+            return true;
+        }
+		[HarmonyPrefix]
+		[HarmonyPatch(typeof(AlertRange), "Awake")]
+		public static bool Awake(AlertRange __instance)
+        {
+			__instance.enabled = false;
+			return true;
+        }
+	}
 }
