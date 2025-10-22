@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PropHuntMod
 {
@@ -19,12 +16,17 @@ namespace PropHuntMod
 
         public T GetRandom()
         {
+            if (used.Count == 0 && inputValues.Count <= 1)
+            {
+                if (inputValues.Count == 0) return default;
+                return inputValues[0];
+            }
             int i = random.Next(inputValues.Count);
             var element = inputValues[i];
             inputValues.RemoveAt(i);
             if (inputValues.Count == 0)
             {
-                inputValues = inputValues.Concat(used).ToList();
+                inputValues.AddRange(used);
                 used = new List<T>();
                 Console.WriteLine("Resetting NoRepeat");
             }
