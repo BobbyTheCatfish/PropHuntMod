@@ -20,8 +20,6 @@ namespace PropHuntMod
         public T GetRandom()
         {
             int i = random.Next(inputValues.Count);
-            Console.WriteLine(i);
-            Console.WriteLine(inputValues.Count);
             var element = inputValues[i];
             inputValues.RemoveAt(i);
             if (inputValues.Count == 0)

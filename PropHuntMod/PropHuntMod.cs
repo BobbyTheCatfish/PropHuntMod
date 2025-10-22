@@ -54,14 +54,12 @@ namespace PropHuntMod
             // TOGGLE VISIBILITY
             if (Input.GetKeyDown(KeyCode.H))
             {
-                TempLog("H");
 				hornet.SetHornet();
 				hornet.ToggleHornet();
             }
             // SET PROP
             if (Input.GetKeyDown(KeyCode.P))
             {
-                TempLog("P");
                 hornet.SetHornet();
                 cover.EnableProp(hornet);
             }
@@ -91,7 +89,7 @@ namespace PropHuntMod
             {
                 damageAmount = 0;
             }
-            TempLog(go.name);
+            //TempLog(go.name);
         }
 
         // Prevent detection by enemies

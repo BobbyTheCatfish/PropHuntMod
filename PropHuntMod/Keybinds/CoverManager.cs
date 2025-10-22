@@ -71,34 +71,62 @@ namespace PropHuntMod.Keybinds
                 return;
             }
             cover = GameObject.Instantiate(existing, transform.position, transform.rotation, transform);
+            TempLog($"{cover.name} - {cover.layer} - {cover.activeInHierarchy}");
 
+            
             var scripts = cover.GetComponentsInChildren<MonoBehaviour>();
-            foreach (var script in scripts)
+            foreach (var component in scripts)
             {
-                Component.Destroy(script);
+                if (component.GetType() != typeof(tk2dSprite) && component.GetType() != typeof(tk2dSpriteAnimator))
+                {
+                    TempLog(component.tag);
+                    Component.Destroy(component);
+                }
+            }
+
+            var colliders = cover.GetComponentsInChildren<Collider2D>();
+            foreach (var component in colliders)
+            {
+                Component.Destroy(component);
+            }
+
+            var physics = cover.GetComponentsInChildren<Rigidbody2D>();
+            foreach (var collider in physics)
+            {
+                Component.Destroy(collider);
             }
 
             //cover.transform.SetPositionZ(existing.transform.position.z);
             hornet.ToggleHornet(false);
         }
 
+        private int[] invalidLayers = { 11, 17 };
         private List<GameObject> GetAllProps()
         {
             GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
             List<GameObject> props = new List<GameObject>();
-
             foreach (GameObject gameObject in allGameObjects)
             {
                 if (
-                    HasScript(gameObject) ||
-                    (gameObject.name.ToLower().Contains("pilgrim") && gameObject.layer != 11) ||
-                    (gameObject.name.ToLower().Contains("corpse") && gameObject.layer != 11) ||
-                    gameObject.layer == 19 ||
-                    gameObject.tag == "RespawnPoint"
+                    HasScript(gameObject)
+                    || (gameObject.name.ToLower().Contains("pilgrim"))
+                    || (gameObject.name.ToLower().Contains("corpse"))
+                    // || gameObject.layer == 19
+                    || gameObject.tag == "RespawnPoint"
                 )
                 {
-                    TempLog(gameObject.name);
-                    props.Add(gameObject);
+                    TempLog($"{gameObject.name} - {gameObject.layer} MAYBE");
+                    var renderer = gameObject.GetComponent<SpriteRenderer>();
+                    if (
+                        ((renderer && renderer.enabled) || gameObject.GetComponent<tk2dSprite>())
+                        && !invalidLayers.Contains(gameObject.layer)
+                        && gameObject.activeInHierarchy
+                        && !Regex.IsMatch(gameObject.name, "\\(\\d+\\) ?(\\(Clone\\))?$")
+                    )
+                    {
+                        TempLog($"{gameObject.name} - {gameObject.layer} YES");
+                        props.Add(gameObject);
+                    }
                 }
             }
 
@@ -108,11 +136,12 @@ namespace PropHuntMod.Keybinds
         private bool HasScript(GameObject obj)
         {
             return (
-                obj.GetComponent<Breakable>() ||
-                obj.GetComponent<PlayMakerNPC>() ||
-                obj.GetComponent<BasicNPC>() ||
-                obj.GetComponent<QuestBoardInteractable>() ||
-                obj.GetComponent<PushableRubble>()
+                obj.GetComponent<Breakable>()
+                || obj.GetComponent<PlayMakerNPC>()
+                || obj.GetComponent<BasicNPC>()
+                || obj.GetComponent<QuestBoardInteractable>()
+                || obj.GetComponent<PushableRubble>()
+                || obj.GetComponent<GrassCut>()
             );
         }
     }

@@ -21,7 +21,6 @@ namespace PropHuntMod.Keybinds
 
         public void ToggleHornet(bool show)
         {
-            TempLog("Hornet show to " + show);
             if (hornet == null) SetHornet();
 
             var render = hornet.GetComponent<MeshRenderer>();
@@ -43,7 +42,6 @@ namespace PropHuntMod.Keybinds
             render = hornet.GetComponent<MeshRenderer>();
 
             if (hornet == null) TempLog("Hornet not found! OH NO!");
-            TempLog(hornet.name);
         }
     }
 }
