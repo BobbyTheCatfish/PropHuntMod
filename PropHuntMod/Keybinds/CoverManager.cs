@@ -1,11 +1,9 @@
-﻿using HutongGames.PlayMaker.Actions;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-using static PropHuntMod.Logging.Logging;
+﻿using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using static PropHuntMod.Logging.Logging;
 
 namespace PropHuntMod.Keybinds
 {
@@ -15,8 +13,11 @@ namespace PropHuntMod.Keybinds
         GameObject cover;
         string currentScene;
         NoRepeat<GameObject> applicableCovers;
-        public void MoveProp(Direction direction, float distance = .1f)
+        public void MoveProp(Direction direction, KeyCode key)
         {
+            float distance = Input.GetKeyDown(KeyCode.LeftAlt) ? 0.01f : 0.1f;
+            if (!Input.GetKey(key)) return;
+
             if (!cover)
             {
                 TempLog("No cover");

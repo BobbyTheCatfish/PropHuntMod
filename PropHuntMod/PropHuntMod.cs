@@ -1,19 +1,10 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
-using GenericVariableExtension;
 using GlobalEnums;
 using HarmonyLib;
-using HarmonyLib.Tools;
 using PropHuntMod.Keybinds;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reflection;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using static PropHuntMod.Logging.Logging;
-using HutongGames.PlayMaker.Actions;
 
 /**
  * FEATURE LIST
@@ -69,12 +60,15 @@ namespace PropHuntMod
             {
                 cover.DisableProp(hornet);
             }
-            if (Input.GetKey(KeyCode.Keypad2)) cover.MoveProp(Direction.Down);
-            if (Input.GetKey(KeyCode.Keypad4)) cover.MoveProp(Direction.Left);
-            if (Input.GetKey(KeyCode.Keypad6)) cover.MoveProp(Direction.Right);
-            if (Input.GetKey(KeyCode.Keypad8)) cover.MoveProp(Direction.Up);
-			if (Input.GetKey(KeyCode.Keypad7)) cover.MoveProp(Direction.Front);
-			if (Input.GetKey(KeyCode.Keypad9)) cover.MoveProp(Direction.Back);
+
+            float distance = Input.GetKey(KeyCode.LeftShift) ? 0.1f : 0.01f;
+
+            cover.MoveProp(Direction.Down, KeyCode.Keypad2);
+            cover.MoveProp(Direction.Left, KeyCode.Keypad4);
+            cover.MoveProp(Direction.Right, KeyCode.Keypad6);
+            cover.MoveProp(Direction.Up, KeyCode.Keypad8);
+            cover.MoveProp(Direction.Front, KeyCode.Keypad7);
+            cover.MoveProp(Direction.Back, KeyCode.Keypad9);
 		}
 
         // Instakill for hiders
