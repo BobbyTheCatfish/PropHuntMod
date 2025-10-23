@@ -11,7 +11,9 @@ using System.ComponentModel;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static PropHuntMod.Logging.Logging;
+using HutongGames.PlayMaker.Actions;
 
 /**
  * FEATURE LIST
@@ -47,10 +49,10 @@ namespace PropHuntMod
 
         private void Update()
         {
-            //if (hornet.hornet != null)
-            //{
-            //    hornet.EnsureHornetHidden();
-            //}
+            if (hornet.hornet != null)
+            {
+                hornet.EnsureHornetHidden();
+            }
             // TOGGLE VISIBILITY
             if (Input.GetKeyDown(KeyCode.H))
             {
@@ -106,6 +108,14 @@ namespace PropHuntMod
         {
 			__instance.enabled = false;
 			return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof (SceneLoad), "Begin")]
+        public static void OnSceneChange(SceneLoad __instance)
+        {
+            cover.DisableProp(hornet);
+            TempLog($"Changing scene to {__instance.TargetSceneName}");
         }
 	}
 }
