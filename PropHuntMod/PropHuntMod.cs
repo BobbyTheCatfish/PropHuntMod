@@ -31,10 +31,13 @@ namespace PropHuntMod
     
         static HornetManager hornet = new HornetManager();
         static CoverManager cover = new CoverManager();
+        private static ModConfiguration config = new ModConfiguration();
 
         private void Awake()
         {
+            
             TempLog("Prop Hunt Loaded.");
+            config.LoadConfig(Config);
             Harmony.CreateAndPatchAll(typeof(PropHuntMod), null);
         }
 
@@ -45,23 +48,23 @@ namespace PropHuntMod
                 hornet.EnsureHornetHidden();
             }
             // TOGGLE VISIBILITY
-            if (Input.GetKeyDown(KeyCode.H))
+            if (Input.GetKeyDown(config.hideHornetKey.Value))
             {
 				hornet.SetHornet();
 				hornet.ToggleHornet();
             }
             // SET PROP
-            if (Input.GetKeyDown(KeyCode.P))
+            if (Input.GetKeyDown(config.swapPropKey.Value))
             {
                 hornet.SetHornet();
                 cover.EnableProp(hornet);
             }
-            if (Input.GetKeyDown(KeyCode.R))
+            if (Input.GetKeyDown(config.resetKey.Value))
             {
                 cover.DisableProp(hornet);
             }
 
-            float distance = Input.GetKey(KeyCode.LeftShift) ? 0.1f : 0.01f;
+            float distance = Input.GetKey(KeyCode.LeftAlt) ? 0.1f : 0.01f;
 
             cover.MoveProp(Direction.Down, KeyCode.Keypad2);
             cover.MoveProp(Direction.Left, KeyCode.Keypad4);
@@ -76,6 +79,8 @@ namespace PropHuntMod
 		[HarmonyPatch(typeof(HeroController), "TakeDamage")]
 		public static void TakeDamage(HeroController __instance, GameObject go, CollisionSide damageSide, ref int damageAmount, HazardType hazardType, DamagePropertyFlags damagePropertyFlags = DamagePropertyFlags.None)
         {
+            if (!config.disableDamage.Value) return;
+
             //if (go.name == "Bone Goomba") // Used for testing
             if (go.tag == "Player" && cover != null)
             {
@@ -93,15 +98,23 @@ namespace PropHuntMod
         [HarmonyPatch(typeof(AlertRange), "OnEnable")]
         public static bool OnEnable(AlertRange __instance)
         {
-            __instance.enabled = false;
-            return true;
+            if (config.disableDamage.Value)
+            {
+                __instance.enabled = false;
+                return true;
+            }
+            return false;
         }
 		[HarmonyPrefix]
 		[HarmonyPatch(typeof(AlertRange), "Awake")]
 		public static bool Awake(AlertRange __instance)
         {
-			__instance.enabled = false;
-			return true;
+            if (config.disableDamage.Value)
+            {
+			    __instance.enabled = false;
+			    return true;
+            }
+            return false;
         }
 
         [HarmonyPrefix]

@@ -90,6 +90,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration.cs" />
     <Compile Include="Keybinds\HornetManager.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Keybinds\CoverManager.cs" />
