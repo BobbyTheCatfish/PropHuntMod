@@ -64,8 +64,6 @@ namespace PropHuntMod
                 cover.DisableProp(hornet);
             }
 
-            float distance = Input.GetKey(KeyCode.LeftAlt) ? 0.1f : 0.01f;
-
             cover.MoveProp(Direction.Down, KeyCode.Keypad2);
             cover.MoveProp(Direction.Left, KeyCode.Keypad4);
             cover.MoveProp(Direction.Right, KeyCode.Keypad6);

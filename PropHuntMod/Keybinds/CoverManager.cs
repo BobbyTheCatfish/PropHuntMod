@@ -15,7 +15,7 @@ namespace PropHuntMod.Keybinds
         NoRepeat<GameObject> applicableCovers;
         public void MoveProp(Direction direction, KeyCode key)
         {
-            float distance = Input.GetKeyDown(KeyCode.LeftAlt) ? 0.01f : 0.1f;
+            float distance = Input.GetKey(KeyCode.LeftAlt) ? 0.01f : 0.1f;
             if (!Input.GetKey(key)) return;
 
             if (!cover)
