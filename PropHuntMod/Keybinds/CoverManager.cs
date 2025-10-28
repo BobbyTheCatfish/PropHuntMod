@@ -27,6 +27,7 @@ namespace PropHuntMod.Keybinds
             var x = cover.transform.position.x;
             var y = cover.transform.position.y;
             var z = cover.transform.position.z;
+
             if (direction == Direction.Left) x -= distance;
             else if (direction == Direction.Right) x += distance;
             else if (direction == Direction.Up) y += distance;
@@ -110,7 +111,7 @@ namespace PropHuntMod.Keybinds
             {
                 if (
                     HasScript(gameObject)
-                    || (gameObject.name.ToLower().Contains("pilgrim"))
+                    //|| (gameObject.name.ToLower().Contains("pilgrim"))
                     || (gameObject.name.ToLower().Contains("corpse"))
                     // || gameObject.layer == 19
                     || gameObject.tag == "RespawnPoint"

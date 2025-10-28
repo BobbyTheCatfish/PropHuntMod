@@ -90,6 +90,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AttackCooldown.cs" />
     <Compile Include="ModConfiguration.cs" />
     <Compile Include="Keybinds\HornetManager.cs" />
     <Compile Include="Logging.cs" />

@@ -32,6 +32,7 @@ namespace PropHuntMod
         static HornetManager hornet = new HornetManager();
         static CoverManager cover = new CoverManager();
         private static ModConfiguration config = new ModConfiguration();
+        private static AttackCooldownPatches attackPatches = new AttackCooldownPatches(config);
 
         private void Awake()
         {
@@ -39,6 +40,7 @@ namespace PropHuntMod
             TempLog("Prop Hunt Loaded.");
             config.LoadConfig(Config);
             Harmony.CreateAndPatchAll(typeof(PropHuntMod), null);
+            //Harmony.CreateAndPatchAll(typeof(AttackCooldownPatches), null);
         }
 
         private void Update()
@@ -115,6 +117,7 @@ namespace PropHuntMod
             return false;
         }
 
+        // Disable prop on scene change
         [HarmonyPrefix]
         [HarmonyPatch(typeof (SceneLoad), "Begin")]
         public static void OnSceneChange(SceneLoad __instance)
@@ -122,5 +125,5 @@ namespace PropHuntMod
             cover.DisableProp(hornet);
             TempLog($"Changing scene to {__instance.TargetSceneName}");
         }
-	}
+    }
 }
