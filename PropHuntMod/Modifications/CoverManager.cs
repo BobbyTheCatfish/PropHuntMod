@@ -3,9 +3,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using NoRepeat;
 using static PropHuntMod.Logging.Logging;
 
-namespace PropHuntMod.Keybinds
+namespace PropHuntMod.Modifications
 {
     enum Direction { Left, Right, Up, Down, Front, Back };
     internal class CoverManager

@@ -2,7 +2,7 @@
 using UnityEngine;
 using static PropHuntMod.Logging.Logging;
 
-namespace PropHuntMod.Keybinds
+namespace PropHuntMod.Modifications
 {
     public class HornetManager
     {

@@ -2,7 +2,7 @@
 using BepInEx.Logging;
 using GlobalEnums;
 using HarmonyLib;
-using PropHuntMod.Keybinds;
+using PropHuntMod.Modifications;
 using UnityEngine;
 using static PropHuntMod.Logging.Logging;
 

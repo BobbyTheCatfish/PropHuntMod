@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics;
 using static PropHuntMod.Logging.Logging;
 
-namespace PropHuntMod
+namespace PropHuntMod.Modifications
 {
     internal class AttackCooldownPatches
     {
