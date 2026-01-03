@@ -44,6 +44,11 @@ namespace PropHuntMod.Modifications
             cover.transform.position = new Vector3(x, y, z);
         }
 
+        public bool IsCovered()
+        {
+            return cover != null;
+        }
+
         public void DisableProp(HornetManager manager)
         {
             GameObject.Destroy(cover);

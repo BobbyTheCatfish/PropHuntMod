@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PropHuntMod</RootNamespace>
     <AssemblyName>PropHuntMod</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,6 +43,16 @@
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\core\BepInEx.dll</HintPath>
+    </Reference>
+    <Reference Include="com.rlabrecque.steamworks.net, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\com.rlabrecque.steamworks.net.dll</HintPath>
+    </Reference>
+    <Reference Include="CrowdControl">
+      <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\CrowdControl\CrowdControl.dll</HintPath>
+    </Reference>
+    <Reference Include="SilksongMultiplayer">
+      <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\XvX\SilksongMultiplayer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -90,15 +101,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AttackCooldown.cs" />
-    <Compile Include="ModConfiguration.cs" />
-    <Compile Include="Keybinds\HornetManager.cs" />
-    <Compile Include="Logging.cs" />
-    <Compile Include="Keybinds\CoverManager.cs" />
-    <Compile Include="NoRepeat.cs" />
+    <Compile Include="Modifications\AttackCooldown.cs" />
+    <Compile Include="Modifications\NoDamage.cs" />
+    <Compile Include="Utils\ModConfiguration.cs" />
+    <Compile Include="Modifications\HornetManager.cs" />
+    <Compile Include="Utils\Logging.cs" />
+    <Compile Include="Modifications\CoverManager.cs" />
+    <Compile Include="Utils\Networking.cs" />
+    <Compile Include="Utils\NoRepeat.cs" />
     <Compile Include="PropHuntMod.cs" />
     <Content Include="PropHuntModOld.txt" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="Steamworks.NET.dll" />
+    <Content Include="steam_api64.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

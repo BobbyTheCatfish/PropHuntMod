@@ -29,7 +29,7 @@ namespace PropHuntMod
     [BepInProcess("Hollow Knight Silksong.exe")]
     public class PropHuntMod : BaseUnityPlugin
     {
-    
+        bool packetsPatched = false;
         static HornetManager hornet = new HornetManager();
         static CoverManager cover = new CoverManager();
         private static ModConfiguration config = new ModConfiguration();
@@ -49,6 +49,11 @@ namespace PropHuntMod
 
         private void Update()
         {
+            if (!packetsPatched)
+            {
+                Harmony.CreateAndPatchAll(typeof(Utils.Networking.PacketReciept), null);
+                packetsPatched = true;
+            }
             if (hornet.hornet != null)
             {
                 hornet.EnsureHornetHidden();
@@ -85,6 +90,17 @@ namespace PropHuntMod
         {
             cover.DisableProp(hornet);
             TempLog($"Changing scene to {__instance.TargetSceneName}");
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof (Breakable), "Break")]
+        public static void OnBreak(Breakable __instance)
+        {
+            if (hornet == null) return;
+            if (__instance.transform.parent.gameObject.name != hornet.hornet.name && !cover.IsCovered())
+            {
+                hornet.hornet.GetComponent<HeroController>().DamageSelf(1);
+            }
         }
     }
 }
