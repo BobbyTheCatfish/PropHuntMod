@@ -4,7 +4,8 @@ using GlobalEnums;
 using HarmonyLib;
 using PropHuntMod.Modifications;
 using UnityEngine;
-using static PropHuntMod.Logging.Logging;
+using Steamworks;
+using System.Collections.Generic;
 
 /**
  * FEATURE LIST
@@ -29,17 +30,21 @@ namespace PropHuntMod
     [BepInProcess("Hollow Knight Silksong.exe")]
     public class PropHuntMod : BaseUnityPlugin
     {
+        internal static ManualLogSource Log;
+
         bool packetsPatched = false;
-        static HornetManager hornet = new HornetManager();
-        static CoverManager cover = new CoverManager();
+        internal static HornetManager hornet = new HornetManager();
+        internal static CoverManager cover = new CoverManager();
         private static ModConfiguration config = new ModConfiguration();
         //private static AttackCooldownPatches attackPatches = new AttackCooldownPatches(config);
         private static NoDamage noDamage = new NoDamage(config, cover);
+        internal static Dictionary<CSteamID, PlayerManager> playerManager = new Dictionary<CSteamID, PlayerManager>();
+        static HeroController heroController;
 
         private void Awake()
         {
-            
-            TempLog("Prop Hunt Loaded.");
+            Log = base.Logger;
+            Log.LogInfo("Prop Hunt Loaded.");
             config.LoadConfig(Config);
             Harmony.CreateAndPatchAll(typeof(PropHuntMod), null);
             Harmony.CreateAndPatchAll(typeof(NoDamage), null);
@@ -51,6 +56,7 @@ namespace PropHuntMod
         {
             if (!packetsPatched)
             {
+                //Log.LogInfo("IS THIS WORKING???");
                 Harmony.CreateAndPatchAll(typeof(Utils.Networking.PacketReciept), null);
                 packetsPatched = true;
             }
@@ -58,6 +64,18 @@ namespace PropHuntMod
             {
                 hornet.EnsureHornetHidden();
             }
+
+            if (heroController == null)
+            {
+                heroController = FindFirstObjectByType<HeroController>();
+            }
+
+            // No keybinds if inputs are blocked
+            if (heroController != null)
+            {
+                if (heroController.IsInputBlocked()) return;
+            }
+
             // TOGGLE VISIBILITY
             if (Input.GetKeyDown(config.hideHornetKey.Value))
             {
@@ -81,6 +99,15 @@ namespace PropHuntMod
             cover.MoveProp(Direction.Up, KeyCode.Keypad8);
             cover.MoveProp(Direction.Front, KeyCode.Keypad7);
             cover.MoveProp(Direction.Back, KeyCode.Keypad9);
+
+            if (
+                !Input.GetKey(KeyCode.Keypad2) && !Input.GetKey(KeyCode.Keypad4) &&
+                !Input.GetKey(KeyCode.Keypad6) && !Input.GetKey(KeyCode.Keypad8) &&
+                !Input.GetKey(KeyCode.Keypad7) && !Input.GetKey(KeyCode.Keypad9)
+                )
+            {
+                cover.SendPropPosition();
+            }
 		}
 
         // Disable prop on scene change
@@ -89,18 +116,20 @@ namespace PropHuntMod
         public static void OnSceneChange(SceneLoad __instance)
         {
             cover.DisableProp(hornet);
-            TempLog($"Changing scene to {__instance.TargetSceneName}");
+            Log.LogInfo($"Changing scene to {__instance.TargetSceneName}");
+            cover.currentScene = __instance.TargetSceneName;
+            cover.applicableCovers = null;
         }
 
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof (Breakable), "Break")]
-        public static void OnBreak(Breakable __instance)
-        {
-            if (hornet == null) return;
-            if (__instance.transform.parent.gameObject.name != hornet.hornet.name && !cover.IsCovered())
-            {
-                hornet.hornet.GetComponent<HeroController>().DamageSelf(1);
-            }
-        }
+        //[HarmonyPrefix]
+        //[HarmonyPatch(typeof (Breakable), "Break")]
+        //public static void OnBreak(Breakable __instance)
+        //{
+        //    if (hornet == null) return;
+        //    if (__instance.transform.parent.gameObject.name != hornet.hornet.name && !cover.IsCovered())
+        //    {
+        //        hornet.hornet.GetComponent<HeroController>().DamageSelf(1);
+        //    }
+        //}
     }
 }

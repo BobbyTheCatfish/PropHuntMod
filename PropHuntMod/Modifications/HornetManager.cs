@@ -1,7 +1,6 @@
-﻿using System;
+﻿using PropHuntMod.Utils.Networking;
+using Steamworks;
 using UnityEngine;
-using PropHuntMod.Utils.Networking;
-using static PropHuntMod.Logging.Logging;
 
 namespace PropHuntMod.Modifications
 {
@@ -9,10 +8,11 @@ namespace PropHuntMod.Modifications
     {
         bool shouldBeShown;
         public GameObject hornet;
+        public CSteamID steamID;
         MeshRenderer render;
         public void ToggleHornet()
         {
-            TempLog("Toggling Hornet");
+            PropHuntMod.Log.LogInfo("Toggling Hornet");
             if (hornet == null) SetHornet();
 
             var render = hornet.GetComponent<MeshRenderer>();
@@ -31,7 +31,7 @@ namespace PropHuntMod.Modifications
             render.enabled = show;
             shouldBeShown = show;
 
-            PacketSend.SendHideStatus(!show);
+            if (!PlayerManager.IsRemotePlayer(steamID)) PacketSend.SendHideStatus(!show);
         }
 
         public void EnsureHornetHidden()
@@ -44,10 +44,20 @@ namespace PropHuntMod.Modifications
 
         public void SetHornet()
         {
-            hornet = GameObject.FindGameObjectWithTag("Player");
-            render = hornet.GetComponent<MeshRenderer>();
+            if (!PlayerManager.IsRemotePlayer(steamID))
+            {
+                hornet = GameObject.FindGameObjectWithTag("Player");
+            }
+            else
+            {
+                PropHuntMod.Log.LogInfo($"Setting hornet for {steamID}");
+                var player = PlayerManager.GetPlayerManager(steamID).playerAvatar;
+                PropHuntMod.Log.LogInfo(player.gameObject.name);
+                hornet = player.gameObject;
+            }
 
-            if (hornet == null) TempLog("Hornet not found! OH NO!");
+            if (hornet == null) PropHuntMod.Log.LogError("Hornet not found! OH NO!");
+            render = hornet.GetComponent<MeshRenderer>();
         }
     }
 }

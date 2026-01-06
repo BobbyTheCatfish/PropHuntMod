@@ -48,11 +48,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\com.rlabrecque.steamworks.net.dll</HintPath>
     </Reference>
-    <Reference Include="CrowdControl">
-      <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\CrowdControl\CrowdControl.dll</HintPath>
-    </Reference>
-    <Reference Include="SilksongMultiplayer">
-      <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\XvX\SilksongMultiplayer.dll</HintPath>
+    <Reference Include="SilksongMultiplayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\XvX\SilksongMultiplayer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -103,17 +101,15 @@
   <ItemGroup>
     <Compile Include="Modifications\AttackCooldown.cs" />
     <Compile Include="Modifications\NoDamage.cs" />
+    <Compile Include="Modifications\PlayerManager.cs" />
     <Compile Include="Utils\ModConfiguration.cs" />
     <Compile Include="Modifications\HornetManager.cs" />
-    <Compile Include="Utils\Logging.cs" />
     <Compile Include="Modifications\CoverManager.cs" />
     <Compile Include="Utils\Networking.cs" />
     <Compile Include="Utils\NoRepeat.cs" />
     <Compile Include="PropHuntMod.cs" />
     <Content Include="PropHuntModOld.txt" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Content Include="Steamworks.NET.dll" />
-    <Content Include="steam_api64.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

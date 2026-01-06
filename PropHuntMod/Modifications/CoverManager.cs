@@ -4,7 +4,8 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using NoRepeat;
-using static PropHuntMod.Logging.Logging;
+using PropHuntMod.Utils.Networking;
+using Steamworks;
 
 namespace PropHuntMod.Modifications
 {
@@ -12,8 +13,10 @@ namespace PropHuntMod.Modifications
     internal class CoverManager
     {
         GameObject cover;
-        string currentScene;
-        NoRepeat<GameObject> applicableCovers;
+        public string currentScene;
+        public CSteamID steamID;
+        public NoRepeat<GameObject> applicableCovers;
+        bool movedRecently = false;
         public void MoveProp(Direction direction, KeyCode key)
         {
             float distance = Input.GetKey(KeyCode.LeftAlt) ? 0.01f : 0.1f;
@@ -21,7 +24,7 @@ namespace PropHuntMod.Modifications
 
             if (!cover)
             {
-                TempLog("No cover");
+                PropHuntMod.Log.LogError("No cover");
                 return;
             }
 
@@ -37,11 +40,37 @@ namespace PropHuntMod.Modifications
             else if (direction == Direction.Back) z += distance;
             else
             {
-                TempLog("Invalid direction");
+                PropHuntMod.Log.LogError("Invalid direction");
                 return;
             }
 
-            cover.transform.position = new Vector3(x, y, z);
+            SetPropLocation(new Vector3(x, y, z));
+            movedRecently = true;
+        }
+
+        public void SetPropLocation(Vector3 location)
+        {
+            if (cover == null)
+            {
+                PropHuntMod.Log.LogError("No cover, can't set prop position");
+                return;
+            }
+
+            cover.transform.position = location;
+        }
+
+        public void SendPropPosition()
+        {
+            if (!movedRecently) return;
+            if (cover == null)
+            {
+                PropHuntMod.Log.LogError("No cover, can't send prop position");
+                return;
+            }
+
+            movedRecently = false;
+            PropHuntMod.Log.LogInfo($"Sending prop position {cover.transform.position}");
+            PacketSend.SendPropLocation(cover.transform.position);
         }
 
         public bool IsCovered()
@@ -51,11 +80,57 @@ namespace PropHuntMod.Modifications
 
         public void DisableProp(HornetManager manager)
         {
+            if (cover == null)
+            {
+                PropHuntMod.Log.LogError("No cover to disable");
+                return;
+            }
             GameObject.Destroy(cover);
             cover = null;
             manager.ToggleHornet(true);
-        }
 
+            if (!PlayerManager.IsRemotePlayer(steamID)) PacketSend.SendPropSwap("");
+        }
+        public void EnableProp(HornetManager hornet, GameObject cover)
+        {
+            if (cover == null)
+            {
+                PropHuntMod.Log.LogError("No valid cover found");
+                return;
+            }
+
+            var transform = hornet.hornet.transform;
+            this.cover = GameObject.Instantiate(cover, transform.position, transform.rotation, transform);
+            PropHuntMod.Log.LogInfo($"{this.cover.name} - {this.cover.layer} - {this.cover.activeInHierarchy}");
+
+
+            var scripts = this.cover.GetComponentsInChildren<MonoBehaviour>();
+            foreach (var component in scripts)
+            {
+                if (component.GetType() != typeof(tk2dSprite) && component.GetType() != typeof(tk2dSpriteAnimator))
+                {
+                    //PropHuntMod.Log.LogInfo(component.tag);
+                    Component.Destroy(component);
+                }
+            }
+
+            var colliders = this.cover.GetComponentsInChildren<Collider2D>();
+            foreach (var component in colliders)
+            {
+                Component.Destroy(component);
+            }
+
+            var physics = this.cover.GetComponentsInChildren<Rigidbody2D>();
+            foreach (var collider in physics)
+            {
+                Component.Destroy(collider);
+            }
+
+            if (!PlayerManager.IsRemotePlayer(steamID)) PacketSend.SendPropSwap(this.cover.name);
+
+            //cover.transform.SetPositionZ(existing.transform.position.z);
+            hornet.ToggleHornet(false);
+        }
         public void EnableProp(HornetManager hornet)
         {
             if (cover)
@@ -64,48 +139,13 @@ namespace PropHuntMod.Modifications
                 cover = null;
             }
 
-            var sceneName = SceneManager.GetActiveScene().name;
-            if (currentScene != sceneName || applicableCovers == null)
+            if (applicableCovers == null)
             {
-                currentScene = sceneName;
                 applicableCovers = new NoRepeat<GameObject>(GetAllProps());
             }
 
-            var transform = hornet.hornet.transform;
-            var existing = applicableCovers.GetRandom();
-            if (existing == null)
-            {
-                TempLog("No valid cover found");
-                return;
-            }
-            cover = GameObject.Instantiate(existing, transform.position, transform.rotation, transform);
-            TempLog($"{cover.name} - {cover.layer} - {cover.activeInHierarchy}");
-
-            
-            var scripts = cover.GetComponentsInChildren<MonoBehaviour>();
-            foreach (var component in scripts)
-            {
-                if (component.GetType() != typeof(tk2dSprite) && component.GetType() != typeof(tk2dSpriteAnimator))
-                {
-                    TempLog(component.tag);
-                    Component.Destroy(component);
-                }
-            }
-
-            var colliders = cover.GetComponentsInChildren<Collider2D>();
-            foreach (var component in colliders)
-            {
-                Component.Destroy(component);
-            }
-
-            var physics = cover.GetComponentsInChildren<Rigidbody2D>();
-            foreach (var collider in physics)
-            {
-                Component.Destroy(collider);
-            }
-
-            //cover.transform.SetPositionZ(existing.transform.position.z);
-            hornet.ToggleHornet(false);
+            var newCover = applicableCovers.GetRandom();
+            EnableProp(hornet, newCover);
         }
 
         private int[] invalidLayers = { 11, 17 };
@@ -123,7 +163,7 @@ namespace PropHuntMod.Modifications
                     || gameObject.tag == "RespawnPoint"
                 )
                 {
-                    TempLog($"{gameObject.name} - {gameObject.layer} MAYBE");
+                    //PropHuntMod.Log.LogInfo($"{gameObject.name} - {gameObject.layer} MAYBE");
                     var renderer = gameObject.GetComponent<SpriteRenderer>();
                     if (
                         ((renderer && renderer.enabled) || gameObject.GetComponent<tk2dSprite>())
@@ -132,7 +172,7 @@ namespace PropHuntMod.Modifications
                         && !Regex.IsMatch(gameObject.name, "\\(\\d+\\) ?(\\(Clone\\))?$")
                     )
                     {
-                        TempLog($"{gameObject.name} - {gameObject.layer} YES");
+                        //PropHuntMod.Log.LogInfo($"{gameObject.name} - {gameObject.layer} YES");
                         props.Add(gameObject);
                     }
                 }
