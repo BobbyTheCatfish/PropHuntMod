@@ -95,12 +95,13 @@ namespace PropHuntMod
                 cover.DisableProp(hornet);
             }
 
-            cover.MoveProp(Direction.Down, KeyCode.Keypad2);
-            cover.MoveProp(Direction.Left, KeyCode.Keypad4);
-            cover.MoveProp(Direction.Right, KeyCode.Keypad6);
-            cover.MoveProp(Direction.Up, KeyCode.Keypad8);
-            cover.MoveProp(Direction.Front, KeyCode.Keypad7);
-            cover.MoveProp(Direction.Back, KeyCode.Keypad9);
+            cover.MoveOwnProp(Direction.Down, KeyCode.Keypad2);
+            cover.MoveOwnProp(Direction.Left, KeyCode.Keypad4);
+            cover.MoveOwnProp(Direction.Right, KeyCode.Keypad6);
+            cover.MoveOwnProp(Direction.Up, KeyCode.Keypad8);
+            cover.MoveOwnProp(Direction.Front, KeyCode.Keypad7);
+            cover.MoveOwnProp(Direction.Back, KeyCode.Keypad9);
+            cover.MoveOwnProp(Direction.Reset, KeyCode.Keypad5);
 
             if (
                 !Input.GetKey(KeyCode.Keypad2) && !Input.GetKey(KeyCode.Keypad4) &&
