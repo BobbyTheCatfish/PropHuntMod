@@ -27,11 +27,11 @@ namespace PropHuntMod.Modifications
             if (!config.disableDamage.Value) return;
 
             //if (go.name == "Bone Goomba") // Used for testing
-            if (go.tag == "Player" && cover != null)
+            /*if (go.tag == "Player" && cover.IsCovered())
             {
                 damageAmount = 9000;
             }
-            else if (hazardType == HazardType.ENEMY)
+            else*/ if (hazardType == HazardType.ENEMY)
             {
                 damageAmount = 0;
             }
