@@ -13,6 +13,7 @@ namespace PropHuntMod.Modifications
     {
         static ModConfiguration config;
         static CoverManager cover;
+        static readonly bool INSTA_KILL = false;
         public NoDamage(ModConfiguration configuration, CoverManager coverManager)
         {
             config = configuration;
@@ -27,11 +28,11 @@ namespace PropHuntMod.Modifications
             if (!config.disableDamage.Value) return;
 
             //if (go.name == "Bone Goomba") // Used for testing
-            /*if (go.tag == "Player" && cover.IsCovered())
+            if (go.tag == "Player" && cover.IsCovered() && INSTA_KILL)
             {
                 damageAmount = 9000;
             }
-            else*/ if (hazardType == HazardType.ENEMY)
+            else if (hazardType == HazardType.ENEMY)
             {
                 damageAmount = 0;
             }
