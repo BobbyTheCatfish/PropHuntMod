@@ -102,6 +102,25 @@ namespace PropHuntMod.Utils.Networking
 
             PropHuntMod.Log.LogInfo($"{senderID} hiding status set to {isHiding}");
         }
+        
+        private static void HandlePropFound(byte[] data, CSteamID senderID, int offset)
+        {
+            ulong rawTargetID = PacketDeserializer.ReadULong(data, ref offset);
+            var targetID = new CSteamID(rawTargetID);
+
+            PropHuntMod.Log.LogInfo(SteamUser.GetSteamID());
+
+            if (targetID == SteamUser.GetSteamID())
+            {
+                Debug.Log("I've been found!");
+                PropHuntMod.cover.DisableProp(PropHuntMod.hornet);
+            }
+            else
+            {
+                PropHuntMod.Log.LogInfo("Someone else has been found");
+            }
+        }
+
     }
 
     public static class PacketSend
@@ -128,6 +147,12 @@ namespace PropHuntMod.Utils.Networking
             );
         }
 
+        public static void SendPropFound(CSteamID propOwner)
+        {
+            CustomPacketHandlers.propFound.SendPacket(
+                PacketSerializer.SerializeULong(propOwner.m_SteamID)
+            );
+        }
     }
 
 }

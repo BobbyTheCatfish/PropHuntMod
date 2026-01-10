@@ -111,6 +111,8 @@ namespace PropHuntMod
             {
                 cover.SendPropPosition();
             }
+
+            if (Input.GetKeyDown(KeyCode.Slash)) cover.ViewCoverComponents();
 		}
 
         // Disable prop on scene change

@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using NoRepeat;
 using PropHuntMod.Utils.Networking;
 using Steamworks;
@@ -95,16 +94,19 @@ namespace PropHuntMod.Modifications
             return cover != null;
         }
 
-        public void DisableProp(HornetManager manager)
+        public void DisableProp(HornetManager manager, bool logOnFail = true)
         {
             if (cover == null)
             {
-                PropHuntMod.Log.LogError("No cover to disable");
+                if (logOnFail) PropHuntMod.Log.LogError("No cover to disable");
                 return;
             }
             GameObject.Destroy(cover);
             cover = null;
             manager.ToggleHornet(true);
+
+            string username = SteamFriends.GetPersonaName();
+            NetworkDataSender.SendGlobalSystemChatMessage($"{username} was revealed!");
 
             if (!PlayerManager.IsRemotePlayer(steamID)) PacketSend.SendPropSwap("");
         }
@@ -115,47 +117,142 @@ namespace PropHuntMod.Modifications
                 PropHuntMod.Log.LogError("No valid cover found");
                 return;
             }
+            
+            if (this.cover != null)
+            {
+                PropHuntMod.Log.LogWarning("Destroying cover...");
+                GameObject.Destroy(this.cover);
+                this.cover = null;
+            }
+            else if (!PlayerManager.IsRemotePlayer(steamID))
+            {
+                PropHuntMod.Log.LogInfo("Sending hiding message");
+                string username = SteamFriends.GetPersonaName();
+                NetworkDataSender.SendGlobalSystemChatMessage($"{username} has hidden!");
+            }
+
+            if (hornet.hornet == null) hornet.SetHornet();
+            if (hornet.hornet == null)
+            {
+                PropHuntMod.Log.LogError($"No hornet found for {steamID}");
+            }
 
             var transform = hornet.hornet.transform;
-            this.cover = GameObject.Instantiate(cover, transform.position, transform.rotation, transform);
+
+            try
+            {
+                PropHuntMod.Log.LogInfo("Creating prop");
+                this.cover = GameObject.Instantiate(cover, transform.position, transform.rotation, transform);
+                this.cover.layer = (int)PhysLayers.HERO_BOX;
+                hornet.ToggleHornet(false);
+            }
+            catch
+            {
+                PropHuntMod.Log.LogError("Ran into an error instantiating cover. Was the cover a bench lol?");
+            }
             PropHuntMod.Log.LogInfo($"{this.cover.name} - {this.cover.layer} - {this.cover.activeInHierarchy}");
 
+            System.Type[] allowedTypes =
+            {
+                typeof(Transform),
+                typeof(MeshFilter),
+                typeof(Renderer),
+                typeof(MeshRenderer),
+                typeof(SpriteRenderer),
+                typeof(tk2dSprite),
+                typeof(tk2dSpriteAnimator),
+                typeof(tk2dSpriteAnimation),
+                typeof(tk2dSpriteAnimationClip),
+                typeof(tk2dSpriteAnimationFrame),
+                typeof(tk2dLookAnimNPC),
+                //typeof(AudioSource)
+            };
 
             var scripts = this.cover.GetComponentsInChildren<MonoBehaviour>();
             foreach (var component in scripts)
             {
-                if (component.GetType() != typeof(tk2dSprite) && component.GetType() != typeof(tk2dSpriteAnimator))
+                System.Type type = component.GetType();
+                if (!allowedTypes.Any((t) => type == t))
                 {
-                    //PropHuntMod.Log.LogInfo(component.tag);
+                    PropHuntMod.Log.LogInfo(component + " removed");
                     Component.Destroy(component);
                 }
             }
 
-            var colliders = this.cover.GetComponentsInChildren<Collider2D>();
-            foreach (var component in colliders)
+            void RemoveComponents<T>(bool keepOnParent = false) where T : Component
             {
-                Component.Destroy(component);
+                var components = this.cover.GetComponentsInChildren<T>();
+                foreach (var component in components)
+                {
+                    PropHuntMod.Log.LogInfo(component + " removed");
+                    if (keepOnParent && component.gameObject != this.cover.gameObject) Component.Destroy(component);
+                }
             }
 
-            var physics = this.cover.GetComponentsInChildren<Rigidbody2D>();
-            foreach (var collider in physics)
+            RemoveComponents<Collider2D>();
+            RemoveComponents<Rigidbody2D>(true);
+
+            var children = this.cover.GetComponentsInChildren<Transform>();
+            foreach (var component in children)
             {
-                Component.Destroy(collider);
+                if (!component.GetComponentInChildren<Renderer>() && !component.GetComponentInChildren<ParticleSystem>())
+                {
+                    PropHuntMod.Log.LogInfo(component.gameObject + " GO removed");
+
+                    component.gameObject.GetComponents<Component>().ToList().ForEach((Component c) =>
+                    {
+                        PropHuntMod.Log.LogInfo(c);
+                    });
+                    GameObject.Destroy(component.gameObject);
+
+                }
             }
 
-            if (!PlayerManager.IsRemotePlayer(steamID)) PacketSend.SendPropSwap(this.cover.name);
 
-            //cover.transform.SetPositionZ(existing.transform.position.z);
-            hornet.ToggleHornet(false);
+            Renderer[] renderers = this.cover.GetComponentsInChildren<Renderer>();
+            if (renderers == null || renderers.Length == 0)
+            {
+                PropHuntMod.Log.LogError("No renderers found");
+            }
+            else
+            {
+                Bounds combinedBounds = renderers[0].bounds;
+
+                for (int i = 1; i < renderers.Length; i++)
+                {
+                    combinedBounds.Encapsulate(renderers[i].bounds);
+                }
+
+                var collider = this.cover.AddComponent<BoxCollider2D>();
+                PropHuntMod.Log.LogInfo($"Added collider {collider}");
+                collider.isTrigger = true;
+
+                collider.offset = this.cover.transform.InverseTransformPoint(combinedBounds.center);
+                collider.size = combinedBounds.size;
+
+                var body = this.cover.AddComponentIfNotPresent<Rigidbody2D>();
+                body.bodyType = RigidbodyType2D.Kinematic;
+
+                var t = this.cover.AddComponent<TriggerHandler>();
+                t.steamID = steamID;
+            }
+
+            if (!PlayerManager.IsRemotePlayer(steamID)) PacketSend.SendPropSwap(cover.name);
+        }
+
+        public void ViewCoverComponents()
+        {
+            if (this.cover == null)
+            {
+                PropHuntMod.Log.LogInfo("No cover found");
+            }
+            foreach (var component in this.cover.GetComponentsInChildren<Component>())
+            {
+                PropHuntMod.Log.LogInfo(component);
+            }
         }
         public void EnableProp(HornetManager hornet)
         {
-            if (cover)
-            {
-                GameObject.Destroy(cover);
-                cover = null;
-            }
-
             if (applicableCovers == null)
             {
                 applicableCovers = new NoRepeat<GameObject>(GetAllProps());
@@ -208,6 +305,81 @@ namespace PropHuntMod.Modifications
                 || obj.GetComponent<PushableRubble>()
                 || obj.GetComponent<GrassCut>()
             );
+        }
+
+        public void OnHit()
+        {
+            if (!PlayerManager.IsRemotePlayer(steamID))
+            {
+                PropHuntMod.Log.LogInfo("UH OH! ON HIT IS SUPPOSED TO BE A REMOTE PLAYER!");
+                return;
+            }
+            else
+            {
+                DisableProp(PlayerManager.GetPlayerManager(steamID).hornetManager);
+                PropHuntMod.Log.LogInfo($"Found {steamID}");
+                PacketSend.SendPropFound(steamID);
+                return;
+            }
+            
+        }
+    }
+
+    class TriggerHandler : MonoBehaviour
+    {
+        public CSteamID steamID;
+        void Awake()
+        {
+            Debug.Log("Hey, i'm on!");
+        }
+        //void OnCollisionEnter2D(Collision2D other)
+        //{
+        //    if (!PlayerManager.IsRemotePlayer(steamID))
+        //    {
+        //        PropHuntMod.Log.LogInfo($"own collider");
+        //    }
+        //    PropHuntMod.Log.LogInfo($"{other.collider.name} - {other.collider.tag}");
+        //    if (other.collider.tag == "Nail Attack")
+        //    {
+        //        PlayerManager.GetPlayerManager(steamID).coverManager.OnHit();
+        //    }
+        //}
+
+        void OnTriggerEnter2D(Collider2D other)
+        {
+            if (!PlayerManager.IsRemotePlayer(steamID))
+            {
+                PropHuntMod.Log.LogInfo($"own collider");
+                PropHuntMod.Log.LogInfo($"{other.name} - {other.tag}");
+                return;
+            }
+            PropHuntMod.Log.LogInfo($"{other.name} - {other.tag}");
+            if (other.tag == "Nail Attack")
+            {
+                PlayerManager.GetPlayerManager(steamID).coverManager.OnHit();
+            }
+        }
+
+        //void OnTriggerStay2D(Collider2D coll)
+        //{
+        //    Debug.Log(coll.gameObject.name);
+        //}
+        void Update()
+        {
+
+
+            BoxCollider2D col = GetComponent<BoxCollider2D>();
+            Bounds b = col.bounds;
+
+            Vector3 bl = new Vector3(b.min.x, b.min.y);
+            Vector3 br = new Vector3(b.max.x, b.min.y);
+            Vector3 tr = new Vector3(b.max.x, b.max.y);
+            Vector3 tl = new Vector3(b.min.x, b.max.y);
+
+            Debug.DrawLine(bl, br, Color.red);
+            Debug.DrawLine(br, tr, Color.red);
+            Debug.DrawLine(tr, tl, Color.red);
+            Debug.DrawLine(tl, bl, Color.red);
         }
     }
 }
