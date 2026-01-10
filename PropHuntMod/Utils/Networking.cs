@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using UnityEngine;
 using PropHuntMod.Modifications;
+using System.Text.RegularExpressions;
 
 namespace PropHuntMod.Utils.Networking
 {
@@ -14,44 +15,22 @@ namespace PropHuntMod.Utils.Networking
         public const int PropSwap = 99;
         public const int PropLocation = 98;
         public const int HideStatus = 97;
+        public const int PropFound = 96;
     }
 
-    [HarmonyPatch(typeof (NetworkDataReceiver), "ProcessPacket")]
-    class PacketReciept
+    static class CustomPacketHandlers
     {
-        //public static MethodBase TargetMethod()
-        //{
-        //    NetworkDataReceiver
-        //    var type = AccessTools.TypeByName("SilksongMultiplayer.NetworkDataReceiver");
-        //    PropHuntMod.Log.LogInfo("Patching SilksongMultiplayer.NetworkDataReceiver");
-        //    return AccessTools.Method(type, "ProcessPacket");
-        //}
+        public readonly static NetworkCustomPacket propSwap = new NetworkCustomPacket(CustomPackets.PropSwap, HandlePropSwap);
+        public readonly static NetworkCustomPacket propLocation = new NetworkCustomPacket(CustomPackets.PropLocation, HandlePropLocation);
+        public readonly static NetworkCustomPacket hideStatus = new NetworkCustomPacket(CustomPackets.HideStatus, HandleHideStatus);
+        public readonly static NetworkCustomPacket propFound = new NetworkCustomPacket(CustomPackets.PropFound, HandlePropFound);
 
-        public static void Prefix(byte[] data, CSteamID senderID)
+        public static void Init()
         {
-            int offset = 0;
-            
-            int packetType = PacketDeserializer.ReadByte(data, ref offset);
-
-            //PropHuntMod.Log.LogInfo(senderID);
-
-            switch(packetType)
-            {
-                case CustomPackets.PropSwap:
-                    PropHuntMod.Log.LogInfo("PROP SWAP PACKET RECEIVED");
-                    HandlePropSwap(data, senderID, ref offset);
-                    break;
-                case CustomPackets.PropLocation:
-                    PropHuntMod.Log.LogInfo("PROP LOCATION PACKET RECEIVED");
-                    HandlePropLocation(data, senderID, ref offset);
-                    break;
-                case CustomPackets.HideStatus:
-                    PropHuntMod.Log.LogInfo("HIDE STATUS PACKET RECEIVED");
-                    HandleHideStatus(data, senderID, ref offset);
-                    break;
-
-                default: break;
-            }
+            SilksongMultiplayerAPI.AddCustomPacket(propSwap);
+            SilksongMultiplayerAPI.AddCustomPacket(propLocation);
+            SilksongMultiplayerAPI.AddCustomPacket(hideStatus);
+            SilksongMultiplayerAPI.AddCustomPacket(propFound);
         }
 
         public static PlayerManager GetPlayerManager(CSteamID steamID)
@@ -66,17 +45,17 @@ namespace PropHuntMod.Utils.Networking
 
             return player;
         }
-        private static bool IsHostInSameRoom(CSteamID steamID)
+        internal static bool IsHostInSameRoom(CSteamID steamID)
         {
-            SilksongMultiplayerAPI.playerSceneMap.TryGetValue(steamID, out var room);
-            bool result = room == PropHuntMod.cover.currentScene;
+            SilksongMultiplayerAPI.remotePlayers.TryGetValue(steamID, out var room);
+            bool result = room.mapName == PropHuntMod.cover.currentScene;
 
             if (result) PropHuntMod.Log.LogInfo($"{steamID} is in the same room");
             else PropHuntMod.Log.LogInfo($"{steamID} is in room {room}, you are in {PropHuntMod.cover.currentScene}");
 
-                return result;
+            return result;
         }
-        private static void HandlePropSwap(byte[] data, CSteamID senderID, ref int offset)
+        private static void HandlePropSwap(byte[] data, CSteamID senderID, int offset)
         {
             string cloneOriginalName = PacketDeserializer.ReadString(data, ref offset);
             PropHuntMod.Log.LogInfo($"{senderID} hiding as {cloneOriginalName}");
@@ -86,34 +65,20 @@ namespace PropHuntMod.Utils.Networking
             if (cloneOriginalName == "")
             {
                 player.currentCoverObjName = null;
-                if (IsHostInSameRoom(senderID)) player.coverManager.DisableProp(player.hornetManager);
             }
             else
             {
                 player.currentCoverObjName = cloneOriginalName;
-                if (IsHostInSameRoom(senderID))
-                {
-                    var toClone = GameObject.Find(cloneOriginalName);
-                    if (toClone == null)
-                    {
-                        PropHuntMod.Log.LogError($"Unable to find GameObject {cloneOriginalName} for {senderID}");
-                        return;
-                    }
-                    player.coverManager.EnableProp(player.hornetManager, toClone);
-                }
             }
-
-
-
+            player.EnsurePropCover();
         }
-
-        private static void HandlePropLocation(byte[] data, CSteamID senderID, ref int offset)
+        private static void HandlePropLocation(byte[] data, CSteamID senderID, int offset)
         {
             Vector3 propPosition = PacketDeserializer.ReadVector3(data, ref offset);
             PlayerManager player = GetPlayerManager(senderID);
 
             player.currentCoverObjLocation = propPosition;
-            
+
             if (IsHostInSameRoom(senderID))
             {
                 player.coverManager.SetPropLocation(propPosition);
@@ -122,9 +87,10 @@ namespace PropHuntMod.Utils.Networking
             PropHuntMod.Log.LogInfo($"{senderID} prop moved to {propPosition}");
         }
 
-        private static void HandleHideStatus(byte[] data, CSteamID senderID, ref int offset)
+        private static void HandleHideStatus(byte[] data, CSteamID senderID, int offset)
         {
             bool isHiding = PacketDeserializer.ReadBool(data, ref offset);
+            PropHuntMod.Log.LogWarning($"HIDING: {isHiding}");
             PlayerManager player = GetPlayerManager(senderID);
 
             player.currentHideState = isHiding;
@@ -141,39 +107,25 @@ namespace PropHuntMod.Utils.Networking
     public static class PacketSend
     {
 
-        private static void SendData(byte[] data, string packetName)
-        {
-            PropHuntMod.Log.LogInfo($"Sending {packetName} packet");
-            NetworkDataSender.Broadcast(data, EP2PSend.k_EP2PSendReliable);
-        }
-
         public static void SendPropSwap(string cloneOriginalName)
         {
-            byte[] data = PacketSerializer.Combine(
-                PacketSerializer.SerializeByte(CustomPackets.PropSwap),
+            CustomPacketHandlers.propSwap.SendPacket(
                 PacketSerializer.SerializeString(cloneOriginalName)
             );
-            SendData(data, "prop swap");
         }
 
         public static void SendHideStatus(bool hiding)
         {
-            byte[] data = PacketSerializer.Combine(
-                PacketSerializer.SerializeByte(CustomPackets.HideStatus),
+            CustomPacketHandlers.hideStatus.SendPacket(
                 PacketSerializer.SerializeBool(hiding)
             );
-
-            SendData(data, "hide status");
         }
 
         public static void SendPropLocation(Vector3 location)
         {
-            byte[] data = PacketSerializer.Combine(
-                PacketSerializer.SerializeByte(CustomPackets.PropLocation),
+            CustomPacketHandlers.propLocation.SendPacket(
                 PacketSerializer.SerializeVector3(location)
             );
-
-            SendData(data, "prop location");
         }
 
     }

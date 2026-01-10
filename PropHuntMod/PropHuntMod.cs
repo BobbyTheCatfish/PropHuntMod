@@ -54,12 +54,12 @@ namespace PropHuntMod
 
         private void Update()
         {
-            if (!packetsPatched)
-            {
-                //Log.LogInfo("IS THIS WORKING???");
-                Harmony.CreateAndPatchAll(typeof(Utils.Networking.PacketReciept), null);
-                packetsPatched = true;
-            }
+            //if (!packetsPatched)
+            //{
+            //    //Log.LogInfo("IS THIS WORKING???");
+            //    //Harmony.CreateAndPatchAll(typeof(Utils.Networking.PacketReciept), null);
+            //    packetsPatched = true;
+            //}
             if (hornet.hornet != null)
             {
                 hornet.EnsureHornetHidden();
