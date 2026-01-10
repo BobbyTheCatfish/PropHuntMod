@@ -1,10 +1,6 @@
-﻿using SilksongMultiplayer;
+﻿using PropHuntMod.Utils.Networking;
+using SilksongMultiplayer;
 using Steamworks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace PropHuntMod.Modifications
@@ -18,11 +14,14 @@ namespace PropHuntMod.Modifications
         public string currentCoverObjName;
         public Vector3 currentCoverObjLocation;
         public bool currentHideState;
+        public CSteamID steamID;
+
         public PlayerManager(CSteamID steamID)
         {
             hornetManager = new HornetManager();
             coverManager = new CoverManager();
 
+            this.steamID = steamID;
             hornetManager.steamID = steamID;
             coverManager.steamID = steamID;
 
@@ -55,6 +54,38 @@ namespace PropHuntMod.Modifications
             bool isRemote = steamID.ToString() != "0" && steamID != null;
             PropHuntMod.Log.LogInfo($"isRemote: {isRemote}");
             return isRemote;
+        }
+
+        public void EnsurePropCover()
+        {
+            if (currentCoverObjName == null)
+            {
+                coverManager.DisableProp(hornetManager);
+                return;
+            }
+
+            if (CustomPacketHandlers.IsHostInSameRoom(steamID))
+            {
+                var toClone = GameObject.Find(currentCoverObjName);
+                if (toClone == null)
+                {
+                    //if (cloneOriginalName.EndsWith("(Clone)"))
+                    //{
+                    //    toClone = GameObject.Find(cloneOriginalName.Substring(0, cloneOriginalName.Length - 7));
+                    //}
+                    if (toClone == null)
+                    {
+                        PropHuntMod.Log.LogError($"Unable to find GameObject {currentCoverObjName} for {steamID}");
+                        return;
+                    }
+                }
+
+                coverManager.EnableProp(hornetManager, toClone);
+            }
+            else
+            {
+                coverManager.DisableProp(hornetManager, false);
+            }
         }
     }
 }

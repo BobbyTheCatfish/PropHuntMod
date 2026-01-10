@@ -6,6 +6,7 @@ using PropHuntMod.Modifications;
 using UnityEngine;
 using Steamworks;
 using System.Collections.Generic;
+using PropHuntMod.Utils.Networking;
 
 /**
  * FEATURE LIST
@@ -49,6 +50,7 @@ namespace PropHuntMod
             Harmony.CreateAndPatchAll(typeof(PropHuntMod), null);
             Harmony.CreateAndPatchAll(typeof(NoDamage), null);
             Harmony.CreateAndPatchAll(typeof(CoverManager), null);
+            CustomPacketHandlers.Init();
             //Harmony.CreateAndPatchAll(typeof(AttackCooldownPatches), null);
         }
 
@@ -119,6 +121,22 @@ namespace PropHuntMod
             Log.LogInfo($"Changing scene to {__instance.TargetSceneName}");
             cover.currentScene = __instance.TargetSceneName;
             cover.applicableCovers = null;
+
+            //foreach (var player in playerManager.Values)
+            //{
+            //    player.EnsurePropCover();
+            //}
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof (GameManager), "OnNextLevelReady")]
+        static void OnNextLevelReady()
+        {
+            Debug.Log($"Ensuring cover for {playerManager.Count} players");
+            foreach (var player in playerManager.Values)
+            {
+                player.EnsurePropCover();
+            }
         }
 
         //[HarmonyPrefix]
