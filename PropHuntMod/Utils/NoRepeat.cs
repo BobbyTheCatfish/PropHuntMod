@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NoRepeat
 {
@@ -33,6 +34,15 @@ namespace NoRepeat
             used.Add(element);
 
             return element;
+        }
+
+        public T GetSpecific(Func<T, bool> func)
+        {
+            T found = inputValues.FirstOrDefault(func);
+            if (found != null) return found;
+
+            found = used.FirstOrDefault(func);
+            return found;
         }
     }
 }

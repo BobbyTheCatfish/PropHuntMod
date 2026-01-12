@@ -1,4 +1,5 @@
-﻿using PropHuntMod.Utils.Networking;
+﻿using PropHuntMod.Utils;
+using PropHuntMod.Utils.Networking;
 using SilksongMultiplayer;
 using Steamworks;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace PropHuntMod.Modifications
     internal class PlayerManager
     {
         public HornetManager hornetManager;
-        public CoverManager coverManager;
+        public BaseCoverManager coverManager;
         public PlayerAvatar playerAvatar;
 
         public string currentCoverObjName;
@@ -19,7 +20,7 @@ namespace PropHuntMod.Modifications
         public PlayerManager(CSteamID steamID)
         {
             hornetManager = new HornetManager();
-            coverManager = new CoverManager();
+            coverManager = new BaseCoverManager();
 
             this.steamID = steamID;
             hornetManager.steamID = steamID;
@@ -28,56 +29,61 @@ namespace PropHuntMod.Modifications
             SilksongMultiplayerAPI.remotePlayers.TryGetValue(steamID, out var remotePlayer);
             if (!IsRemotePlayer(steamID))
             {
+                PropHuntMod.Log.LogError($"{steamID} is local.");
+                return;
+            }
+
+            PropHuntMod.playerManager.Add(steamID, this);
+
+            if (remotePlayer == null)
+            {
                 PropHuntMod.Log.LogError($"No remotePlayer for {steamID}");
                 return;
             }
 
             playerAvatar = remotePlayer;
         }
-
         public static PlayerManager GetPlayerManager(CSteamID steamID)
         {
             PropHuntMod.playerManager.TryGetValue(steamID, out var player);
-
-            if (player == null)
-            {
-                player = new Modifications.PlayerManager(steamID);
-                PropHuntMod.playerManager.Add(steamID, player);
-            }
+            if (player == null) player = new PlayerManager(steamID);
 
             return player;
         }
-
         public static bool IsRemotePlayer(CSteamID steamID)
         {
-            PropHuntMod.Log.LogInfo(steamID);
-            bool isRemote = steamID.ToString() != "0" && steamID != null;
-            PropHuntMod.Log.LogInfo($"isRemote: {isRemote}");
+            bool isRemote = steamID.ToString() != "0" && steamID != null && steamID != SteamUser.GetSteamID();
+            //PropHuntMod.Log.LogInfo($"isRemote: {isRemote}");
             return isRemote;
         }
+        internal static bool IsHostInSameRoom(CSteamID steamID)
+        {
+            var player = GetPlayerManager(steamID);
+            if (player == null || player.playerAvatar == null) return false;
 
+            bool result = player.playerAvatar.mapName == PropHuntMod.cover.currentScene;
+
+            if (result) PropHuntMod.Log.LogInfo($"{steamID} is in the same room");
+            else PropHuntMod.Log.LogInfo($"{steamID} is in room {player.playerAvatar.mapName}, you are in {PropHuntMod.cover.currentScene}");
+
+            return result;
+        }
         public void EnsurePropCover()
         {
             if (currentCoverObjName == null)
             {
                 coverManager.DisableProp(hornetManager);
+                hornetManager.ToggleHornet(true);
                 return;
             }
 
-            if (CustomPacketHandlers.IsHostInSameRoom(steamID))
+            if (IsHostInSameRoom(steamID))
             {
-                var toClone = GameObject.Find(currentCoverObjName);
+                var toClone = PropValidation.currentSceneObjects.GetSpecific(o => o.name == currentCoverObjName);
                 if (toClone == null)
                 {
-                    //if (cloneOriginalName.EndsWith("(Clone)"))
-                    //{
-                    //    toClone = GameObject.Find(cloneOriginalName.Substring(0, cloneOriginalName.Length - 7));
-                    //}
-                    if (toClone == null)
-                    {
-                        PropHuntMod.Log.LogError($"Unable to find GameObject {currentCoverObjName} for {steamID}");
-                        return;
-                    }
+                    PropHuntMod.Log.LogError($"Unable to find GameObject {currentCoverObjName} for {steamID}");
+                    return;
                 }
 
                 coverManager.EnableProp(hornetManager, toClone);

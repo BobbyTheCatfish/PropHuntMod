@@ -7,9 +7,9 @@ namespace PropHuntMod.Modifications
 {
     internal class NoDamage
     {
-        static CoverManager cover;
+        static BaseCoverManager cover;
         static readonly bool INSTA_KILL = false;
-        public NoDamage(CoverManager coverManager)
+        public NoDamage(BaseCoverManager coverManager)
         {
             cover = coverManager;
         }

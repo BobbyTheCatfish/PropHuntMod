@@ -45,16 +45,6 @@ namespace PropHuntMod.Utils.Networking
 
             return player;
         }
-        internal static bool IsHostInSameRoom(CSteamID steamID)
-        {
-            SilksongMultiplayerAPI.remotePlayers.TryGetValue(steamID, out var room);
-            bool result = room.mapName == PropHuntMod.cover.currentScene;
-
-            if (result) PropHuntMod.Log.LogInfo($"{steamID} is in the same room");
-            else PropHuntMod.Log.LogInfo($"{steamID} is in room {room}, you are in {PropHuntMod.cover.currentScene}");
-
-            return result;
-        }
         private static void HandlePropSwap(byte[] data, CSteamID senderID, int offset)
         {
             string cloneOriginalName = PacketDeserializer.ReadString(data, ref offset);
@@ -79,7 +69,7 @@ namespace PropHuntMod.Utils.Networking
 
             player.currentCoverObjLocation = propPosition;
 
-            if (IsHostInSameRoom(senderID))
+            if (PlayerManager.IsHostInSameRoom(senderID))
             {
                 player.coverManager.SetPropLocation(propPosition);
             }
@@ -95,7 +85,7 @@ namespace PropHuntMod.Utils.Networking
 
             player.currentHideState = isHiding;
 
-            if (IsHostInSameRoom(senderID))
+            if (PlayerManager.IsHostInSameRoom(senderID))
             {
                 player.hornetManager.ToggleHornet(!isHiding);
             }
@@ -112,7 +102,7 @@ namespace PropHuntMod.Utils.Networking
 
             if (targetID == SteamUser.GetSteamID())
             {
-                Debug.Log("I've been found!");
+                PropHuntMod.Log.LogInfo("I've been found!");
                 PropHuntMod.cover.DisableProp(PropHuntMod.hornet);
             }
             else

@@ -6,6 +6,7 @@ using UnityEngine;
 using Steamworks;
 using System.Collections.Generic;
 using PropHuntMod.Utils.Networking;
+using PropHuntMod.Utils;
 
 /**
  * FEATURE LIST
@@ -33,7 +34,7 @@ namespace PropHuntMod
         internal static ManualLogSource Log;
 
         internal static HornetManager hornet = new HornetManager();
-        internal static CoverManager cover = new CoverManager();
+        internal static SelfCoverManager cover = new SelfCoverManager();
         //private static AttackCooldownPatches attackPatches = new AttackCooldownPatches(config);
         private static NoDamage noDamage = new NoDamage(cover);
         internal static Dictionary<CSteamID, PlayerManager> playerManager = new Dictionary<CSteamID, PlayerManager>();
@@ -46,7 +47,7 @@ namespace PropHuntMod
             Utils.Config.LoadConfig(this.Config);
             Harmony.CreateAndPatchAll(typeof(PropHuntMod), null);
             Harmony.CreateAndPatchAll(typeof(NoDamage), null);
-            Harmony.CreateAndPatchAll(typeof(CoverManager), null);
+            Harmony.CreateAndPatchAll(typeof(BaseCoverManager), null);
             CustomPacketHandlers.Init();
             //Harmony.CreateAndPatchAll(typeof(AttackCooldownPatches), null);
         }
@@ -79,20 +80,20 @@ namespace PropHuntMod
             if (Input.GetKeyDown(Utils.Config.swapPropKey))
             {
                 hornet.SetHornet();
-                cover.EnableProp(hornet);
+                cover.EnableProp();
             }
             if (Input.GetKeyDown(Utils.Config.resetKey))
             {
                 cover.DisableProp(hornet);
             }
 
-            cover.MoveOwnProp(Direction.Down, KeyCode.Keypad2);
-            cover.MoveOwnProp(Direction.Left, KeyCode.Keypad4);
-            cover.MoveOwnProp(Direction.Right, KeyCode.Keypad6);
-            cover.MoveOwnProp(Direction.Up, KeyCode.Keypad8);
-            cover.MoveOwnProp(Direction.Front, KeyCode.Keypad7);
-            cover.MoveOwnProp(Direction.Back, KeyCode.Keypad9);
-            cover.MoveOwnProp(Direction.Reset, KeyCode.Keypad5);
+            cover.MoveProp(Direction.Down, KeyCode.Keypad2);
+            cover.MoveProp(Direction.Left, KeyCode.Keypad4);
+            cover.MoveProp(Direction.Right, KeyCode.Keypad6);
+            cover.MoveProp(Direction.Up, KeyCode.Keypad8);
+            cover.MoveProp(Direction.Front, KeyCode.Keypad7);
+            cover.MoveProp(Direction.Back, KeyCode.Keypad9);
+            cover.MoveProp(Direction.Reset, KeyCode.Keypad5, true);
 
             if (
                 !Input.GetKey(KeyCode.Keypad2) && !Input.GetKey(KeyCode.Keypad4) &&
@@ -102,8 +103,6 @@ namespace PropHuntMod
             {
                 cover.SendPropPosition();
             }
-
-            if (Input.GetKeyDown(KeyCode.Slash)) cover.ViewCoverComponents();
 		}
 
         // Disable prop on scene change
@@ -114,7 +113,7 @@ namespace PropHuntMod
             cover.DisableProp(hornet);
             Log.LogInfo($"Changing scene to {__instance.TargetSceneName}");
             cover.currentScene = __instance.TargetSceneName;
-            cover.applicableCovers = null;
+            PropValidation.ResetProps();
 
             //foreach (var player in playerManager.Values)
             //{
@@ -126,6 +125,7 @@ namespace PropHuntMod
         [HarmonyPatch(typeof (GameManager), "OnNextLevelReady")]
         static void OnNextLevelReady()
         {
+            PropValidation.GetAllProps(cover.currentScene);
             Debug.Log($"Ensuring cover for {playerManager.Count} players");
             foreach (var player in playerManager.Values)
             {

@@ -6,7 +6,7 @@ namespace PropHuntMod.Modifications
 {
     public class HornetManager
     {
-        bool shouldBeShown;
+        public bool shouldBeShown;
         public GameObject hornet;
         public CSteamID steamID;
         MeshRenderer render;
