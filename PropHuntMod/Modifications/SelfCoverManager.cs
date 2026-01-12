@@ -22,7 +22,7 @@ namespace PropHuntMod.Modifications
 
             if (!cover)
             {
-                PropHuntMod.Log.LogError("No cover");
+                Log.LogError("No cover");
                 return;
             }
 
@@ -47,7 +47,7 @@ namespace PropHuntMod.Modifications
             }
             else
             {
-                PropHuntMod.Log.LogError("Invalid direction");
+                Log.LogError("Invalid direction");
                 return;
             }
 
@@ -55,7 +55,7 @@ namespace PropHuntMod.Modifications
             y = Mathf.Clamp(y, pos.y - 4, pos.y + 4);
             z = Mathf.Clamp(z, pos.z - 4, pos.z + 4);
 
-            PropHuntMod.Log.LogInfo($"Hornet position: {hornet.hornet.transform.position}");
+            Log.LogInfo($"Hornet position: {hornet.hornet.transform.position}");
 
             SetPropLocation(new Vector3(x, y, z));
             movedRecently = true;
@@ -74,7 +74,7 @@ namespace PropHuntMod.Modifications
 
         public new void OnHit()
         {
-            PropHuntMod.Log.LogError("UH OH! ON HIT IS SUPPOSED TO BE A REMOTE PLAYER!");
+            Log.LogError("UH OH! ON HIT IS SUPPOSED TO BE A REMOTE PLAYER!");
         }
     }
 }

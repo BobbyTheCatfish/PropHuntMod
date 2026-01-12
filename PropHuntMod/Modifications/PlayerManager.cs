@@ -29,7 +29,7 @@ namespace PropHuntMod.Modifications
             SilksongMultiplayerAPI.remotePlayers.TryGetValue(steamID, out var remotePlayer);
             if (!IsRemotePlayer(steamID))
             {
-                PropHuntMod.Log.LogError($"{steamID} is local.");
+                Log.LogError($"{steamID} is local.");
                 return;
             }
 
@@ -37,7 +37,7 @@ namespace PropHuntMod.Modifications
 
             if (remotePlayer == null)
             {
-                PropHuntMod.Log.LogError($"No remotePlayer for {steamID}");
+                Log.LogError($"No remotePlayer for {steamID}");
                 return;
             }
 
@@ -53,7 +53,7 @@ namespace PropHuntMod.Modifications
         public static bool IsRemotePlayer(CSteamID steamID)
         {
             bool isRemote = steamID.ToString() != "0" && steamID != null && steamID != SteamUser.GetSteamID();
-            //PropHuntMod.Log.LogInfo($"isRemote: {isRemote}");
+            //Log.LogInfo($"isRemote: {isRemote}");
             return isRemote;
         }
         internal static bool IsHostInSameRoom(CSteamID steamID)
@@ -63,8 +63,8 @@ namespace PropHuntMod.Modifications
 
             bool result = player.playerAvatar.mapName == PropHuntMod.cover.currentScene;
 
-            if (result) PropHuntMod.Log.LogInfo($"{steamID} is in the same room");
-            else PropHuntMod.Log.LogInfo($"{steamID} is in room {player.playerAvatar.mapName}, you are in {PropHuntMod.cover.currentScene}");
+            if (result) Log.LogInfo($"{steamID} is in the same room");
+            else Log.LogInfo($"{steamID} is in room {player.playerAvatar.mapName}, you are in {PropHuntMod.cover.currentScene}");
 
             return result;
         }
@@ -82,7 +82,7 @@ namespace PropHuntMod.Modifications
                 var toClone = PropValidation.currentSceneObjects.GetSpecific(o => o.name == currentCoverObjName);
                 if (toClone == null)
                 {
-                    PropHuntMod.Log.LogError($"Unable to find GameObject {currentCoverObjName} for {steamID}");
+                    Log.LogError($"Unable to find GameObject {currentCoverObjName} for {steamID}");
                     return;
                 }
 

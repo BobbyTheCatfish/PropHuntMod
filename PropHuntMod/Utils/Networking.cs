@@ -74,13 +74,13 @@ namespace PropHuntMod.Utils.Networking
                 player.coverManager.SetPropLocation(propPosition);
             }
 
-            PropHuntMod.Log.LogInfo($"{senderID} prop moved to {propPosition}");
+            Log.LogInfo($"{senderID} prop moved to {propPosition}");
         }
 
         private static void HandleHideStatus(byte[] data, CSteamID senderID, int offset)
         {
             bool isHiding = PacketDeserializer.ReadBool(data, ref offset);
-            PropHuntMod.Log.LogWarning($"HIDING: {isHiding}");
+            Log.LogWarning($"HIDING: {isHiding}");
             PlayerManager player = GetPlayerManager(senderID);
 
             player.currentHideState = isHiding;
@@ -90,7 +90,7 @@ namespace PropHuntMod.Utils.Networking
                 player.hornetManager.ToggleHornet(!isHiding);
             }
 
-            PropHuntMod.Log.LogInfo($"{senderID} hiding status set to {isHiding}");
+            Log.LogInfo($"{senderID} hiding status set to {isHiding}");
         }
         
         private static void HandlePropFound(byte[] data, CSteamID senderID, int offset)
@@ -98,11 +98,11 @@ namespace PropHuntMod.Utils.Networking
             ulong rawTargetID = PacketDeserializer.ReadULong(data, ref offset);
             var targetID = new CSteamID(rawTargetID);
 
-            PropHuntMod.Log.LogInfo(SteamUser.GetSteamID());
+            Log.LogInfo(SteamUser.GetSteamID());
 
             if (targetID == SteamUser.GetSteamID())
             {
-                PropHuntMod.Log.LogInfo("I've been found!");
+                Log.LogInfo("I've been found!");
                 PropHuntMod.cover.DisableProp(PropHuntMod.hornet);
             }
             else

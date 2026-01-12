@@ -1,4 +1,5 @@
-﻿using PropHuntMod.Utils.Networking;
+﻿using PropHuntMod.Utils;
+using PropHuntMod.Utils.Networking;
 using Steamworks;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ namespace PropHuntMod.Modifications
         MeshRenderer render;
         public void ToggleHornet()
         {
-            PropHuntMod.Log.LogInfo("Toggling Hornet");
+            Log.LogInfo("Toggling Hornet");
             if (hornet == null) SetHornet();
 
             var render = hornet.GetComponent<MeshRenderer>();
@@ -50,13 +51,13 @@ namespace PropHuntMod.Modifications
             }
             else
             {
-                PropHuntMod.Log.LogInfo($"Setting hornet for {steamID}");
+                Log.LogInfo($"Setting hornet for {steamID}");
                 var player = PlayerManager.GetPlayerManager(steamID).playerAvatar;
-                PropHuntMod.Log.LogInfo(player.gameObject.name);
+                Log.LogInfo(player.gameObject.name);
                 hornet = player.gameObject;
             }
 
-            if (hornet == null) PropHuntMod.Log.LogError("Hornet not found! OH NO!");
+            if (hornet == null) Log.LogError("Hornet not found! OH NO!");
             render = hornet.GetComponent<MeshRenderer>();
         }
     }

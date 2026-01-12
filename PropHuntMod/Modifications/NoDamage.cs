@@ -30,7 +30,7 @@ namespace PropHuntMod.Modifications
             {
                 damageAmount = 0;
             }
-            //PropHuntMod.Log.LogInfo(go.name);
+            //Log.LogInfo(go.name);
         }
 
         // Prevent detection by enemies

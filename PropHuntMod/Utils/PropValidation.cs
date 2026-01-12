@@ -51,7 +51,7 @@ namespace PropHuntMod.Utils
                 var props = ExtraProps.props.FirstOrDefault(k => scene.StartsWith(k.Key)).Value;
 
                 if (props == null) return false;
-                PropHuntMod.Log.LogError("success");
+                Log.LogError("success");
                 var renderer = gameObject.GetComponent<SpriteRenderer>();
                 if (renderer == null || renderer.sprite == null) return false;
                 if (renderer.color != Color.white) return false;
@@ -60,7 +60,7 @@ namespace PropHuntMod.Utils
         }
         static void LogSpecificObj(string objectName, string condition)
         {
-            if (objectName == "Bonechurch_shop") PropHuntMod.Log.LogInfo(condition);
+            if (objectName == "Bonechurch_shop") Log.LogInfo(condition);
         }
         static bool IsValidProp(string scene, GameObject gameObject)
         {
@@ -73,7 +73,7 @@ namespace PropHuntMod.Utils
 
             if (Regex.IsMatch(gameObject.name, "^pebble$|^junk_push|^Small_bell_push|^weaver_corpse_shrine", RegexOptions.IgnoreCase))
             {
-                PropHuntMod.Log.LogInfo($"{gameObject.name} - banned");
+                Log.LogInfo($"{gameObject.name} - banned");
                 return false;
             }
             if (gameObject.name.Contains("(Clone)"))
@@ -97,7 +97,7 @@ namespace PropHuntMod.Utils
 
             //if (gameObject.name.StartsWith("CC_metal__"))
             //{
-            //    PropHuntMod.Log.LogInfo(gameObject.name);
+            //    Log.LogInfo(gameObject.name);
             //}
 
             // Then filter positives
@@ -116,7 +116,7 @@ namespace PropHuntMod.Utils
             try
             {
                 var oldObjRenderer = GetRenderer(existingGameObject);
-                //PropHuntMod.Log.LogInfo(oldObjRenderer.sprite);
+                //Log.LogInfo(oldObjRenderer.sprite);
                 
                 if (oldObjRenderer == null || oldObjRenderer.sprite == null || newObjRenderer == null || newObjRenderer.sprite == null) return false;
 
@@ -124,8 +124,8 @@ namespace PropHuntMod.Utils
             }
             catch (Exception e)
             {
-                PropHuntMod.Log.LogError($"{existingGameObject.name} failed, no sprite on one of the objects?");
-                PropHuntMod.Log.LogError(e);
+                Log.LogError($"{existingGameObject.name} failed, no sprite on one of the objects?");
+                Log.LogError(e);
                 return true;
             }
         }
@@ -147,14 +147,14 @@ namespace PropHuntMod.Utils
             foreach (var gameObject in allGameObjects)
             {
                 if (!IsValidProp(scene, gameObject)) continue;
-                //PropHuntMod.Log.LogInfo($"{gameObject.name} - {gameObject.layer} MAYBE");
+                //Log.LogInfo($"{gameObject.name} - {gameObject.layer} MAYBE");
 
-                if (gameObject.name == "Bonechurch_Shop") PropHuntMod.Log.LogInfo("valid prop");
+                if (gameObject.name == "Bonechurch_Shop") Log.LogInfo("valid prop");
                 var renderer = GetRenderer(gameObject);
                 if (renderer == null) continue;
 
                 if (props.Any(o => IsGameObjectDuplicate(renderer, o))) continue;
-                PropHuntMod.Log.LogInfo($"{gameObject.name} - {gameObject.layer} YES");
+                Log.LogInfo($"{gameObject.name} - {gameObject.layer} YES");
                 props.Add(gameObject);
             }
 
@@ -188,7 +188,7 @@ namespace PropHuntMod.Utils
                 var components = gameObject.GetComponentsInChildren<T>();
                 foreach (var component in components)
                 {
-                    //PropHuntMod.Log.LogInfo(component + " removed");
+                    //Log.LogInfo(component + " removed");
                     if (keepOnParent && component.gameObject != gameObject.gameObject) Component.Destroy(component);
                 }
             }
@@ -223,12 +223,12 @@ namespace PropHuntMod.Utils
                 }
                 catch (Exception e)
                 {
-                    PropHuntMod.Log.LogError("Ran into an error instantiating cover.");
-                    PropHuntMod.Log.LogError(e);
+                    Log.LogError("Ran into an error instantiating cover.");
+                    Log.LogError(e);
                 }
 
                 if (cover == null) continue;
-                PropHuntMod.Log.LogInfo(cover.name);
+                Log.LogInfo(cover.name);
 
                 StripProp(cover);
 
@@ -236,7 +236,7 @@ namespace PropHuntMod.Utils
                 Renderer[] renderers = parent.GetComponentsInChildren<Renderer>();
                 if (renderers.Length == 0)
                 {
-                    PropHuntMod.Log.LogError("No renderers found");
+                    Log.LogError("No renderers found");
                 }
                 else
                 {

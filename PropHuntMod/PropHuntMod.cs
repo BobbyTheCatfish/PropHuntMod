@@ -1,5 +1,4 @@
 ﻿using BepInEx;
-using BepInEx.Logging;
 using HarmonyLib;
 using PropHuntMod.Modifications;
 using UnityEngine;
@@ -31,8 +30,6 @@ namespace PropHuntMod
     [BepInProcess("Hollow Knight Silksong.exe")]
     public class PropHuntMod : BaseUnityPlugin
     {
-        internal static ManualLogSource Log;
-
         internal static HornetManager hornet = new HornetManager();
         internal static SelfCoverManager cover = new SelfCoverManager();
         //private static AttackCooldownPatches attackPatches = new AttackCooldownPatches(config);
@@ -42,8 +39,9 @@ namespace PropHuntMod
 
         private void Awake()
         {
-            Log = base.Logger;
+            Log.SetLogger(base.Logger);
             Log.LogInfo("Prop Hunt Loaded.");
+
             Utils.Config.LoadConfig(this.Config);
             Harmony.CreateAndPatchAll(typeof(PropHuntMod), null);
             Harmony.CreateAndPatchAll(typeof(NoDamage), null);

@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using NoRepeat;
 using PropHuntMod.Utils.Networking;
+using PropHuntMod.Utils;
 using Steamworks;
 using SilksongMultiplayer.NetworkData;
 using GlobalEnums;
@@ -24,7 +25,7 @@ namespace PropHuntMod.Modifications
         {
             if (cover == null)
             {
-                PropHuntMod.Log.LogError("No cover, can't set prop position");
+                Log.LogError("No cover, can't set prop position");
                 return;
             }
 
@@ -36,12 +37,12 @@ namespace PropHuntMod.Modifications
             if (!movedRecently) return;
             if (cover == null)
             {
-                PropHuntMod.Log.LogError("No cover, can't send prop position");
+                Log.LogError("No cover, can't send prop position");
                 return;
             }
 
             movedRecently = false;
-            PropHuntMod.Log.LogInfo($"Sending prop position {cover.transform.position}");
+            Log.LogInfo($"Sending prop position {cover.transform.position}");
             PacketSend.SendPropLocation(cover.transform.position);
         }
 
@@ -54,7 +55,7 @@ namespace PropHuntMod.Modifications
         {
             if (cover == null)
             {
-                if (logOnFail) PropHuntMod.Log.LogError("No cover to disable");
+                if (logOnFail) Log.LogError("No cover to disable");
                 return;
             }
             GameObject.Destroy(cover);
@@ -72,19 +73,19 @@ namespace PropHuntMod.Modifications
             // Can't do anything
             if (cover == null)
             {
-                PropHuntMod.Log.LogError("No valid cover found");
+                Log.LogError("No valid cover found");
                 return;
             }
             
             if (this.cover != null)
             {
-                PropHuntMod.Log.LogWarning("Destroying cover...");
+                Log.LogWarning("Destroying cover...");
                 GameObject.Destroy(this.cover);
                 this.cover = null;
             }
             else if (!PlayerManager.IsRemotePlayer(steamID))
             {
-                PropHuntMod.Log.LogInfo("Sending hiding message");
+                Log.LogInfo("Sending hiding message");
                 string username = SteamFriends.GetPersonaName();
                 NetworkDataSender.SendGlobalSystemChatMessage($"{username} has hidden!");
             }
@@ -95,21 +96,23 @@ namespace PropHuntMod.Modifications
 
             try
             {
-                PropHuntMod.Log.LogInfo("Creating prop");
+                Log.LogInfo("Creating prop");
                 this.cover = GameObject.Instantiate(cover, transform.position, transform.rotation, transform);
                 cover.SetActive(true);
                 coverOGName = cover.name;
 
                 this.cover.layer = (int)PhysLayers.HERO_BOX;
                 hornet.ToggleHornet(false);
+
+                this.cover.GetComponent<TriggerHandler>().steamID = steamID;
             }
             catch (Exception e)
             {
-                PropHuntMod.Log.LogError("Ran into an error instantiating cover.");
-                PropHuntMod.Log.LogError(e);
+                Log.LogError("Ran into an error instantiating cover.");
+                Log.LogError(e);
             }
 
-            PropHuntMod.Log.LogInfo($"{this.cover.name} - {this.cover.layer} - {this.cover.activeInHierarchy}");
+            Log.LogInfo($"{this.cover.name} - {this.cover.layer} - {this.cover.activeInHierarchy}");
 
             if (!PlayerManager.IsRemotePlayer(steamID)) PacketSend.SendPropSwap(cover.name);
         }
@@ -138,7 +141,7 @@ namespace PropHuntMod.Modifications
         //                }
         //                return ren;
         //            }
-        //            //PropHuntMod.Log.LogInfo($"{gameObject.name} - {gameObject.layer} MAYBE");
+        //            //Log.LogInfo($"{gameObject.name} - {gameObject.layer} MAYBE");
                     
         //            var renderer = GetRenderer(gameObject);
         //            if (
@@ -150,22 +153,22 @@ namespace PropHuntMod.Modifications
         //            )
         //            {
         //                if (props.Any(o => {
-        //                    PropHuntMod.Log.LogInfo("Getting sprite renderer");
+        //                    Log.LogInfo("Getting sprite renderer");
         //                    try
         //                    {
-        //                        //PropHuntMod.Log.LogInfo(renderer);
-        //                        PropHuntMod.Log.LogInfo(renderer.sprite);
-        //                        //PropHuntMod.Log.LogInfo(renderer.sprite.texture);
-        //                        //PropHuntMod.Log.LogInfo(renderer.sprite.texture.name);
+        //                        //Log.LogInfo(renderer);
+        //                        Log.LogInfo(renderer.sprite);
+        //                        //Log.LogInfo(renderer.sprite.texture);
+        //                        //Log.LogInfo(renderer.sprite.texture.name);
         //                        var ren = GetRenderer(o);
-        //                        PropHuntMod.Log.LogInfo(ren.sprite);
+        //                        Log.LogInfo(ren.sprite);
         //                        if (ren == null || ren.sprite == null || renderer == null) return false;
         //                        return ren.sprite.name == renderer.sprite.name;
         //                    }
         //                    catch (Exception e)
         //                    {
-        //                        PropHuntMod.Log.LogError($"{gameObject.name} failed, not a real object?");
-        //                        PropHuntMod.Log.LogError(e);
+        //                        Log.LogError($"{gameObject.name} failed, not a real object?");
+        //                        Log.LogError(e);
         //                        return true;
         //                    }
         //                }))
@@ -173,7 +176,7 @@ namespace PropHuntMod.Modifications
         //                    continue;
         //                }
 
-        //                PropHuntMod.Log.LogInfo($"{gameObject.name} - {gameObject.layer} YES");
+        //                Log.LogInfo($"{gameObject.name} - {gameObject.layer} YES");
         //                props.Add(gameObject);
         //            }
         //        }
@@ -198,7 +201,7 @@ namespace PropHuntMod.Modifications
         public void OnHit()
         {
             DisableProp(PlayerManager.GetPlayerManager(steamID).hornetManager);
-            PropHuntMod.Log.LogInfo($"Found {steamID}");
+            Log.LogInfo($"Found {steamID}");
             PacketSend.SendPropFound(steamID);
             return;
         }
@@ -217,9 +220,9 @@ namespace PropHuntMod.Modifications
         //{
         //    if (!PlayerManager.IsRemotePlayer(steamID))
         //    {
-        //        PropHuntMod.Log.LogInfo($"own collider");
+        //        Log.LogInfo($"own collider");
         //    }
-        //    PropHuntMod.Log.LogInfo($"{other.collider.name} - {other.collider.tag}");
+        //    Log.LogInfo($"{other.collider.name} - {other.collider.tag}");
         //    if (other.collider.tag == "Nail Attack")
         //    {
         //        PlayerManager.GetPlayerManager(steamID).coverManager.OnHit();
@@ -230,11 +233,11 @@ namespace PropHuntMod.Modifications
         {
             if (!PlayerManager.IsRemotePlayer(steamID))
             {
-                //PropHuntMod.Log.LogInfo($"own collider");
-                //PropHuntMod.Log.LogInfo($"{other.name} - {other.tag}");
+                //Log.LogInfo($"own collider");
+                //Log.LogInfo($"{other.name} - {other.tag}");
                 return;
             }
-            //PropHuntMod.Log.LogInfo($"{other.name} - {other.tag}");
+            //Log.LogInfo($"{other.name} - {other.tag}");
             if (other.tag == "Nail Attack")
             {
                 PlayerManager.GetPlayerManager(steamID).coverManager.OnHit();

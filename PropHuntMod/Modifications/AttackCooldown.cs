@@ -2,6 +2,7 @@
 using HarmonyLib;
 using System;
 using System.Diagnostics;
+using PropHuntMod.Utils;
 
 namespace PropHuntMod.Modifications
 {
@@ -18,7 +19,7 @@ namespace PropHuntMod.Modifications
             float time = 0.0f;
             //float time = Config.attackCooldown;
             cooldown = time;
-            PropHuntMod.Log.LogInfo("cooled down");
+            Log.LogInfo("cooled down");
         }
 
         [HarmonyPrefix]
@@ -27,7 +28,7 @@ namespace PropHuntMod.Modifications
         {
             var stack = new StackTrace(true);
             Console.WriteLine(stack.ToString());
-            //PropHuntMod.Log.LogInfo("ATTACK!");
+            //Logger.LogInfo("ATTACK!");
         }
 
         //[HarmonyPostfix]
@@ -66,8 +67,8 @@ namespace PropHuntMod.Modifications
         //[HarmonyPatch(typeof(HeroController), "CanAttackAction")]
         //public static bool CanAttackAction(HeroController __instance, ref float ___attack_cooldown, HeroControllerStates ___cState, ref bool __result)
         //{
-        //    PropHuntMod.Log.LogInfo(___attack_cooldown.ToString());
-        //    PropHuntMod.Log.LogInfo(___cState.dashing.ToString());
+        //    Logger.LogInfo(___attack_cooldown.ToString());
+        //    Logger.LogInfo(___cState.dashing.ToString());
         //    __result = ___attack_cooldown < 0;
         //    return true;
         //}
