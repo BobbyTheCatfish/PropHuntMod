@@ -1,22 +1,16 @@
 ﻿using GlobalEnums;
 using HarmonyLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
+using PropHuntMod.Utils;
 
 namespace PropHuntMod.Modifications
 {
     internal class NoDamage
     {
-        static ModConfiguration config;
         static CoverManager cover;
         static readonly bool INSTA_KILL = false;
-        public NoDamage(ModConfiguration configuration, CoverManager coverManager)
+        public NoDamage(CoverManager coverManager)
         {
-            config = configuration;
             cover = coverManager;
         }
 
@@ -25,7 +19,7 @@ namespace PropHuntMod.Modifications
         [HarmonyPatch(typeof(HeroController), "TakeDamage")]
         public static void TakeDamage(HeroController __instance, GameObject go, CollisionSide damageSide, ref int damageAmount, HazardType hazardType, DamagePropertyFlags damagePropertyFlags = DamagePropertyFlags.None)
         {
-            if (!config.disableDamage.Value) return;
+            if (!Config.disableDamage) return;
 
             //if (go.name == "Bone Goomba") // Used for testing
             if (go.tag == "Player" && cover.IsCovered() && INSTA_KILL)
@@ -44,7 +38,7 @@ namespace PropHuntMod.Modifications
         [HarmonyPatch(typeof(AlertRange), "OnEnable")]
         public static bool OnEnable(AlertRange __instance)
         {
-            if (config.disableDamage.Value == true)
+            if (Config.disableDamage == true)
             {
                 __instance.enabled = false;
                 return true;
@@ -55,7 +49,7 @@ namespace PropHuntMod.Modifications
         [HarmonyPatch(typeof(AlertRange), "Awake")]
         public static bool Awake(AlertRange __instance)
         {
-            if (config.disableDamage.Value == true)
+            if (Config.disableDamage == true)
             {
                 __instance.enabled = false;
                 return true;

@@ -1,6 +1,5 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
-using GlobalEnums;
 using HarmonyLib;
 using PropHuntMod.Modifications;
 using UnityEngine;
@@ -35,9 +34,8 @@ namespace PropHuntMod
 
         internal static HornetManager hornet = new HornetManager();
         internal static CoverManager cover = new CoverManager();
-        private static ModConfiguration config = new ModConfiguration();
         //private static AttackCooldownPatches attackPatches = new AttackCooldownPatches(config);
-        private static NoDamage noDamage = new NoDamage(config, cover);
+        private static NoDamage noDamage = new NoDamage(cover);
         internal static Dictionary<CSteamID, PlayerManager> playerManager = new Dictionary<CSteamID, PlayerManager>();
         static HeroController heroController;
 
@@ -45,7 +43,7 @@ namespace PropHuntMod
         {
             Log = base.Logger;
             Log.LogInfo("Prop Hunt Loaded.");
-            config.LoadConfig(Config);
+            Utils.Config.LoadConfig(this.Config);
             Harmony.CreateAndPatchAll(typeof(PropHuntMod), null);
             Harmony.CreateAndPatchAll(typeof(NoDamage), null);
             Harmony.CreateAndPatchAll(typeof(CoverManager), null);
@@ -72,18 +70,18 @@ namespace PropHuntMod
             }
 
             // TOGGLE VISIBILITY
-            if (Input.GetKeyDown(config.hideHornetKey.Value))
+            if (Input.GetKeyDown(Utils.Config.hideHornetKey))
             {
 				hornet.SetHornet();
 				hornet.ToggleHornet();
             }
             // SET PROP
-            if (Input.GetKeyDown(config.swapPropKey.Value))
+            if (Input.GetKeyDown(Utils.Config.swapPropKey))
             {
                 hornet.SetHornet();
                 cover.EnableProp(hornet);
             }
-            if (Input.GetKeyDown(config.resetKey.Value))
+            if (Input.GetKeyDown(Utils.Config.resetKey))
             {
                 cover.DisableProp(hornet);
             }

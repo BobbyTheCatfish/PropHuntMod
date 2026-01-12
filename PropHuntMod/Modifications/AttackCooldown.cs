@@ -7,17 +7,16 @@ namespace PropHuntMod.Modifications
 {
     internal class AttackCooldownPatches
     {
-        static ModConfiguration config;
         TraceListener listener = new ConsoleTraceListener();
-        public AttackCooldownPatches(ModConfiguration configuration)
+        public AttackCooldownPatches()
         {
-            config = configuration;
             Trace.Listeners.Add(listener);
         }
 
         public static void SetAttackCooldown(ref float cooldown)
         {
-            float time = config.attackCooldown.Value;
+            float time = 0.0f;
+            //float time = Config.attackCooldown;
             cooldown = time;
             PropHuntMod.Log.LogInfo("cooled down");
         }
