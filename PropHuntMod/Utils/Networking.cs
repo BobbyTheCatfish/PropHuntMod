@@ -16,6 +16,7 @@ namespace PropHuntMod.Utils.Networking
         public const int PropLocation = 98;
         public const int HideStatus = 97;
         public const int PropFound = 96;
+        public const int Heartbeat = 95;
     }
 
     static class CustomPacketHandlers
@@ -24,13 +25,14 @@ namespace PropHuntMod.Utils.Networking
         public readonly static NetworkCustomPacket propLocation = new NetworkCustomPacket(CustomPackets.PropLocation, HandlePropLocation);
         public readonly static NetworkCustomPacket hideStatus = new NetworkCustomPacket(CustomPackets.HideStatus, HandleHideStatus);
         public readonly static NetworkCustomPacket propFound = new NetworkCustomPacket(CustomPackets.PropFound, HandlePropFound);
-
+        public readonly static NetworkCustomPacket heartbeat = new NetworkCustomPacket(CustomPackets.Heartbeat, HandleHeartbeat);
         public static void Init()
         {
             SilksongMultiplayerAPI.AddCustomPacket(propSwap);
             SilksongMultiplayerAPI.AddCustomPacket(propLocation);
             SilksongMultiplayerAPI.AddCustomPacket(hideStatus);
             SilksongMultiplayerAPI.AddCustomPacket(propFound);
+            SilksongMultiplayerAPI.AddCustomPacket(heartbeat);
         }
 
         public static PlayerManager GetPlayerManager(CSteamID steamID)
@@ -48,7 +50,7 @@ namespace PropHuntMod.Utils.Networking
         private static void HandlePropSwap(byte[] data, CSteamID senderID, int offset)
         {
             string cloneOriginalName = PacketDeserializer.ReadString(data, ref offset);
-            PropHuntMod.Log.LogInfo($"{senderID} hiding as {cloneOriginalName}");
+            Log.LogInfo($"{senderID} hiding as {cloneOriginalName}");
 
             PlayerManager player = GetPlayerManager(senderID);
 
@@ -107,10 +109,25 @@ namespace PropHuntMod.Utils.Networking
             }
             else
             {
-                PropHuntMod.Log.LogInfo("Someone else has been found");
+                Log.LogInfo("Someone else has been found");
             }
         }
 
+        private static void HandleHeartbeat(byte[] data, CSteamID senderID, int offset)
+        {
+            bool hidden = PacketDeserializer.ReadBool(data, ref offset);
+            string coverName = PacketDeserializer.ReadString(data, ref offset);
+            Vector3 coverPosition = PacketDeserializer.ReadVector3(data, ref offset);
+
+            PlayerManager player = GetPlayerManager(senderID);
+            if (coverName == "") player.currentCoverObjName = null;
+            else player.currentCoverObjName = coverName;
+
+            player.currentCoverObjLocation = coverPosition;
+
+            player.EnsurePropCover();
+            player.hornetManager.ToggleHornet(!hidden);
+        }
     }
 
     public static class PacketSend
@@ -141,6 +158,22 @@ namespace PropHuntMod.Utils.Networking
         {
             CustomPacketHandlers.propFound.SendPacket(
                 PacketSerializer.SerializeULong(propOwner.m_SteamID)
+            );
+        }
+
+        public static void SendHeartbeat()
+        {
+            bool hidden = !PropHuntMod.hornet.shouldBeShown;
+            string coverName = PropHuntMod.cover.coverOGName;
+            Vector3 coverPosition = PropHuntMod.cover.cover != null ? PropHuntMod.cover.cover.transform.position : Vector3.zero;
+
+            CustomPacketHandlers.heartbeat.SendPacket(
+                PacketSerializer.Combine(
+                    PacketSerializer.SerializeBool(hidden),
+                    PacketSerializer.SerializeString(coverName),
+                    PacketSerializer.SerializeVector3(coverPosition)
+                )
+                
             );
         }
     }
