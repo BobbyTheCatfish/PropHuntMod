@@ -33,7 +33,6 @@ namespace PropHuntMod
     {
         internal static ManualLogSource Log;
 
-        bool packetsPatched = false;
         internal static HornetManager hornet = new HornetManager();
         internal static CoverManager cover = new CoverManager();
         private static ModConfiguration config = new ModConfiguration();
@@ -56,12 +55,6 @@ namespace PropHuntMod
 
         private void Update()
         {
-            //if (!packetsPatched)
-            //{
-            //    //Log.LogInfo("IS THIS WORKING???");
-            //    //Harmony.CreateAndPatchAll(typeof(Utils.Networking.PacketReciept), null);
-            //    packetsPatched = true;
-            //}
             if (hornet.hornet != null)
             {
                 hornet.EnsureHornetHidden();

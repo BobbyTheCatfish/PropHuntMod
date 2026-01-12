@@ -7,6 +7,8 @@ using PropHuntMod.Utils.Networking;
 using Steamworks;
 using SilksongMultiplayer.NetworkData;
 using GlobalEnums;
+using System.IO;
+using System;
 
 namespace PropHuntMod.Modifications
 {
@@ -143,6 +145,7 @@ namespace PropHuntMod.Modifications
             {
                 PropHuntMod.Log.LogInfo("Creating prop");
                 this.cover = GameObject.Instantiate(cover, transform.position, transform.rotation, transform);
+                //this.cover.transform.SetScaleX(-1 * this.cover.transform.GetScaleX());
                 this.cover.layer = (int)PhysLayers.HERO_BOX;
                 hornet.ToggleHornet(false);
             }
@@ -165,6 +168,7 @@ namespace PropHuntMod.Modifications
                 typeof(tk2dSpriteAnimationClip),
                 typeof(tk2dSpriteAnimationFrame),
                 typeof(tk2dLookAnimNPC),
+                typeof(CurveRotationAnimation)
                 //typeof(AudioSource)
             };
 
@@ -238,6 +242,8 @@ namespace PropHuntMod.Modifications
             }
 
             if (!PlayerManager.IsRemotePlayer(steamID)) PacketSend.SendPropSwap(cover.name);
+
+            PropHuntMod.Log.LogInfo(cover.transform.localScale);
         }
 
         public void ViewCoverComponents()
@@ -255,57 +261,93 @@ namespace PropHuntMod.Modifications
         {
             if (applicableCovers == null)
             {
-                applicableCovers = new NoRepeat<GameObject>(GetAllProps());
+                applicableCovers = new NoRepeat<GameObject>(Utils.PropValidation.GetAllProps(currentScene));
             }
 
             var newCover = applicableCovers.GetRandom();
             EnableProp(hornet, newCover);
         }
 
-        private int[] invalidLayers = { 11, 17 };
-        private List<GameObject> GetAllProps()
-        {
-            GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
-            List<GameObject> props = new List<GameObject>();
-            foreach (GameObject gameObject in allGameObjects)
-            {
-                if (
-                    HasScript(gameObject)
-                    //|| (gameObject.name.ToLower().Contains("pilgrim"))
-                    || (gameObject.name.ToLower().Contains("corpse"))
-                    // || gameObject.layer == 19
-                    || gameObject.tag == "RespawnPoint"
-                )
-                {
-                    //PropHuntMod.Log.LogInfo($"{gameObject.name} - {gameObject.layer} MAYBE");
-                    var renderer = gameObject.GetComponent<SpriteRenderer>();
-                    if (
-                        ((renderer && renderer.enabled) || gameObject.GetComponent<tk2dSprite>())
-                        && !invalidLayers.Contains(gameObject.layer)
-                        && gameObject.activeInHierarchy
-                        && !Regex.IsMatch(gameObject.name, "\\(\\d+\\) ?(\\(Clone\\))?$")
-                    )
-                    {
-                        //PropHuntMod.Log.LogInfo($"{gameObject.name} - {gameObject.layer} YES");
-                        props.Add(gameObject);
-                    }
-                }
-            }
+        //private int[] invalidLayers = { 11, 17 };
+        //private List<GameObject> GetAllProps()
+        //{
+        //    GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
+        //    List<GameObject> props = new List<GameObject>();
+        //    foreach (GameObject gameObject in allGameObjects)
+        //    {
+        //        if (
+        //            HasScript(gameObject)
+        //            //|| (gameObject.name.ToLower().Contains("pilgrim"))
+        //            || (gameObject.name.ToLower().Contains("corpse"))
+        //            // || gameObject.layer == 19
+        //            || gameObject.tag == "RespawnPoint"
+        //        )
+        //        {
+        //            SpriteRenderer GetRenderer(GameObject go)
+        //            {
+        //                var ren = go.GetComponent<SpriteRenderer>();
+        //                if (ren != null && ren.sprite == null)
+        //                {
+        //                    ren = go.GetComponentsInChildren<SpriteRenderer>().Where(s => s.sprite != null).FirstOrDefault();
+        //                }
+        //                return ren;
+        //            }
+        //            //PropHuntMod.Log.LogInfo($"{gameObject.name} - {gameObject.layer} MAYBE");
+                    
+        //            var renderer = GetRenderer(gameObject);
+        //            if (
+        //                ((renderer && renderer.enabled) || gameObject.GetComponent<tk2dSprite>())
+        //                && !invalidLayers.Contains(gameObject.layer)
+        //                && gameObject.activeInHierarchy
+        //                && !Regex.IsMatch(gameObject.name, "\\(\\d+\\)? ?(\\(Clone\\))?$")
+        //                && !Regex.IsMatch(gameObject.name, "pebble|junk_push|Small_bell_push|weaver_corpse_shrine", RegexOptions.IgnoreCase)
+        //            )
+        //            {
+        //                if (props.Any(o => {
+        //                    PropHuntMod.Log.LogInfo("Getting sprite renderer");
+        //                    try
+        //                    {
+        //                        //PropHuntMod.Log.LogInfo(renderer);
+        //                        PropHuntMod.Log.LogInfo(renderer.sprite);
+        //                        //PropHuntMod.Log.LogInfo(renderer.sprite.texture);
+        //                        //PropHuntMod.Log.LogInfo(renderer.sprite.texture.name);
+        //                        var ren = GetRenderer(o);
+        //                        PropHuntMod.Log.LogInfo(ren.sprite);
+        //                        if (ren == null || ren.sprite == null || renderer == null) return false;
+        //                        return ren.sprite.name == renderer.sprite.name;
+        //                    }
+        //                    catch (Exception e)
+        //                    {
+        //                        PropHuntMod.Log.LogError($"{gameObject.name} failed, not a real object?");
+        //                        PropHuntMod.Log.LogError(e);
+        //                        return true;
+        //                    }
+        //                }))
+        //                {
+        //                    continue;
+        //                }
 
-            return props;
-        }
+        //                PropHuntMod.Log.LogInfo($"{gameObject.name} - {gameObject.layer} YES");
+        //                props.Add(gameObject);
+        //            }
+        //        }
+        //    }
 
-        private bool HasScript(GameObject obj)
-        {
-            return (
-                obj.GetComponent<Breakable>()
-                || obj.GetComponent<PlayMakerNPC>()
-                || obj.GetComponent<BasicNPC>()
-                || obj.GetComponent<QuestBoardInteractable>()
-                || obj.GetComponent<PushableRubble>()
-                || obj.GetComponent<GrassCut>()
-            );
-        }
+        //    AddPropsToOutput(props);
+        //    return props;
+        //}
+
+        //private bool HasScript(GameObject obj)
+        //{
+        //    return (
+        //        obj.GetComponent<Breakable>()
+        //        || obj.GetComponent<PlayMakerNPC>()
+        //        || obj.GetComponent<BasicNPC>()
+        //        || obj.GetComponent<QuestBoardInteractable>()
+        //        || obj.GetComponent<PushableRubble>()
+        //        || obj.GetComponent<GrassCut>()
+        //    );
+        //}
 
         public void OnHit()
         {
@@ -323,6 +365,8 @@ namespace PropHuntMod.Modifications
             }
             
         }
+
+        
     }
 
     class TriggerHandler : MonoBehaviour
@@ -364,22 +408,22 @@ namespace PropHuntMod.Modifications
         //{
         //    Debug.Log(coll.gameObject.name);
         //}
-        void Update()
-        {
+        //void Update()
+        //{
 
 
-            BoxCollider2D col = GetComponent<BoxCollider2D>();
-            Bounds b = col.bounds;
+        //    BoxCollider2D col = GetComponent<BoxCollider2D>();
+        //    Bounds b = col.bounds;
 
-            Vector3 bl = new Vector3(b.min.x, b.min.y);
-            Vector3 br = new Vector3(b.max.x, b.min.y);
-            Vector3 tr = new Vector3(b.max.x, b.max.y);
-            Vector3 tl = new Vector3(b.min.x, b.max.y);
+        //    Vector3 bl = new Vector3(b.min.x, b.min.y);
+        //    Vector3 br = new Vector3(b.max.x, b.min.y);
+        //    Vector3 tr = new Vector3(b.max.x, b.max.y);
+        //    Vector3 tl = new Vector3(b.min.x, b.max.y);
 
-            Debug.DrawLine(bl, br, Color.red);
-            Debug.DrawLine(br, tr, Color.red);
-            Debug.DrawLine(tr, tl, Color.red);
-            Debug.DrawLine(tl, bl, Color.red);
-        }
+        //    Debug.DrawLine(bl, br, Color.red);
+        //    Debug.DrawLine(br, tr, Color.red);
+        //    Debug.DrawLine(tr, tl, Color.red);
+        //    Debug.DrawLine(tl, bl, Color.red);
+        //}
     }
 }

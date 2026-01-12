@@ -44,7 +44,7 @@ namespace PropHuntMod.Modifications
         [HarmonyPatch(typeof(AlertRange), "OnEnable")]
         public static bool OnEnable(AlertRange __instance)
         {
-            if (config.disableDamage.Value)
+            if (config.disableDamage.Value == true)
             {
                 __instance.enabled = false;
                 return true;
@@ -55,7 +55,7 @@ namespace PropHuntMod.Modifications
         [HarmonyPatch(typeof(AlertRange), "Awake")]
         public static bool Awake(AlertRange __instance)
         {
-            if (config.disableDamage.Value)
+            if (config.disableDamage.Value == true)
             {
                 __instance.enabled = false;
                 return true;
