@@ -209,6 +209,9 @@ namespace PropHuntMod.Utils
         static void PrepareAllProps(List<GameObject> props)
         {
             var parent = new GameObject("PROP PARENT");
+            var hornetTransform = PropHuntMod.hornet.hornet.transform;
+            parent.transform.SetPosition2D(hornetTransform.position);
+            parent.transform.SetParent(hornetTransform);
             parent.SetActive(false);
 
             List<GameObject> allProps = new List<GameObject>();

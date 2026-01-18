@@ -13,7 +13,7 @@ namespace PropHuntMod.Modifications
         public PlayerAvatar playerAvatar;
 
         public string currentCoverObjName;
-        public Vector3 currentCoverObjLocation;
+        public Vector3? currentCoverObjLocation;
         public bool currentHideState;
         public CSteamID steamID;
 
@@ -87,6 +87,7 @@ namespace PropHuntMod.Modifications
                 }
 
                 coverManager.EnableProp(hornetManager, toClone);
+                if (currentCoverObjLocation != null) coverManager.SetPropLocation(currentCoverObjLocation ?? Vector3.zero);
             }
             else
             {

@@ -35,14 +35,13 @@ namespace PropHuntMod.Utils.Networking
             SilksongMultiplayerAPI.AddCustomPacket(heartbeat);
         }
 
-        public static PlayerManager GetPlayerManager(CSteamID steamID)
+        public static Modifications.PlayerManager GetPlayerManager(CSteamID steamID)
         {
             PropHuntMod.playerManager.TryGetValue(steamID, out var player);
 
             if (player == null)
             {
                 player = new Modifications.PlayerManager(steamID);
-                PropHuntMod.playerManager.Add(steamID, player);
             }
 
             return player;
@@ -52,7 +51,8 @@ namespace PropHuntMod.Utils.Networking
             string cloneOriginalName = PacketDeserializer.ReadString(data, ref offset);
             Log.LogInfo($"{senderID} hiding as {cloneOriginalName}");
 
-            PlayerManager player = GetPlayerManager(senderID);
+            Modifications.PlayerManager player = GetPlayerManager(senderID);
+            player.currentCoverObjLocation = null;
 
             if (cloneOriginalName == "")
             {
@@ -67,15 +67,18 @@ namespace PropHuntMod.Utils.Networking
         private static void HandlePropLocation(byte[] data, CSteamID senderID, int offset)
         {
             Vector3 propPosition = PacketDeserializer.ReadVector3(data, ref offset);
-            PlayerManager player = GetPlayerManager(senderID);
+            Modifications.PlayerManager player = GetPlayerManager(senderID);
 
             player.currentCoverObjLocation = propPosition;
 
-            if (PlayerManager.IsHostInSameRoom(senderID))
+            if (Modifications.PlayerManager.IsHostInSameRoom(senderID))
             {
                 player.coverManager.SetPropLocation(propPosition);
             }
-
+            else
+            {
+                player.currentCoverObjLocation = propPosition;
+            }
             Log.LogInfo($"{senderID} prop moved to {propPosition}");
         }
 
@@ -83,11 +86,11 @@ namespace PropHuntMod.Utils.Networking
         {
             bool isHiding = PacketDeserializer.ReadBool(data, ref offset);
             Log.LogWarning($"HIDING: {isHiding}");
-            PlayerManager player = GetPlayerManager(senderID);
+            Modifications.PlayerManager player = GetPlayerManager(senderID);
 
             player.currentHideState = isHiding;
 
-            if (PlayerManager.IsHostInSameRoom(senderID))
+            if (Modifications.PlayerManager.IsHostInSameRoom(senderID))
             {
                 player.hornetManager.ToggleHornet(!isHiding);
             }
@@ -109,7 +112,9 @@ namespace PropHuntMod.Utils.Networking
             }
             else
             {
-                Log.LogInfo("Someone else has been found");
+                var player = GetPlayerManager(senderID);
+                player.coverManager.DisableProp(player.hornetManager);
+                Log.LogInfo($"{SteamFriends.GetFriendPersonaName(senderID)} has been found");
             }
         }
 
@@ -119,7 +124,7 @@ namespace PropHuntMod.Utils.Networking
             string coverName = PacketDeserializer.ReadString(data, ref offset);
             Vector3 coverPosition = PacketDeserializer.ReadVector3(data, ref offset);
 
-            PlayerManager player = GetPlayerManager(senderID);
+            Modifications.PlayerManager player = GetPlayerManager(senderID);
             if (coverName == "") player.currentCoverObjName = null;
             else player.currentCoverObjName = coverName;
 

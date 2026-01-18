@@ -15,29 +15,35 @@ namespace PropHuntMod.Utils
             logger = log;
         }
 
-        public static void LogInfo(object data)
+        public static void LogInfo(params object[] data)
         {
-            logger.LogInfo(data);
+            foreach (object obj in data)
+                logger.LogInfo(obj);
         }
-        public static void LogWarning(object data)
+        public static void LogWarning(params object[] data)
         {
-            logger.LogWarning(data);
+            foreach (object obj in data)
+                logger.LogWarning(obj);
         }
-        public static void LogError(object data)
+        public static void LogError(params object[] data)
         {
-            logger.LogError(data);
+            foreach (object obj in data)
+                logger.LogError(obj);
         }
-        public static void LogFatal(object data)
+        public static void LogFatal(params object[] data)
         {
-            logger.LogFatal(data);
+            foreach (object obj in data)
+                logger.LogFatal(obj);
         }
-        public static void LogDebug(object data)
+        public static void LogDebug(params object[] data)
         {
-            logger.LogDebug(data);
+            foreach (object obj in data)
+                logger.LogDebug(obj);
         }
-        public static void LogMessage(object data)
+        public static void LogMessage(params object[] data)
         {
-            logger.LogMessage(data);
+            foreach (object obj in data)
+                logger.LogMessage(obj);
         }
     }
 }

@@ -19,7 +19,6 @@ namespace PropHuntMod.Modifications
         public string currentScene;
         public CSteamID steamID;
         internal bool movedRecently = false;
-        
 
         public void SetPropLocation(Vector3 location)
         {
@@ -63,10 +62,13 @@ namespace PropHuntMod.Modifications
             coverOGName = "";
             manager.ToggleHornet(true);
 
-            string username = SteamFriends.GetPersonaName();
-            NetworkDataSender.SendGlobalSystemChatMessage($"{username} was revealed!");
 
-            if (!PlayerManager.IsRemotePlayer(steamID)) PacketSend.SendPropSwap("");
+            if (!PlayerManager.IsRemotePlayer(steamID))
+            {
+                string username = SteamFriends.GetPersonaName();
+                NetworkDataSender.SendGlobalSystemChatMessage($"{username} was revealed!");
+                PacketSend.SendPropSwap("");
+            }
         }
         public void EnableProp(HornetManager hornet, GameObject cover)
         {
@@ -205,8 +207,6 @@ namespace PropHuntMod.Modifications
             PacketSend.SendPropFound(steamID);
             return;
         }
-
-        
     }
 
     class TriggerHandler : MonoBehaviour
@@ -238,7 +238,7 @@ namespace PropHuntMod.Modifications
                 return;
             }
             //Log.LogInfo($"{other.name} - {other.tag}");
-            if (other.tag == "Nail Attack")
+            if (other.tag == "Nail Attack" && !PropHuntMod.cover.IsCovered())
             {
                 PlayerManager.GetPlayerManager(steamID).coverManager.OnHit();
             }
