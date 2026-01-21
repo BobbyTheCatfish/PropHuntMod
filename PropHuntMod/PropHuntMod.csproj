@@ -52,9 +52,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="SilksongMultiplayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\XvX\SilksongMultiplayer.dll</HintPath>
+    <Reference Include="SSMP">
+      <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\SSMP\SSMP.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -148,7 +147,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "C:\Users\BobbyTC\source\repos\PropHuntMod\PropHuntMod\bin\Debug\PropHuntMod.dll" "H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\prophunt" /Y
-xcopy "C:\Users\BobbyTC\source\repos\PropHuntMod\PropHuntMod\bin\Debug\PropHuntMod.pdb" "H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\prophunt" /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "C:\Users\BobbyTC\source\repos\PropHuntMod\PropHuntMod\bin\Debug\PropHuntMod.dll" "H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\SSMP" /Y
+xcopy "C:\Users\BobbyTC\source\repos\PropHuntMod\PropHuntMod\bin\Debug\PropHuntMod.pdb" "H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\SSMP" /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>

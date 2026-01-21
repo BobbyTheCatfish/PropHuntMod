@@ -1,186 +1,262 @@
-﻿using HarmonyLib;
-using SilksongMultiplayer;
-using SilksongMultiplayer.NetworkData;
-using Steamworks;
-using System.Reflection;
-using System.Security.Cryptography;
+﻿using PropHuntMod.Modifications;
+using SSMP.Api.Client;
+using SSMP.Api.Client.Networking;
+using SSMP.Networking.Packet;
 using UnityEngine;
-using PropHuntMod.Modifications;
-using System.Text.RegularExpressions;
 
 namespace PropHuntMod.Utils.Networking
 {
-    struct CustomPackets
+    public enum CustomPackets
     {
-        public const int PropSwap = 99;
-        public const int PropLocation = 98;
-        public const int HideStatus = 97;
-        public const int PropFound = 96;
-        public const int Heartbeat = 95;
+        PropSwap,
+        ForcePropSwap,
+        PropLocation,
+        HideStatus,
+        PropFound,
+        Heartbeat,
+        GameOver,
     }
 
-    static class CustomPacketHandlers
+    public class NetworkData : IPacketData
     {
-        public readonly static NetworkCustomPacket propSwap = new NetworkCustomPacket(CustomPackets.PropSwap, HandlePropSwap);
-        public readonly static NetworkCustomPacket propLocation = new NetworkCustomPacket(CustomPackets.PropLocation, HandlePropLocation);
-        public readonly static NetworkCustomPacket hideStatus = new NetworkCustomPacket(CustomPackets.HideStatus, HandleHideStatus);
-        public readonly static NetworkCustomPacket propFound = new NetworkCustomPacket(CustomPackets.PropFound, HandlePropFound);
-        public readonly static NetworkCustomPacket heartbeat = new NetworkCustomPacket(CustomPackets.Heartbeat, HandleHeartbeat);
-        public static void Init()
+        public bool IsReliable => true;
+        public bool DropReliableDataIfNewerExists => true;
+        public ushort Id { get; set; }
+        public virtual void WriteData(IPacket packet)
         {
-            SilksongMultiplayerAPI.AddCustomPacket(propSwap);
-            SilksongMultiplayerAPI.AddCustomPacket(propLocation);
-            SilksongMultiplayerAPI.AddCustomPacket(hideStatus);
-            SilksongMultiplayerAPI.AddCustomPacket(propFound);
-            SilksongMultiplayerAPI.AddCustomPacket(heartbeat);
+            //packet.Write(Id);
+        }
+        public virtual void ReadData(IPacket packet)
+        {
+            Id = packet.ReadUShort();
+        }
+    }
+
+    public class PropSwapData : NetworkData
+    {
+        public string propName { get; set; }
+
+        public override void WriteData(IPacket packet)
+        {
+            packet.Write(propName);
         }
 
-        public static Modifications.PlayerManager GetPlayerManager(CSteamID steamID)
+        public override void ReadData(IPacket packet)
         {
-            PropHuntMod.playerManager.TryGetValue(steamID, out var player);
+            Id = packet.ReadUShort();
+            propName = packet.ReadString();
+        }
+    }
 
-            if (player == null)
+    public class ForcePropSwapData : NetworkData
+    {
+        public override void WriteData(IPacket packet) { }
+        public override void ReadData(IPacket packet) { }
+    }
+
+    public class PropLocationData : NetworkData
+    {
+        public Vector3 propPosition { get; set; }
+        public float propRotation { get; set; }
+        public override void WriteData(IPacket packet)
+        {
+            packet.Write(propPosition.x);
+            packet.Write(propPosition.y);
+            packet.Write(propPosition.z);
+
+            packet.Write(propRotation);
+        }
+
+        public override void ReadData(IPacket packet)
+        {
+            Id = packet.ReadUShort();
+            propPosition = new Vector3(packet.ReadFloat(), packet.ReadFloat(), packet.ReadFloat());
+            propRotation = packet.ReadFloat();
+        }
+    }
+
+    public class HideStatusData : NetworkData
+    {
+        public bool isHiding { get; set; }
+
+        public override void WriteData(IPacket packet)
+        {
+            packet.Write(isHiding);
+        }
+
+        public override void ReadData(IPacket packet)
+        {
+            Id = packet.ReadUShort();
+            isHiding = packet.ReadBool();
+        }
+    }
+
+    public class PropFoundData : NetworkData
+    {
+        public bool isClientFound { get; set; }
+        public ushort propOwnerID { get; set; }
+        public override void WriteData(IPacket packet)
+        {
+            packet.Write(propOwnerID);
+        }
+        public override void ReadData(IPacket packet)
+        {
+            Id = packet.ReadUShort();
+            isClientFound = packet.ReadBool();
+            propOwnerID = packet.ReadUShort();
+        }
+    }
+
+    public class GameOverData : NetworkData
+    {
+        public string winnerUsername { get; set; }
+        public override void WriteData(IPacket packet)
+        {
+        }
+
+        public override void ReadData(IPacket packet)
+        {
+            winnerUsername = packet.ReadString();
+        }
+    }
+    static class Network
+    {
+        static IClientAddonNetworkSender<CustomPackets> sender;
+        static IClientAddonNetworkReceiver<CustomPackets> receiver;
+        public static void SendPropSwap(string propName)
+        {
+            sender.SendSingleData(CustomPackets.PropSwap, new PropSwapData
             {
-                player = new Modifications.PlayerManager(steamID);
-            }
-
-            return player;
+                propName = propName
+            });
         }
-        private static void HandlePropSwap(byte[] data, CSteamID senderID, int offset)
-        {
-            string cloneOriginalName = PacketDeserializer.ReadString(data, ref offset);
-            Log.LogInfo($"{senderID} hiding as {cloneOriginalName}");
 
-            Modifications.PlayerManager player = GetPlayerManager(senderID);
+        public static void SendPropLocation(Vector3 propPosition, float propRotation)
+        {
+            sender.SendSingleData(CustomPackets.PropLocation, new PropLocationData
+            {
+                propPosition = propPosition,
+                propRotation = propRotation
+            });
+        }
+
+        public static void SendHideStatus(bool isHiding)
+        {
+            sender.SendSingleData(CustomPackets.HideStatus, new HideStatusData
+            {
+                isHiding = isHiding
+            });
+        }
+
+        public static void SendPropFound(ushort propOwnerID)
+        {
+            sender.SendSingleData(CustomPackets.PropFound, new PropFoundData
+            {
+                propOwnerID = propOwnerID
+            });
+        }
+
+        public static void Init(IClientApi clientApi, ClientAddon clientAddon)
+        {
+            sender = clientApi.NetClient.GetNetworkSender<CustomPackets>(clientAddon);
+            receiver = clientApi.NetClient.GetNetworkReceiver<CustomPackets>(clientAddon, InstantiatePacket);
+
+            receiver.RegisterPacketHandler<PropSwapData>(CustomPackets.PropSwap, OnPropSwap);
+            receiver.RegisterPacketHandler<ForcePropSwapData>(CustomPackets.ForcePropSwap, OnForcePropSwap);
+            receiver.RegisterPacketHandler<PropLocationData>(CustomPackets.PropSwap, OnPropLocation);
+            receiver.RegisterPacketHandler<HideStatusData>(CustomPackets.PropSwap, OnHideStatus);
+            receiver.RegisterPacketHandler<PropFoundData>(CustomPackets.PropSwap, OnPropFound);
+            receiver.RegisterPacketHandler<GameOverData>(CustomPackets.GameOver, OnGameOver);
+        }
+
+        static void OnPropSwap(PropSwapData data)
+        {
+            string propName = data.propName;
+            PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
             player.currentCoverObjLocation = null;
 
-            if (cloneOriginalName == "")
+            if (propName == "")
             {
                 player.currentCoverObjName = null;
             }
             else
             {
-                player.currentCoverObjName = cloneOriginalName;
+                player.currentCoverObjName = propName;
             }
+
             player.EnsurePropCover();
         }
-        private static void HandlePropLocation(byte[] data, CSteamID senderID, int offset)
+
+        static void OnForcePropSwap(ForcePropSwapData data)
         {
-            Vector3 propPosition = PacketDeserializer.ReadVector3(data, ref offset);
-            Modifications.PlayerManager player = GetPlayerManager(senderID);
-
-            player.currentCoverObjLocation = propPosition;
-
-            if (Modifications.PlayerManager.IsHostInSameRoom(senderID))
-            {
-                player.coverManager.SetPropLocation(propPosition);
-            }
-            else
-            {
-                player.currentCoverObjLocation = propPosition;
-            }
-            Log.LogInfo($"{senderID} prop moved to {propPosition}");
+            PropHuntMod.cover.EnableProp();
         }
 
-        private static void HandleHideStatus(byte[] data, CSteamID senderID, int offset)
+        static void OnPropLocation(PropLocationData data)
         {
-            bool isHiding = PacketDeserializer.ReadBool(data, ref offset);
-            Log.LogWarning($"HIDING: {isHiding}");
-            Modifications.PlayerManager player = GetPlayerManager(senderID);
+            PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
 
-            player.currentHideState = isHiding;
+            player.currentCoverObjLocation = data.propPosition;
+            player.currentCoverObjRotation = data.propRotation;
 
-            if (Modifications.PlayerManager.IsHostInSameRoom(senderID))
+            if (PlayerManager.IsHostInSameRoom(data.Id))
             {
-                player.hornetManager.ToggleHornet(!isHiding);
+                player.coverManager.SetPropLocation(data.propPosition);
+            }
+            Log.LogInfo($"{data.Id} prop moved to {data.propPosition}, {data.propRotation}");
+        }
+
+        static void OnHideStatus(HideStatusData data)
+        {
+            PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
+
+            player.currentHideState = data.isHiding;
+
+            if (PlayerManager.IsHostInSameRoom(data.Id))
+            {
+                player.hornetManager.ToggleHornet(!data.isHiding);
             }
 
-            Log.LogInfo($"{senderID} hiding status set to {isHiding}");
+            Log.LogInfo($"{data.Id} hiding status set to {data.isHiding}");
         }
-        
-        private static void HandlePropFound(byte[] data, CSteamID senderID, int offset)
+
+        static void OnPropFound(PropFoundData data)
         {
-            ulong rawTargetID = PacketDeserializer.ReadULong(data, ref offset);
-            var targetID = new CSteamID(rawTargetID);
-
-            Log.LogInfo(SteamUser.GetSteamID());
-
-            if (targetID == SteamUser.GetSteamID())
+            var isClientFound = data.isClientFound;
+            if (isClientFound)
             {
                 Log.LogInfo("I've been found!");
                 PropHuntMod.cover.DisableProp(PropHuntMod.hornet);
             }
             else
             {
-                var player = GetPlayerManager(senderID);
+                var player = PlayerManager.GetPlayerManager(data.propOwnerID);
                 player.coverManager.DisableProp(player.hornetManager);
-                Log.LogInfo($"{SteamFriends.GetFriendPersonaName(senderID)} has been found");
+                Log.LogInfo($"{player.playerAvatar.Username} has been found");
             }
         }
 
-        private static void HandleHeartbeat(byte[] data, CSteamID senderID, int offset)
+        static void OnGameOver(GameOverData data)
         {
-            bool hidden = PacketDeserializer.ReadBool(data, ref offset);
-            string coverName = PacketDeserializer.ReadString(data, ref offset);
-            Vector3 coverPosition = PacketDeserializer.ReadVector3(data, ref offset);
+            PropHuntMod.cover.DisableProp(PropHuntMod.hornet);
+            string winner = data.winnerUsername;
+        }
 
-            Modifications.PlayerManager player = GetPlayerManager(senderID);
-            if (coverName == "") player.currentCoverObjName = null;
-            else player.currentCoverObjName = coverName;
 
-            player.currentCoverObjLocation = coverPosition;
-
-            player.EnsurePropCover();
-            player.hornetManager.ToggleHornet(!hidden);
+        internal static IPacketData InstantiatePacket(CustomPackets packetID)
+        {
+            switch (packetID) {
+                case CustomPackets.PropSwap:
+                    return new PropSwapData();
+                case CustomPackets.PropLocation:
+                    return new PropLocationData();
+                case CustomPackets.HideStatus:
+                    return new HideStatusData();
+                case CustomPackets.PropFound:
+                    return new PropFoundData();
+                default:
+                    return null;
+            }
         }
     }
-
-    public static class PacketSend
-    {
-
-        public static void SendPropSwap(string cloneOriginalName)
-        {
-            CustomPacketHandlers.propSwap.SendPacket(
-                PacketSerializer.SerializeString(cloneOriginalName)
-            );
-        }
-
-        public static void SendHideStatus(bool hiding)
-        {
-            CustomPacketHandlers.hideStatus.SendPacket(
-                PacketSerializer.SerializeBool(hiding)
-            );
-        }
-
-        public static void SendPropLocation(Vector3 location)
-        {
-            CustomPacketHandlers.propLocation.SendPacket(
-                PacketSerializer.SerializeVector3(location)
-            );
-        }
-
-        public static void SendPropFound(CSteamID propOwner)
-        {
-            CustomPacketHandlers.propFound.SendPacket(
-                PacketSerializer.SerializeULong(propOwner.m_SteamID)
-            );
-        }
-
-        public static void SendHeartbeat()
-        {
-            bool hidden = !PropHuntMod.hornet.shouldBeShown;
-            string coverName = PropHuntMod.cover.coverOGName;
-            Vector3 coverPosition = PropHuntMod.cover.cover != null ? PropHuntMod.cover.cover.transform.position : Vector3.zero;
-
-            CustomPacketHandlers.heartbeat.SendPacket(
-                PacketSerializer.Combine(
-                    PacketSerializer.SerializeBool(hidden),
-                    PacketSerializer.SerializeString(coverName),
-                    PacketSerializer.SerializeVector3(coverPosition)
-                )
-                
-            );
-        }
-    }
-
 }
