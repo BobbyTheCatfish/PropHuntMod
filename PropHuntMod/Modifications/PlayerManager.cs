@@ -1,12 +1,13 @@
 ﻿using PropHuntMod.Utils;
 using PropHuntMod.Utils.Networking;
 using SSMP.Api.Client;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace PropHuntMod.Modifications
 {
-    using PlayerID = CSteamID;
+    using PlayerID = UInt16;
     internal class PlayerManager
     {
         public HornetManager hornetManager;

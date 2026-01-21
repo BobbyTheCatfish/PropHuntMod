@@ -10,7 +10,7 @@ using SSMP.Api.Client;
 
 namespace PropHuntMod.Modifications
 {
-    using PlayerID = CSteamID;
+    using PlayerID = UInt16;
     internal class BaseCoverManager
     {
         internal GameObject cover;

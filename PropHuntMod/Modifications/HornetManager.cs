@@ -1,10 +1,11 @@
 ﻿using PropHuntMod.Utils;
 using PropHuntMod.Utils.Networking;
+using System;
 using UnityEngine;
 
 namespace PropHuntMod.Modifications
 {
-    using PlayerID = CSteamID;
+    using PlayerID = UInt16;
     public class HornetManager
     {
         public bool shouldBeShown;

@@ -1,12 +1,13 @@
 ﻿using BepInEx;
 using HarmonyLib;
 using PropHuntMod.Modifications;
-using UnityEngine;
-using System.Collections.Generic;
 //using PropHuntMod.Utils.Networking;
 using PropHuntMod.Utils;
-using System.Linq;
 using SSMP.Api.Client;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /**
@@ -28,7 +29,7 @@ using UnityEngine.SceneManagement;
 
 namespace PropHuntMod
 {
-    using PlayerID = CSteamID;
+    using PlayerID = UInt16;
     [BepInPlugin("com.bobbythecatfish.prophunt", Utils.Config.ModName, Utils.Config.ModVersion)]
     [BepInProcess("Hollow Knight Silksong.exe")]
     public class PropHuntMod : BaseUnityPlugin
