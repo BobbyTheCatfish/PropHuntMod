@@ -2,10 +2,12 @@
 using HarmonyLib;
 using PropHuntMod.Modifications;
 using UnityEngine;
-using Steamworks;
 using System.Collections.Generic;
-using PropHuntMod.Utils.Networking;
+//using PropHuntMod.Utils.Networking;
 using PropHuntMod.Utils;
+using System.Linq;
+using SSMP.Api.Client;
+using UnityEngine.SceneManagement;
 
 /**
  * FEATURE LIST
@@ -26,7 +28,7 @@ using PropHuntMod.Utils;
 
 namespace PropHuntMod
 {
-    [BepInPlugin("com.bobbythecatfish.prophunt", "Prop Hunt", "0.1.0")]
+    [BepInPlugin("com.bobbythecatfish.prophunt", Utils.Config.ModName, Utils.Config.ModVersion)]
     [BepInProcess("Hollow Knight Silksong.exe")]
     public class PropHuntMod : BaseUnityPlugin
     {
@@ -34,32 +36,36 @@ namespace PropHuntMod
         internal static SelfCoverManager cover = new SelfCoverManager();
         //private static AttackCooldownPatches attackPatches = new AttackCooldownPatches(config);
         private static NoDamage noDamage = new NoDamage(cover);
-        internal static Dictionary<CSteamID, PlayerManager> playerManager = new Dictionary<CSteamID, PlayerManager>();
-        static HeroController heroController;
+        internal static Dictionary<ushort, PlayerManager> playerManager = new Dictionary<ushort, PlayerManager>();
+        HeroController heroController => HeroController.instance;
+        internal static IClientApi client;
+        internal static bool modEnabled = false;
 
-        private void Awake()
+        void Awake()
         {
+            Utils.Config.LoadConfig(Config);
             Log.SetLogger(base.Logger);
-            Log.LogInfo("Prop Hunt Loaded.");
+        }
+        public static void Initialize(IClientApi clientApi)
+        {
+            Log.LogInfo("Prop Hunt mod Loaded.");
 
-            Utils.Config.LoadConfig(this.Config);
+            client = clientApi;
+
             Harmony.CreateAndPatchAll(typeof(PropHuntMod), null);
             Harmony.CreateAndPatchAll(typeof(NoDamage), null);
             Harmony.CreateAndPatchAll(typeof(BaseCoverManager), null);
-            CustomPacketHandlers.Init();
+            modEnabled = true;
             //Harmony.CreateAndPatchAll(typeof(AttackCooldownPatches), null);
         }
 
         private void Update()
         {
+            if (!modEnabled) return;
+
             if (hornet.hornet != null)
             {
                 hornet.EnsureHornetHidden();
-            }
-
-            if (heroController == null)
-            {
-                heroController = FindFirstObjectByType<HeroController>();
             }
 
             // No keybinds if inputs are blocked
@@ -71,8 +77,8 @@ namespace PropHuntMod
             // TOGGLE VISIBILITY
             if (Input.GetKeyDown(Utils.Config.hideHornetKey))
             {
-				hornet.SetHornet();
-				hornet.ToggleHornet();
+                hornet.SetHornet();
+                hornet.ToggleHornet();
             }
             // SET PROP
             if (Input.GetKeyDown(Utils.Config.swapPropKey))
@@ -85,13 +91,16 @@ namespace PropHuntMod
                 cover.DisableProp(hornet);
             }
 
-            cover.MoveProp(Direction.Down, KeyCode.Keypad2);
-            cover.MoveProp(Direction.Left, KeyCode.Keypad4);
-            cover.MoveProp(Direction.Right, KeyCode.Keypad6);
-            cover.MoveProp(Direction.Up, KeyCode.Keypad8);
-            cover.MoveProp(Direction.Front, KeyCode.Keypad7);
-            cover.MoveProp(Direction.Back, KeyCode.Keypad9);
-            cover.MoveProp(Direction.Reset, KeyCode.Keypad5, true);
+            // Prop movement
+            {
+                cover.MoveProp(Direction.Down, KeyCode.Keypad2);
+                cover.MoveProp(Direction.Left, KeyCode.Keypad4);
+                cover.MoveProp(Direction.Right, KeyCode.Keypad6);
+                cover.MoveProp(Direction.Up, KeyCode.Keypad8);
+                cover.MoveProp(Direction.Front, KeyCode.Keypad7);
+                cover.MoveProp(Direction.Back, KeyCode.Keypad9);
+                cover.MoveProp(Direction.Reset, KeyCode.Keypad5, true);
+            }
 
             if (
                 !Input.GetKey(KeyCode.Keypad2) && !Input.GetKey(KeyCode.Keypad4) &&
@@ -101,16 +110,18 @@ namespace PropHuntMod
             {
                 cover.SendPropPosition();
             }
-		}
+        }
 
         // Disable prop on scene change
         [HarmonyPrefix]
-        [HarmonyPatch(typeof (SceneLoad), "Begin")]
-        public static void OnSceneChange(SceneLoad __instance)
+        [HarmonyPatch(typeof(SceneLoad), "Begin")]
+        internal static void OnSceneChange(SceneLoad __instance)
         {
+            if (!modEnabled) return;
+
             cover.DisableProp(hornet);
             Log.LogInfo($"Changing scene to {__instance.TargetSceneName}");
-            cover.currentScene = __instance.TargetSceneName;
+            //cover.currentScene = __instance.TargetSceneName;
             PropValidation.ResetProps();
 
             //foreach (var player in playerManager.Values)
@@ -120,10 +131,12 @@ namespace PropHuntMod
         }
 
         [HarmonyPostfix]
-        [HarmonyPatch(typeof (GameManager), "OnNextLevelReady")]
-        static void OnNextLevelReady()
+        [HarmonyPatch(typeof(GameManager), "OnNextLevelReady")]
+        internal static void OnNextLevelReady()
         {
-            PropValidation.GetAllProps(cover.currentScene);
+            if (!modEnabled) return;
+
+            PropValidation.GetAllProps(SceneManager.GetActiveScene().name);
             Debug.Log($"Ensuring cover for {playerManager.Count} players");
             foreach (var player in playerManager.Values)
             {
@@ -135,6 +148,8 @@ namespace PropHuntMod
         //[HarmonyPatch(typeof (Breakable), "Break")]
         //public static void OnBreak(Breakable __instance)
         //{
+        //    if (!modEnabled) return;
+        //
         //    if (hornet == null) return;
         //    if (__instance.transform.parent.gameObject.name != hornet.hornet.name && !cover.IsCovered())
         //    {

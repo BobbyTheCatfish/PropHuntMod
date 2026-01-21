@@ -10,6 +10,10 @@ namespace PropHuntMod.Utils
 {
     internal static class Config
     {
+        public const string ModName = "Prop Hunt";
+        public const string ModVersion = "0.1.0";
+        public const int SSMPApiVersion = 1;
+
         static ConfigEntry<bool> _disableDamage;
         //static ConfigEntry<float> _attackCooldown;
         static ConfigEntry<KeyCode> _swapPropKey;
