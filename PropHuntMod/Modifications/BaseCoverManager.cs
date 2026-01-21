@@ -1,25 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using NoRepeat;
 using PropHuntMod.Utils.Networking;
 using PropHuntMod.Utils;
-using Steamworks;
-using SilksongMultiplayer.NetworkData;
+//using SilksongMultiplayer.NetworkData;
 using GlobalEnums;
 using System;
+using SSMP.Api.Client;
 
 namespace PropHuntMod.Modifications
 {
-    enum Direction { Left, Right, Up, Down, Front, Back, Reset };
     internal class BaseCoverManager
     {
         internal GameObject cover;
         internal string coverOGName = "";
-        public string currentScene;
-        public CSteamID steamID;
-        internal bool movedRecently = false;
-
+        //public string currentScene;
+        public ushort playerID;
+        internal bool isRemote = true;
         public void SetPropLocation(Vector3 location)
         {
             if (cover == null)
@@ -31,18 +28,22 @@ namespace PropHuntMod.Modifications
             cover.transform.position = location;
         }
 
-        public void SendPropPosition()
+        public void SetPropLocation(float rotation)
         {
-            if (!movedRecently) return;
             if (cover == null)
             {
-                Log.LogError("No cover, can't send prop position");
+                Log.LogError("No cover, can't set prop rotation");
                 return;
             }
 
-            movedRecently = false;
-            Log.LogInfo($"Sending prop position {cover.transform.position}");
-            PacketSend.SendPropLocation(cover.transform.position);
+            var r = cover.transform.rotation;
+            cover.transform.rotation = new Quaternion(rotation, r.y, r.z, r.w);
+        }
+
+        public void SetPropLocation(Vector3 location, float rotation)
+        {
+            SetPropLocation(location);
+            SetPropLocation(rotation);
         }
 
         public bool IsCovered()
@@ -63,13 +64,12 @@ namespace PropHuntMod.Modifications
             manager.ToggleHornet(true);
 
 
-            if (!PlayerManager.IsRemotePlayer(steamID))
+            if (!isRemote)
             {
-                string username = SteamFriends.GetPersonaName();
-                NetworkDataSender.SendGlobalSystemChatMessage($"{username} was revealed!");
-                PacketSend.SendPropSwap("");
+                Network.SendPropSwap("");
             }
         }
+
         public void EnableProp(HornetManager hornet, GameObject cover)
         {
             // Can't do anything
@@ -84,12 +84,6 @@ namespace PropHuntMod.Modifications
                 Log.LogWarning("Destroying cover...");
                 GameObject.Destroy(this.cover);
                 this.cover = null;
-            }
-            else if (!PlayerManager.IsRemotePlayer(steamID))
-            {
-                Log.LogInfo("Sending hiding message");
-                string username = SteamFriends.GetPersonaName();
-                NetworkDataSender.SendGlobalSystemChatMessage($"{username} has hidden!");
             }
 
             // Create prop, parent to hornet, and hide hornet
@@ -106,7 +100,9 @@ namespace PropHuntMod.Modifications
                 this.cover.layer = (int)PhysLayers.HERO_BOX;
                 hornet.ToggleHornet(false);
 
-                this.cover.GetComponent<TriggerHandler>().steamID = steamID;
+                var handler = this.cover.GetComponent<TriggerHandler>();
+                handler.playerID = playerID;
+                handler.isRemote = isRemote;
             }
             catch (Exception e)
             {
@@ -116,7 +112,7 @@ namespace PropHuntMod.Modifications
 
             Log.LogInfo($"{this.cover.name} - {this.cover.layer} - {this.cover.activeInHierarchy}");
 
-            if (!PlayerManager.IsRemotePlayer(steamID)) PacketSend.SendPropSwap(cover.name);
+            if (!isRemote) Network.SendPropSwap(cover.name);
         }
 
         //private int[] invalidLayers = { 11, 17 };
@@ -202,36 +198,25 @@ namespace PropHuntMod.Modifications
 
         public void OnHit()
         {
-            DisableProp(PlayerManager.GetPlayerManager(steamID).hornetManager);
-            Log.LogInfo($"Found {steamID}");
-            PacketSend.SendPropFound(steamID);
+            DisableProp(PlayerManager.GetPlayerManager(playerID).hornetManager);
+            Log.LogInfo($"Found {playerID}");
+            Network.SendPropFound(playerID);
             return;
         }
     }
 
     class TriggerHandler : MonoBehaviour
     {
-        public CSteamID steamID;
+        public ushort playerID;
+        public bool isRemote;
         void Awake()
         {
             Debug.Log("Hey, i'm on!");
         }
-        //void OnCollisionEnter2D(Collision2D other)
-        //{
-        //    if (!PlayerManager.IsRemotePlayer(steamID))
-        //    {
-        //        Log.LogInfo($"own collider");
-        //    }
-        //    Log.LogInfo($"{other.collider.name} - {other.collider.tag}");
-        //    if (other.collider.tag == "Nail Attack")
-        //    {
-        //        PlayerManager.GetPlayerManager(steamID).coverManager.OnHit();
-        //    }
-        //}
 
         void OnTriggerEnter2D(Collider2D other)
         {
-            if (!PlayerManager.IsRemotePlayer(steamID))
+            if (!isRemote)
             {
                 //Log.LogInfo($"own collider");
                 //Log.LogInfo($"{other.name} - {other.tag}");
@@ -240,30 +225,8 @@ namespace PropHuntMod.Modifications
             //Log.LogInfo($"{other.name} - {other.tag}");
             if (other.tag == "Nail Attack" && !PropHuntMod.cover.IsCovered())
             {
-                PlayerManager.GetPlayerManager(steamID).coverManager.OnHit();
+                PlayerManager.GetPlayerManager(playerID).coverManager.OnHit();
             }
         }
-
-        //void OnTriggerStay2D(Collider2D coll)
-        //{
-        //    Debug.Log(coll.gameObject.name);
-        //}
-        //void Update()
-        //{
-
-
-        //    BoxCollider2D col = GetComponent<BoxCollider2D>();
-        //    Bounds b = col.bounds;
-
-        //    Vector3 bl = new Vector3(b.min.x, b.min.y);
-        //    Vector3 br = new Vector3(b.max.x, b.min.y);
-        //    Vector3 tr = new Vector3(b.max.x, b.max.y);
-        //    Vector3 tl = new Vector3(b.min.x, b.max.y);
-
-        //    Debug.DrawLine(bl, br, Color.red);
-        //    Debug.DrawLine(br, tr, Color.red);
-        //    Debug.DrawLine(tr, tl, Color.red);
-        //    Debug.DrawLine(tl, bl, Color.red);
-        //}
     }
 }

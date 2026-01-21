@@ -1,7 +1,6 @@
 ﻿using GlobalEnums;
 using NoRepeat;
 using PropHuntMod.Modifications;
-using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.IO;

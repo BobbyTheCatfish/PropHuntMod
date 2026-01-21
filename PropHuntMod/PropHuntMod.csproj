@@ -120,6 +120,8 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="PropHuntClient.cs" />
+    <Compile Include="PropHuntServer.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\ModConfiguration.cs" />
     <Compile Include="Modifications\HornetManager.cs" />

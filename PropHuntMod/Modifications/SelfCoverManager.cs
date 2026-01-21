@@ -1,17 +1,26 @@
 ﻿using NoRepeat;
 using PropHuntMod.Utils;
+using PropHuntMod.Utils.Networking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace PropHuntMod.Modifications
 {
+    enum Direction { Left, Right, Up, Down, Front, Back, Reset };
+    enum Rotation { Left, Right };
     internal class SelfCoverManager : BaseCoverManager
     {
-        
+
+        internal bool movedRecently = false;
+        internal SelfCoverManager()
+        {
+            isRemote = false;
+        }
         public void MoveProp(Direction direction, KeyCode key, bool onlyOnce = false)
         {
             if (onlyOnce && !Input.GetKeyDown(key)) return;
@@ -61,11 +70,47 @@ namespace PropHuntMod.Modifications
             movedRecently = true;
         }
 
+        public void RotateProp(Rotation direction, KeyCode key)
+        {
+            if (!Input.GetKey(key)) return;
+
+            bool slowDown = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
+            float distance = slowDown ? 0.01f : 0.1f;
+
+            if (!cover)
+            {
+                Log.LogError("No cover");
+                return;
+            }
+
+            float rotation = cover.transform.rotation.x;
+
+            if (direction == Rotation.Right) rotation += distance;
+            else rotation -= distance;
+
+            SetPropLocation(rotation);
+            movedRecently = true;
+        }
+
+        public void SendPropPosition()
+        {
+            if (!movedRecently) return;
+            if (cover == null)
+            {
+                Log.LogError("No cover, can't send prop position");
+                return;
+            }
+
+            movedRecently = false;
+            Log.LogInfo($"Sending prop position {cover.transform.position}");
+            Network.SendPropLocation(cover.transform.position, cover.transform.rotation.x);
+        }
+
         public void EnableProp()
         {
             if (PropValidation.currentSceneObjects == null)
             {
-                PropValidation.GetAllProps(currentScene);
+                PropValidation.GetAllProps(SceneManager.GetActiveScene().name);
             }
 
             var newCover = PropValidation.currentSceneObjects.GetRandom();
