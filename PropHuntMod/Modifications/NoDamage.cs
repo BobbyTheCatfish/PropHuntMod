@@ -33,28 +33,28 @@ namespace PropHuntMod.Modifications
             //Log.LogInfo(go.name);
         }
 
+        static bool DisableAlertRange(AlertRange alertRange)
+        {
+            if (Config.disableDamage == true)
+            {
+                alertRange.enabled = false;
+                return false;
+            }
+            return true;
+        }
+
         // Prevent detection by enemies
         [HarmonyPrefix]
         [HarmonyPatch(typeof(AlertRange), "OnEnable")]
         public static bool OnEnable(AlertRange __instance)
         {
-            if (Config.disableDamage == true)
-            {
-                __instance.enabled = false;
-                return true;
-            }
-            return false;
+            return DisableAlertRange(__instance);
         }
         [HarmonyPrefix]
         [HarmonyPatch(typeof(AlertRange), "Awake")]
         public static bool Awake(AlertRange __instance)
         {
-            if (Config.disableDamage == true)
-            {
-                __instance.enabled = false;
-                return true;
-            }
-            return false;
+            return DisableAlertRange(__instance);
         }
     }
 }
