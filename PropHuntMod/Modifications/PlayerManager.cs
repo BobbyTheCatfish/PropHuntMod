@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace PropHuntMod.Modifications
 {
+    using PlayerID = CSteamID;
     internal class PlayerManager
     {
         public HornetManager hornetManager;
@@ -15,56 +16,56 @@ namespace PropHuntMod.Modifications
         public string currentCoverObjName;
         public Vector3? currentCoverObjLocation;
         public bool currentHideState;
-        public CSteamID steamID;
+        public PlayerID playerID;
 
-        public PlayerManager(CSteamID steamID)
+        public PlayerManager(PlayerID playerID)
         {
             hornetManager = new HornetManager();
             coverManager = new BaseCoverManager();
 
-            this.steamID = steamID;
-            hornetManager.steamID = steamID;
-            coverManager.steamID = steamID;
+            this.playerID = playerID;
+            hornetManager.playerID = playerID;
+            coverManager.playerID = playerID;
 
-            SilksongMultiplayerAPI.remotePlayers.TryGetValue(steamID, out var remotePlayer);
-            if (!IsRemotePlayer(steamID))
+            SilksongMultiplayerAPI.remotePlayers.TryGetValue(playerID, out var remotePlayer);
+            if (!IsRemotePlayer(playerID))
             {
-                Log.LogError($"{steamID} is local.");
+                Log.LogError($"{playerID} is local.");
                 return;
             }
 
-            PropHuntMod.playerManager.Add(steamID, this);
+            PropHuntMod.playerManager.Add(playerID, this);
 
             if (remotePlayer == null)
             {
-                Log.LogError($"No remotePlayer for {steamID}");
+                Log.LogError($"No remotePlayer for {playerID}");
                 return;
             }
 
             playerAvatar = remotePlayer;
         }
-        public static PlayerManager GetPlayerManager(CSteamID steamID)
+        public static PlayerManager GetPlayerManager(PlayerID playerID)
         {
-            PropHuntMod.playerManager.TryGetValue(steamID, out var player);
-            if (player == null) player = new PlayerManager(steamID);
+            PropHuntMod.playerManager.TryGetValue(playerID, out var player);
+            if (player == null) player = new PlayerManager(playerID);
 
             return player;
         }
-        public static bool IsRemotePlayer(CSteamID steamID)
+        public static bool IsRemotePlayer(PlayerID playerID)
         {
-            bool isRemote = steamID.ToString() != "0" && steamID != null && steamID != SteamUser.GetSteamID();
+            bool isRemote = playerID.ToString() != "0" && playerID != null && playerID != SteamUser.GetSteamID();
             //Log.LogInfo($"isRemote: {isRemote}");
             return isRemote;
         }
-        internal static bool IsHostInSameRoom(CSteamID steamID)
+        internal static bool IsHostInSameRoom(PlayerID playerID)
         {
-            var player = GetPlayerManager(steamID);
+            var player = GetPlayerManager(playerID);
             if (player == null || player.playerAvatar == null) return false;
 
             bool result = player.playerAvatar.mapName == PropHuntMod.cover.currentScene;
 
-            if (result) Log.LogInfo($"{steamID} is in the same room");
-            else Log.LogInfo($"{steamID} is in room {player.playerAvatar.mapName}, you are in {PropHuntMod.cover.currentScene}");
+            if (result) Log.LogInfo($"{playerID} is in the same room");
+            else Log.LogInfo($"{playerID} is in room {player.playerAvatar.mapName}, you are in {PropHuntMod.cover.currentScene}");
 
             return result;
         }
@@ -77,12 +78,12 @@ namespace PropHuntMod.Modifications
                 return;
             }
 
-            if (IsHostInSameRoom(steamID))
+            if (IsHostInSameRoom(playerID))
             {
                 var toClone = PropValidation.currentSceneObjects.GetSpecific(o => o.name == currentCoverObjName);
                 if (toClone == null)
                 {
-                    Log.LogError($"Unable to find GameObject {currentCoverObjName} for {steamID}");
+                    Log.LogError($"Unable to find GameObject {currentCoverObjName} for {playerID}");
                     return;
                 }
 

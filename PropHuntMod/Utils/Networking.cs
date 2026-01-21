@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace PropHuntMod.Utils.Networking
 {
+    using PlayerID = CSteamID;
     struct CustomPackets
     {
         public const int PropSwap = 99;
@@ -35,18 +36,18 @@ namespace PropHuntMod.Utils.Networking
             SilksongMultiplayerAPI.AddCustomPacket(heartbeat);
         }
 
-        public static Modifications.PlayerManager GetPlayerManager(CSteamID steamID)
+        public static Modifications.PlayerManager GetPlayerManager(PlayerID playerID)
         {
-            PropHuntMod.playerManager.TryGetValue(steamID, out var player);
+            PropHuntMod.playerManager.TryGetValue(playerID, out var player);
 
             if (player == null)
             {
-                player = new Modifications.PlayerManager(steamID);
+                player = new Modifications.PlayerManager(playerID);
             }
 
             return player;
         }
-        private static void HandlePropSwap(byte[] data, CSteamID senderID, int offset)
+        private static void HandlePropSwap(byte[] data, PlayerID senderID, int offset)
         {
             string cloneOriginalName = PacketDeserializer.ReadString(data, ref offset);
             Log.LogInfo($"{senderID} hiding as {cloneOriginalName}");
@@ -64,7 +65,7 @@ namespace PropHuntMod.Utils.Networking
             }
             player.EnsurePropCover();
         }
-        private static void HandlePropLocation(byte[] data, CSteamID senderID, int offset)
+        private static void HandlePropLocation(byte[] data, PlayerID senderID, int offset)
         {
             Vector3 propPosition = PacketDeserializer.ReadVector3(data, ref offset);
             Modifications.PlayerManager player = GetPlayerManager(senderID);
@@ -82,7 +83,7 @@ namespace PropHuntMod.Utils.Networking
             Log.LogInfo($"{senderID} prop moved to {propPosition}");
         }
 
-        private static void HandleHideStatus(byte[] data, CSteamID senderID, int offset)
+        private static void HandleHideStatus(byte[] data, PlayerID senderID, int offset)
         {
             bool isHiding = PacketDeserializer.ReadBool(data, ref offset);
             Log.LogWarning($"HIDING: {isHiding}");
@@ -98,10 +99,10 @@ namespace PropHuntMod.Utils.Networking
             Log.LogInfo($"{senderID} hiding status set to {isHiding}");
         }
         
-        private static void HandlePropFound(byte[] data, CSteamID senderID, int offset)
+        private static void HandlePropFound(byte[] data, PlayerID senderID, int offset)
         {
             ulong rawTargetID = PacketDeserializer.ReadULong(data, ref offset);
-            var targetID = new CSteamID(rawTargetID);
+            var targetID = new PlayerID(rawTargetID);
 
             Log.LogInfo(SteamUser.GetSteamID());
 
@@ -118,7 +119,7 @@ namespace PropHuntMod.Utils.Networking
             }
         }
 
-        private static void HandleHeartbeat(byte[] data, CSteamID senderID, int offset)
+        private static void HandleHeartbeat(byte[] data, PlayerID senderID, int offset)
         {
             bool hidden = PacketDeserializer.ReadBool(data, ref offset);
             string coverName = PacketDeserializer.ReadString(data, ref offset);
@@ -159,7 +160,7 @@ namespace PropHuntMod.Utils.Networking
             );
         }
 
-        public static void SendPropFound(CSteamID propOwner)
+        public static void SendPropFound(PlayerID propOwner)
         {
             CustomPacketHandlers.propFound.SendPacket(
                 PacketSerializer.SerializeULong(propOwner.m_SteamID)

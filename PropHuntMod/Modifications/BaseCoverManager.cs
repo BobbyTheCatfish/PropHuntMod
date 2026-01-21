@@ -11,13 +11,14 @@ using System;
 
 namespace PropHuntMod.Modifications
 {
+    using PlayerID = CSteamID;
     enum Direction { Left, Right, Up, Down, Front, Back, Reset };
     internal class BaseCoverManager
     {
         internal GameObject cover;
         internal string coverOGName = "";
         public string currentScene;
-        public CSteamID steamID;
+        public PlayerID playerID;
         internal bool movedRecently = false;
 
         public void SetPropLocation(Vector3 location)
@@ -63,7 +64,7 @@ namespace PropHuntMod.Modifications
             manager.ToggleHornet(true);
 
 
-            if (!PlayerManager.IsRemotePlayer(steamID))
+            if (!PlayerManager.IsRemotePlayer(playerID))
             {
                 string username = SteamFriends.GetPersonaName();
                 NetworkDataSender.SendGlobalSystemChatMessage($"{username} was revealed!");
@@ -85,7 +86,7 @@ namespace PropHuntMod.Modifications
                 GameObject.Destroy(this.cover);
                 this.cover = null;
             }
-            else if (!PlayerManager.IsRemotePlayer(steamID))
+            else if (!PlayerManager.IsRemotePlayer(playerID))
             {
                 Log.LogInfo("Sending hiding message");
                 string username = SteamFriends.GetPersonaName();
@@ -106,7 +107,7 @@ namespace PropHuntMod.Modifications
                 this.cover.layer = (int)PhysLayers.HERO_BOX;
                 hornet.ToggleHornet(false);
 
-                this.cover.GetComponent<TriggerHandler>().steamID = steamID;
+                this.cover.GetComponent<TriggerHandler>().playerID = playerID;
             }
             catch (Exception e)
             {
@@ -116,7 +117,7 @@ namespace PropHuntMod.Modifications
 
             Log.LogInfo($"{this.cover.name} - {this.cover.layer} - {this.cover.activeInHierarchy}");
 
-            if (!PlayerManager.IsRemotePlayer(steamID)) PacketSend.SendPropSwap(cover.name);
+            if (!PlayerManager.IsRemotePlayer(playerID)) PacketSend.SendPropSwap(cover.name);
         }
 
         //private int[] invalidLayers = { 11, 17 };
@@ -202,16 +203,16 @@ namespace PropHuntMod.Modifications
 
         public void OnHit()
         {
-            DisableProp(PlayerManager.GetPlayerManager(steamID).hornetManager);
-            Log.LogInfo($"Found {steamID}");
-            PacketSend.SendPropFound(steamID);
+            DisableProp(PlayerManager.GetPlayerManager(playerID).hornetManager);
+            Log.LogInfo($"Found {playerID}");
+            PacketSend.SendPropFound(playerID);
             return;
         }
     }
 
     class TriggerHandler : MonoBehaviour
     {
-        public CSteamID steamID;
+        public PlayerID playerID;
         void Awake()
         {
             Debug.Log("Hey, i'm on!");
@@ -231,7 +232,7 @@ namespace PropHuntMod.Modifications
 
         void OnTriggerEnter2D(Collider2D other)
         {
-            if (!PlayerManager.IsRemotePlayer(steamID))
+            if (!PlayerManager.IsRemotePlayer(playerID))
             {
                 //Log.LogInfo($"own collider");
                 //Log.LogInfo($"{other.name} - {other.tag}");
@@ -240,7 +241,7 @@ namespace PropHuntMod.Modifications
             //Log.LogInfo($"{other.name} - {other.tag}");
             if (other.tag == "Nail Attack" && !PropHuntMod.cover.IsCovered())
             {
-                PlayerManager.GetPlayerManager(steamID).coverManager.OnHit();
+                PlayerManager.GetPlayerManager(playerID).coverManager.OnHit();
             }
         }
 

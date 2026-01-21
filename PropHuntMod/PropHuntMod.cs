@@ -26,6 +26,8 @@ using PropHuntMod.Utils;
 
 namespace PropHuntMod
 {
+    using PlayerID = CSteamID;
+
     [BepInPlugin("com.bobbythecatfish.prophunt", "Prop Hunt", "0.1.0")]
     [BepInProcess("Hollow Knight Silksong.exe")]
     public class PropHuntMod : BaseUnityPlugin
@@ -34,7 +36,7 @@ namespace PropHuntMod
         internal static SelfCoverManager cover = new SelfCoverManager();
         //private static AttackCooldownPatches attackPatches = new AttackCooldownPatches(config);
         private static NoDamage noDamage = new NoDamage(cover);
-        internal static Dictionary<CSteamID, PlayerManager> playerManager = new Dictionary<CSteamID, PlayerManager>();
+        internal static Dictionary<PlayerID, PlayerManager> playerManager = new Dictionary<PlayerID, PlayerManager>();
         static HeroController heroController;
 
         private void Awake()

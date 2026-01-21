@@ -5,11 +5,12 @@ using UnityEngine;
 
 namespace PropHuntMod.Modifications
 {
+    using PlayerID = CSteamID;
     public class HornetManager
     {
         public bool shouldBeShown;
         public GameObject hornet;
-        public CSteamID steamID;
+        public PlayerID playerID;
         MeshRenderer render;
         public void ToggleHornet()
         {
@@ -32,7 +33,7 @@ namespace PropHuntMod.Modifications
             render.enabled = show;
             shouldBeShown = show;
 
-            if (!PlayerManager.IsRemotePlayer(steamID)) PacketSend.SendHideStatus(!show);
+            if (!PlayerManager.IsRemotePlayer(playerID)) PacketSend.SendHideStatus(!show);
         }
 
         public void EnsureHornetHidden()
@@ -45,14 +46,14 @@ namespace PropHuntMod.Modifications
 
         public void SetHornet()
         {
-            if (!PlayerManager.IsRemotePlayer(steamID))
+            if (!PlayerManager.IsRemotePlayer(playerID))
             {
                 hornet = GameObject.FindGameObjectWithTag("Player");
             }
             else
             {
-                Log.LogInfo($"Setting hornet for {steamID}");
-                var player = PlayerManager.GetPlayerManager(steamID).playerAvatar;
+                Log.LogInfo($"Setting hornet for {playerID}");
+                var player = PlayerManager.GetPlayerManager(playerID).playerAvatar;
                 Log.LogInfo(player.gameObject.name);
                 hornet = player.gameObject;
             }
