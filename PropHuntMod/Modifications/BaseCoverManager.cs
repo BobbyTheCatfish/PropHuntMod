@@ -10,12 +10,13 @@ using SSMP.Api.Client;
 
 namespace PropHuntMod.Modifications
 {
+    using PlayerID = CSteamID;
     internal class BaseCoverManager
     {
         internal GameObject cover;
         internal string coverOGName = "";
         //public string currentScene;
-        public ushort playerID;
+        public PlayerID playerID;
         internal bool isRemote = true;
         public void SetPropLocation(Vector3 location)
         {
@@ -85,7 +86,7 @@ namespace PropHuntMod.Modifications
                 GameObject.Destroy(this.cover);
                 this.cover = null;
             }
-
+            
             // Create prop, parent to hornet, and hide hornet
             if (hornet.hornet == null) hornet.SetHornet();
             var transform = hornet.hornet.transform;
@@ -207,7 +208,7 @@ namespace PropHuntMod.Modifications
 
     class TriggerHandler : MonoBehaviour
     {
-        public ushort playerID;
+        public PlayerID playerID;
         public bool isRemote;
         void Awake()
         {

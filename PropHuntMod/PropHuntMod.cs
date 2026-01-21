@@ -28,6 +28,7 @@ using UnityEngine.SceneManagement;
 
 namespace PropHuntMod
 {
+    using PlayerID = CSteamID;
     [BepInPlugin("com.bobbythecatfish.prophunt", Utils.Config.ModName, Utils.Config.ModVersion)]
     [BepInProcess("Hollow Knight Silksong.exe")]
     public class PropHuntMod : BaseUnityPlugin
@@ -36,7 +37,7 @@ namespace PropHuntMod
         internal static SelfCoverManager cover = new SelfCoverManager();
         //private static AttackCooldownPatches attackPatches = new AttackCooldownPatches(config);
         private static NoDamage noDamage = new NoDamage(cover);
-        internal static Dictionary<ushort, PlayerManager> playerManager = new Dictionary<ushort, PlayerManager>();
+        internal static Dictionary<PlayerID, PlayerManager> playerManager = new Dictionary<PlayerID, PlayerManager>();
         HeroController heroController => HeroController.instance;
         internal static IClientApi client;
         internal static bool modEnabled = false;

@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace PropHuntMod.Modifications
 {
+    using PlayerID = CSteamID;
     internal class PlayerManager
     {
         public HornetManager hornetManager;
@@ -16,9 +17,9 @@ namespace PropHuntMod.Modifications
         public Vector3? currentCoverObjLocation;
         public float? currentCoverObjRotation;
         public bool currentHideState;
-        public ushort playerID;
+        public PlayerID playerID;
 
-        public PlayerManager(ushort playerID)
+        public PlayerManager(PlayerID playerID)
         {
             hornetManager = new HornetManager();
             coverManager = new BaseCoverManager();
@@ -42,7 +43,7 @@ namespace PropHuntMod.Modifications
                 return;
             }
         }
-        public static PlayerManager GetPlayerManager(ushort playerID)
+        public static PlayerManager GetPlayerManager(PlayerID playerID)
         {
             PropHuntMod.playerManager.TryGetValue(playerID, out var player);
             if (player == null) player = new PlayerManager(playerID);

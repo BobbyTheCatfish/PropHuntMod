@@ -4,11 +4,12 @@ using UnityEngine;
 
 namespace PropHuntMod.Modifications
 {
+    using PlayerID = CSteamID;
     public class HornetManager
     {
         public bool shouldBeShown;
         public GameObject hornet;
-        public ushort playerID;
+        public PlayerID playerID;
         MeshRenderer render;
         public bool isRemote;
         public void ToggleHornet()
