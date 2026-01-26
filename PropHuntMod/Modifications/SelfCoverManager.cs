@@ -11,15 +11,15 @@ using UnityEngine.SceneManagement;
 
 namespace PropHuntMod.Modifications
 {
-    enum Direction { Left, Right, Up, Down, Front, Back, Reset };
-    enum Rotation { Left, Right };
+    enum Direction { Left, Right, Up, Down, Front, Back, Reset, RotateLeft, RotateRight };
     internal class SelfCoverManager : BaseCoverManager
     {
-
+        public static SelfCoverManager instance;
         internal bool movedRecently = false;
         internal SelfCoverManager()
         {
             isRemote = false;
+            instance = this;
         }
         public void MoveProp(Direction direction, KeyCode key, bool onlyOnce = false)
         {
@@ -40,8 +40,7 @@ namespace PropHuntMod.Modifications
             var z = position.z;
             var rotation = this.rotation;
 
-            HornetManager hornet = PropHuntMod.hornet;
-            var pos = hornet.hornet.transform.position;
+            SelfHornetManager hornet = SelfHornetManager.instance;
             if (!hornet.HornetExists()) return;
 
             if (direction == Direction.Left) x -= distance;
@@ -88,8 +87,6 @@ namespace PropHuntMod.Modifications
             }
 
             movedRecently = false;
-            Log.LogInfo($"Sending prop position {cover.transform.position}");
-            Network.SendPropLocation(cover.transform.position, cover.transform.rotation.x);
             ClientNetwork.SendPropLocation(position, rotation);
         }
 
@@ -120,7 +117,7 @@ namespace PropHuntMod.Modifications
             return success;
         }
 
-        public new void OnHit()
+        public override void OnHit()
         {
             Log.LogError("UH OH! ON HIT IS SUPPOSED TO BE A REMOTE PLAYER!");
         }

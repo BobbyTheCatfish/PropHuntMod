@@ -9,7 +9,6 @@ namespace PropHuntMod.Modifications
     using PlayerID = UInt16;
     internal class PlayerManager
     {
-        public HornetManager hornetManager;
         public BaseHornetManager hornetManager;
         public BaseCoverManager coverManager;
 

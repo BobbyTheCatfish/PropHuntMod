@@ -8,7 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 /**
  * FEATURE LIST
@@ -34,14 +36,15 @@ namespace PropHuntMod
     [BepInProcess("Hollow Knight Silksong.exe")]
     public class PropHuntMod : BaseUnityPlugin
     {
-        internal static HornetManager hornet = new HornetManager();
-        internal static SelfCoverManager cover = new SelfCoverManager();
+        internal SelfHornetManager hornet = new SelfHornetManager();
+        internal SelfCoverManager cover = new SelfCoverManager();
         //private static AttackCooldownPatches attackPatches = new AttackCooldownPatches(config);
         private static NoDamage noDamage = new NoDamage();
         internal static Dictionary<PlayerID, PlayerManager> playerManager = new Dictionary<PlayerID, PlayerManager>();
         HeroController heroController => HeroController.instance;
         internal static IClientApi client;
         internal static bool modEnabled = false;
+
 
         void Awake()
         {
@@ -54,11 +57,17 @@ namespace PropHuntMod
 
             client = clientApi;
 
-            Harmony.CreateAndPatchAll(typeof(PropHuntMod), null);
-            Harmony.CreateAndPatchAll(typeof(NoDamage), null);
-            Harmony.CreateAndPatchAll(typeof(BaseCoverManager), null);
+            Harmony.CreateAndPatchAll(typeof(PropHuntMod), "prophunt");
+            Harmony.CreateAndPatchAll(typeof(NoDamage), "prophunt");
+            Harmony.CreateAndPatchAll(typeof(BaseCoverManager), "prophunt");
             modEnabled = true;
-            //Harmony.CreateAndPatchAll(typeof(AttackCooldownPatches), null);
+            //Harmony.CreateAndPatchAll(typeof(AttackCooldownPatches), "prophunt");
+        }
+
+        public static void Unload()
+        {
+            Harmony.UnpatchID("prophunt");
+            modEnabled = false;
         }
 
         private void Update()
@@ -76,16 +85,26 @@ namespace PropHuntMod
                 if (heroController.IsInputBlocked()) return;
             }
 
+
+            /**************
+             *  KEYBINDS  *
+             **************/
+
+            // Prevent keybinds if chat window or other text input is up
+            GameObject selection = EventSystem.current.currentSelectedGameObject;
+            if (selection != null)
+            {
+                if (selection.GetComponent<InputField>() != null) return;
+            }
+
             // TOGGLE VISIBILITY
             if (Input.GetKeyDown(Utils.Config.hideHornetKey))
             {
-                hornet.SetHornet();
                 hornet.ToggleHornet();
             }
             // SET PROP
             if (Input.GetKeyDown(Utils.Config.swapPropKey))
             {
-                hornet.SetHornet();
                 cover.EnableProp();
             }
             if (Input.GetKeyDown(Utils.Config.resetKey))
@@ -95,6 +114,8 @@ namespace PropHuntMod
 
             // Prop movement
             {
+                if (hornet.hornet == null) return;
+
                 cover.MoveProp(Direction.Down, KeyCode.Keypad2);
                 cover.MoveProp(Direction.Left, KeyCode.Keypad4);
                 cover.MoveProp(Direction.Right, KeyCode.Keypad6);
@@ -102,12 +123,16 @@ namespace PropHuntMod
                 cover.MoveProp(Direction.Front, KeyCode.Keypad7);
                 cover.MoveProp(Direction.Back, KeyCode.Keypad9);
                 cover.MoveProp(Direction.Reset, KeyCode.Keypad5, true);
+
+                cover.MoveProp(Direction.RotateLeft, KeyCode.Keypad1);
+                cover.MoveProp(Direction.RotateRight, KeyCode.Keypad3);
             }
 
             if (
                 !Input.GetKey(KeyCode.Keypad2) && !Input.GetKey(KeyCode.Keypad4) &&
                 !Input.GetKey(KeyCode.Keypad6) && !Input.GetKey(KeyCode.Keypad8) &&
-                !Input.GetKey(KeyCode.Keypad7) && !Input.GetKey(KeyCode.Keypad9)
+                !Input.GetKey(KeyCode.Keypad7) && !Input.GetKey(KeyCode.Keypad9) &&
+                !Input.GetKey(KeyCode.Keypad1) && !Input.GetKey(KeyCode.Keypad3)
                 )
             {
                 cover.SendPropPosition();
@@ -121,7 +146,7 @@ namespace PropHuntMod
         {
             if (!modEnabled) return;
 
-            cover.DisableProp(hornet);
+            SelfCoverManager.instance.DisableProp();
             Log.LogInfo($"Changing scene to {__instance.TargetSceneName}");
             //cover.currentScene = __instance.TargetSceneName;
             PropValidation.ResetProps();
