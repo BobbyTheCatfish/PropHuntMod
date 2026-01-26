@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace PropHuntMod.Utils
 {
@@ -138,8 +139,10 @@ namespace PropHuntMod.Utils
             }
             return renderer;
         }
-        public static void GetAllProps(string scene)
+        public static void GetAllProps()
         {
+            string scene = SceneManager.GetActiveScene().name;
+
             GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
             List<GameObject> props = new List<GameObject>();
 
@@ -208,9 +211,13 @@ namespace PropHuntMod.Utils
         static void PrepareAllProps(List<GameObject> props)
         {
             var parent = new GameObject("PROP PARENT");
-            var hornetTransform = PropHuntMod.hornet.hornet.transform;
-            parent.transform.SetPosition2D(hornetTransform.position);
-            parent.transform.SetParent(hornetTransform);
+
+            if (!SelfHornetManager.instance.HornetExists()) return;
+
+            var hornetTransform = SelfHornetManager.instance.hornet.transform;
+            GameObject.Instantiate(parent, hornetTransform);
+            //parent.transform.SetPosition2D(hornetTransform.position);
+            //parent.transform.SetParent(hornetTransform);
             parent.SetActive(false);
 
             List<GameObject> allProps = new List<GameObject>();
@@ -220,7 +227,7 @@ namespace PropHuntMod.Utils
                 GameObject cover = null;
                 try
                 {
-                    cover = GameObject.Instantiate(prop, parent.transform.position, parent.transform.rotation, parent.transform);
+                    cover = GameObject.Instantiate(prop, parent.transform);
                     cover.layer = (int)PhysLayers.HERO_BOX;
                 }
                 catch (Exception e)

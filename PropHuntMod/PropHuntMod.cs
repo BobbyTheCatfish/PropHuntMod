@@ -138,7 +138,7 @@ namespace PropHuntMod
         {
             if (!modEnabled) return;
 
-            PropValidation.GetAllProps(SceneManager.GetActiveScene().name);
+            PropValidation.GetAllProps();
             Debug.Log($"Ensuring cover for {playerManager.Count} players");
             foreach (var player in playerManager.Values)
             {

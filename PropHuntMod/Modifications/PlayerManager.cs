@@ -80,6 +80,7 @@ namespace PropHuntMod.Modifications
 
             if (IsHostInSameRoom(playerID))
             {
+                if (PropValidation.currentSceneObjects == null) PropValidation.GetAllProps();
                 var toClone = PropValidation.currentSceneObjects.GetSpecific(o => o.name == currentCoverObjName);
                 if (toClone == null)
                 {

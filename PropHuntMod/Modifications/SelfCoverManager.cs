@@ -110,7 +110,7 @@ namespace PropHuntMod.Modifications
         {
             if (PropValidation.currentSceneObjects == null)
             {
-                PropValidation.GetAllProps(SceneManager.GetActiveScene().name);
+                PropValidation.GetAllProps();
             }
 
             var newCover = PropValidation.currentSceneObjects.GetRandom();
