@@ -7,12 +7,7 @@ namespace PropHuntMod.Modifications
 {
     internal class NoDamage
     {
-        static BaseCoverManager cover;
         static readonly bool INSTA_KILL = false;
-        public NoDamage(BaseCoverManager coverManager)
-        {
-            cover = coverManager;
-        }
 
         // Instakill for hiders
         [HarmonyPrefix]
@@ -22,7 +17,7 @@ namespace PropHuntMod.Modifications
             if (!Config.disableDamage) return;
 
             //if (go.name == "Bone Goomba") // Used for testing
-            if (go.tag == "Player" && cover.IsCovered() && INSTA_KILL)
+            if (go.tag == "Player" && SelfCoverManager.instance.IsHiding && INSTA_KILL)
             {
                 damageAmount = 9000;
             }

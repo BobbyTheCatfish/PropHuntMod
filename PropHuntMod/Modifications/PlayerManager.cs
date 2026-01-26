@@ -1,5 +1,4 @@
 ﻿using PropHuntMod.Utils;
-using PropHuntMod.Utils.Networking;
 using SSMP.Api.Client;
 using System;
 using UnityEngine;
@@ -11,18 +10,19 @@ namespace PropHuntMod.Modifications
     internal class PlayerManager
     {
         public HornetManager hornetManager;
+        public BaseHornetManager hornetManager;
         public BaseCoverManager coverManager;
 
         public IClientPlayer playerAvatar => PropHuntMod.client.ClientManager.GetPlayer(playerID);
-        public string currentCoverObjName;
-        public Vector3? currentCoverObjLocation;
-        public float? currentCoverObjRotation;
-        public bool currentHideState;
+        public string currentCoverObjName = "";
+        public Vector3 currentCoverObjLocation = Vector3.zero;
+        public float currentCoverObjRotation = 0;
+        public bool currentHideState = false;
         public PlayerID playerID;
 
         public PlayerManager(PlayerID playerID)
         {
-            hornetManager = new HornetManager();
+            hornetManager = new BaseHornetManager();
             coverManager = new BaseCoverManager();
 
             this.playerID = playerID;
@@ -71,7 +71,7 @@ namespace PropHuntMod.Modifications
         }
         public void EnsurePropCover()
         {
-            if (currentCoverObjName == null)
+            if (string.IsNullOrEmpty(currentCoverObjName))
             {
                 coverManager.DisableProp(hornetManager);
                 hornetManager.ToggleHornet(true);
@@ -89,12 +89,18 @@ namespace PropHuntMod.Modifications
                 }
 
                 coverManager.EnableProp(hornetManager, toClone);
-                if (currentCoverObjLocation != null) coverManager.SetPropLocation(currentCoverObjLocation ?? Vector3.zero);
+                coverManager.SetPropLocation(currentCoverObjLocation, currentCoverObjRotation);
             }
             else
             {
                 coverManager.DisableProp(hornetManager, false);
             }
+        }
+
+        public void ResetCoverPosition()
+        {
+            currentCoverObjLocation = Vector3.zero;
+            currentCoverObjRotation = 0;
         }
     }
 }

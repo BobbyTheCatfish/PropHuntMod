@@ -106,10 +106,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands.cs" />
     <Compile Include="Modifications\AttackCooldown.cs" />
     <Compile Include="Modifications\NoDamage.cs" />
     <Compile Include="Modifications\PlayerManager.cs" />
     <Compile Include="Modifications\SelfCoverManager.cs" />
+    <Compile Include="Modifications\SelfHornetManager.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -124,9 +126,13 @@
     <Compile Include="PropHuntServer.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\ModConfiguration.cs" />
-    <Compile Include="Modifications\HornetManager.cs" />
+    <Compile Include="Modifications\BaseHornetManager.cs" />
     <Compile Include="Modifications\BaseCoverManager.cs" />
-    <Compile Include="Utils\Networking.cs" />
+    <Compile Include="Utils\Networking\ClientNetwork.cs" />
+    <Compile Include="Utils\Networking\ClientSentPackets.cs" />
+    <Compile Include="Utils\Networking\Common.cs" />
+    <Compile Include="Utils\Networking\ServerNetwork.cs" />
+    <Compile Include="Utils\Networking\ServerSentPackets.cs" />
     <Compile Include="Utils\NoRepeat.cs" />
     <Compile Include="PropHuntMod.cs" />
     <Compile Include="Utils\PropValidation.cs" />

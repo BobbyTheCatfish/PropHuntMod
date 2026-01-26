@@ -37,7 +37,7 @@ namespace PropHuntMod
         internal static HornetManager hornet = new HornetManager();
         internal static SelfCoverManager cover = new SelfCoverManager();
         //private static AttackCooldownPatches attackPatches = new AttackCooldownPatches(config);
-        private static NoDamage noDamage = new NoDamage(cover);
+        private static NoDamage noDamage = new NoDamage();
         internal static Dictionary<PlayerID, PlayerManager> playerManager = new Dictionary<PlayerID, PlayerManager>();
         HeroController heroController => HeroController.instance;
         internal static IClientApi client;

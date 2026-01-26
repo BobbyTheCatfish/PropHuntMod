@@ -6,7 +6,6 @@ using PropHuntMod.Utils;
 //using SilksongMultiplayer.NetworkData;
 using GlobalEnums;
 using System;
-using SSMP.Api.Client;
 
 namespace PropHuntMod.Modifications
 {
@@ -18,83 +17,82 @@ namespace PropHuntMod.Modifications
         //public string currentScene;
         public PlayerID playerID;
         internal bool isRemote = true;
+        internal Vector3 position => cover.transform.localPosition;
+        internal float rotation => cover?.transform.GetRotation2D() ?? 0;
+        public bool IsHiding => cover != null;
         public void SetPropLocation(Vector3 location)
         {
-            if (cover == null)
+            if (!IsHiding)
             {
                 Log.LogError("No cover, can't set prop position");
                 return;
             }
 
-            cover.transform.position = location;
+            cover.transform.localPosition = location;
         }
 
         public void SetPropLocation(float rotation)
         {
-            if (cover == null)
+            if (!IsHiding)
             {
                 Log.LogError("No cover, can't set prop rotation");
                 return;
             }
 
-            var r = cover.transform.rotation;
-            cover.transform.rotation = new Quaternion(rotation, r.y, r.z, r.w);
+            cover.transform.SetRotation2D(rotation);
         }
 
         public void SetPropLocation(Vector3 location, float rotation)
         {
+            if (!IsHiding)
+            {
+                Log.LogError("No cover, can't set prop rotation");
+                return;
+            }
             SetPropLocation(location);
             SetPropLocation(rotation);
         }
 
-        public bool IsCovered()
+        public virtual bool DisableProp(BaseHornetManager manager, bool logOnFail = true)
         {
-            return cover != null;
-        }
-
-        public void DisableProp(HornetManager manager, bool logOnFail = true)
-        {
-            if (cover == null)
+            if (!IsHiding)
             {
                 if (logOnFail) Log.LogError("No cover to disable");
-                return;
+                return false;
             }
+
             GameObject.Destroy(cover);
             cover = null;
             coverOGName = "";
             manager.ToggleHornet(true);
 
-
-            if (!isRemote)
-            {
-                Network.SendPropSwap("");
-            }
+            return true;
         }
 
-        public void EnableProp(HornetManager hornet, GameObject cover)
+        public virtual bool EnableProp(BaseHornetManager hornet, GameObject cover)
         {
             // Can't do anything
             if (cover == null)
             {
                 Log.LogError("No valid cover found");
-                return;
+                return false;
             }
             
-            if (this.cover != null)
+            if (IsHiding)
             {
                 Log.LogWarning("Destroying cover...");
                 GameObject.Destroy(this.cover);
                 this.cover = null;
             }
-            
+
             // Create prop, parent to hornet, and hide hornet
-            if (hornet.hornet == null) hornet.SetHornet();
-            var transform = hornet.hornet.transform;
+            if (!hornet.HornetExists()) return false;
 
             try
             {
                 Log.LogInfo("Creating prop");
-                this.cover = GameObject.Instantiate(cover, transform.position, transform.rotation, transform);
+                this.cover = GameObject.Instantiate(cover, hornet.hornet.transform);
+
                 cover.SetActive(true);
                 coverOGName = cover.name;
 
@@ -112,8 +110,7 @@ namespace PropHuntMod.Modifications
             }
 
             Log.LogInfo($"{this.cover.name} - {this.cover.layer} - {this.cover.activeInHierarchy}");
-
-            if (!isRemote) Network.SendPropSwap(cover.name);
+            return true;
         }
 
         //private int[] invalidLayers = { 11, 17 };
@@ -197,11 +194,11 @@ namespace PropHuntMod.Modifications
         //    );
         //}
 
-        public void OnHit()
+        public virtual void OnHit()
         {
-            DisableProp(PlayerManager.GetPlayerManager(playerID).hornetManager);
+            //DisableProp(PlayerManager.GetPlayerManager(playerID).hornetManager);
             Log.LogInfo($"Found {playerID}");
-            Network.SendPropFound(playerID);
+            ClientNetwork.SendPropFound(playerID);
             return;
         }
     }
@@ -224,7 +221,7 @@ namespace PropHuntMod.Modifications
                 return;
             }
             //Log.LogInfo($"{other.name} - {other.tag}");
-            if (other.tag == "Nail Attack" && !PropHuntMod.cover.IsCovered())
+            if (other.tag == "Nail Attack" && !SelfCoverManager.instance.IsHiding)
             {
                 PlayerManager.GetPlayerManager(playerID).coverManager.OnHit();
             }

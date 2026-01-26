@@ -29,18 +29,20 @@ namespace PropHuntMod.Modifications
             bool slowDown = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
             float distance = slowDown ? 0.01f : 0.1f;
 
-            if (!cover)
+            if (!IsHiding)
             {
-                Log.LogError("No cover");
+                Log.LogError("No cover, can't move");
                 return;
             }
 
-            var x = cover.transform.position.x;
-            var y = cover.transform.position.y;
-            var z = cover.transform.position.z;
+            var x = position.x;
+            var y = position.y;
+            var z = position.z;
+            var rotation = this.rotation;
 
             HornetManager hornet = PropHuntMod.hornet;
             var pos = hornet.hornet.transform.position;
+            if (!hornet.HornetExists()) return;
 
             if (direction == Direction.Left) x -= distance;
             else if (direction == Direction.Right) x += distance;
@@ -48,54 +50,38 @@ namespace PropHuntMod.Modifications
             else if (direction == Direction.Down) y -= distance;
             else if (direction == Direction.Front) z -= distance;
             else if (direction == Direction.Back) z += distance;
+            else if (direction == Direction.RotateLeft) rotation -= distance * 10;
+            else if (direction == Direction.RotateRight) rotation += distance * 10;
             else if (direction == Direction.Reset)
             {
-                x = pos.x;
-                y = pos.y;
-                z = pos.z;
+                x = 0;
+                y = 0;
+                z = 0;
+                SetPropLocation(0);
             }
             else
             {
-                Log.LogError("Invalid direction");
+                Log.LogError($"Invalid movement direction {direction} ({(int)direction})");
                 return;
             }
 
-            x = Mathf.Clamp(x, pos.x - 2, pos.x + 2);
-            y = Mathf.Clamp(y, pos.y - 4, pos.y + 4);
-            z = Mathf.Clamp(z, pos.z - 4, pos.z + 4);
+            x = Mathf.Clamp(x, -2, 2);
+            y = Mathf.Clamp(y, -4, 4);
+            z = Mathf.Clamp(z, -4, 4);
+
+            if (rotation >= 360) rotation -= 360;
+            else if (rotation < 0) rotation += 360;
 
             Log.LogInfo($"Hornet position: {hornet.hornet.transform.position}");
 
-            SetPropLocation(new Vector3(x, y, z));
-            movedRecently = true;
-        }
-
-        public void RotateProp(Rotation direction, KeyCode key)
-        {
-            if (!Input.GetKey(key)) return;
-
-            bool slowDown = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
-            float distance = slowDown ? 0.01f : 0.1f;
-
-            if (!cover)
-            {
-                Log.LogError("No cover");
-                return;
-            }
-
-            float rotation = cover.transform.rotation.x;
-
-            if (direction == Rotation.Right) rotation += distance;
-            else rotation -= distance;
-
-            SetPropLocation(rotation);
+            SetPropLocation(new Vector3(x, y, z), rotation);
             movedRecently = true;
         }
 
         public void SendPropPosition()
         {
             if (!movedRecently) return;
-            if (cover == null)
+            if (!IsHiding)
             {
                 Log.LogError("No cover, can't send prop position");
                 return;
@@ -104,6 +90,7 @@ namespace PropHuntMod.Modifications
             movedRecently = false;
             Log.LogInfo($"Sending prop position {cover.transform.position}");
             Network.SendPropLocation(cover.transform.position, cover.transform.rotation.x);
+            ClientNetwork.SendPropLocation(position, rotation);
         }
 
         public void EnableProp()
@@ -114,12 +101,32 @@ namespace PropHuntMod.Modifications
             }
 
             var newCover = PropValidation.currentSceneObjects.GetRandom();
-            EnableProp(PropHuntMod.hornet, newCover);
+            EnableProp(newCover);
+        }
+
+        public bool EnableProp(GameObject cover)
+        {
+            var success = base.EnableProp(SelfHornetManager.instance, cover);
+            if (success) ClientNetwork.SendPropSwap(cover.name);
+
+            return success;
+        }
+
+        public bool DisableProp(bool logOnFail = true)
+        {
+            var success = base.DisableProp(SelfHornetManager.instance, logOnFail);
+            if (success) ClientNetwork.SendPropSwap("");
+
+            return success;
         }
 
         public new void OnHit()
         {
             Log.LogError("UH OH! ON HIT IS SUPPOSED TO BE A REMOTE PLAYER!");
         }
+
+        // To hide the original methods
+        public override bool EnableProp(BaseHornetManager hornet, GameObject cover) { return EnableProp(cover); }
+        public override bool DisableProp(BaseHornetManager hornet, bool logOnFail = true) { return DisableProp(logOnFail); }
     }
 }
