@@ -1,0 +1,141 @@
+﻿using PropHuntMod.Modifications;
+using SSMP.Api.Client;
+using SSMP.Api.Client.Networking;
+using UnityEngine;
+
+namespace PropHuntMod.Utils.Networking
+{
+    static class ClientNetwork
+    {
+        static IClientAddonNetworkSender<CustomPackets> sender;
+        static IClientAddonNetworkReceiver<CustomPackets> receiver;
+
+        /******************
+         * PACKET SENDERS *
+         ******************/
+        public static void SendPropSwap(string propName)
+        {
+            Log.LogInfo($"Sending prop swap: {propName}");
+            sender.SendSingleData(CustomPackets.PropSwap, new FromClient.PropSwap
+            {
+                propName = propName
+            });
+        }
+
+        public static void SendPropLocation(Vector3 propPosition, float propRotation)
+        {
+            Log.LogInfo($"Sending prop location: {propPosition}, {propRotation}");
+            sender.SendSingleData(CustomPackets.PropLocation, new FromClient.PropLocation
+            {
+                propPosition = propPosition,
+                propRotation = propRotation
+            });
+        }
+
+        public static void SendHideStatus(bool isHiding)
+        {
+            Log.LogInfo($"Sending hide status: {isHiding}");
+            sender.SendSingleData(CustomPackets.HideStatus, new FromClient.HideStatus
+            {
+                isHiding = isHiding
+            });
+        }
+
+        public static void SendPropFound(ushort propOwnerID)
+        {
+            Log.LogInfo($"Sending prop found: {propOwnerID}");
+            sender.SendSingleData(CustomPackets.PropFound, new FromClient.PropFound
+            {
+                propOwnerID = propOwnerID
+            });
+        }
+
+        public static void Init(IClientApi clientApi, ClientAddon clientAddon)
+        {
+            sender = clientApi.NetClient.GetNetworkSender<CustomPackets>(clientAddon);
+            receiver = clientApi.NetClient.GetNetworkReceiver<CustomPackets>(clientAddon, FromServer.Packets.Instantiate);
+
+            receiver.RegisterPacketHandler<FromServer.PropSwap>(CustomPackets.PropSwap, OnPropSwap);
+            receiver.RegisterPacketHandler<FromServer.ForcePropSwap>(CustomPackets.ForcePropSwap, OnForcePropSwap);
+            receiver.RegisterPacketHandler<FromServer.PropLocation>(CustomPackets.PropLocation, OnPropLocation);
+            receiver.RegisterPacketHandler<FromServer.HideStatus>(CustomPackets.HideStatus, OnHideStatus);
+            receiver.RegisterPacketHandler<FromServer.PropFound>(CustomPackets.PropFound, OnPropFound);
+            receiver.RegisterPacketHandler<FromServer.GameOver>(CustomPackets.GameOver, OnGameOver);
+        }
+
+        /********************
+         * PACKET RECEIVERS *
+         ********************/
+        static void OnPropSwap(FromServer.PropSwap data)
+        {
+            string propName = data.propName;
+            PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
+            player.ResetCoverPosition();
+
+            if (propName == "")
+            {
+                player.currentCoverObjName = null;
+            }
+            else
+            {
+                player.currentCoverObjName = propName;
+            }
+
+            player.EnsurePropCover();
+        }
+
+        static void OnForcePropSwap(FromServer.ForcePropSwap data)
+        {
+            SelfCoverManager.instance.EnableProp();
+        }
+
+        static void OnPropLocation(FromServer.PropLocation data)
+        {
+            PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
+
+            player.currentCoverObjLocation = data.propPosition;
+            player.currentCoverObjRotation = data.propRotation;
+
+            if (PlayerManager.IsHostInSameRoom(data.Id))
+            {
+                player.coverManager.SetPropLocation(data.propPosition);
+            }
+            Log.LogInfo($"{data.Id} prop moved to {data.propPosition}, {data.propRotation}");
+        }
+
+        static void OnHideStatus(FromServer.HideStatus data)
+        {
+            PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
+
+            player.hornetManager.shouldBeShown = !data.isHiding;
+
+            if (PlayerManager.IsHostInSameRoom(data.Id))
+            {
+                player.hornetManager.ToggleHornet(!data.isHiding);
+            }
+
+            Log.LogInfo($"{data.Id} hiding status set to {data.isHiding}");
+        }
+
+        static void OnPropFound(FromServer.PropFound data)
+        {
+            if (data.isClientFound)
+            {
+                Log.LogInfo("I've been found!");
+                SelfCoverManager.instance.DisableProp();
+            }
+            else
+            {
+                var player = PlayerManager.GetPlayerManager(data.propOwnerID);
+                player.coverManager.DisableProp(player.hornetManager);
+                Log.LogInfo($"{player.playerAvatar.Username} has been found");
+            }
+        }
+
+        static void OnGameOver(FromServer.GameOver data)
+        {
+            SelfCoverManager.instance.DisableProp();
+            string winner = data.winnerUsername;
+        }
+    }
+}
