@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PropHuntMod.Utils;
 
 namespace NoRepeat
 {
@@ -29,7 +30,7 @@ namespace NoRepeat
             {
                 inputValues.AddRange(used);
                 used = new List<T>();
-                Console.WriteLine("Resetting NoRepeat");
+                Log.LogInfo("Resetting NoRepeat");
             }
             used.Add(element);
 

@@ -1,0 +1,77 @@
+﻿using PropHuntMod.Utils;
+using PropHuntMod.Utils.Networking;
+using System;
+using UnityEngine;
+
+namespace PropHuntMod.Modifications
+{
+    using PlayerID = UInt16;
+    public class BaseHornetManager
+    {
+        public bool shouldBeShown = true;
+        public GameObject hornet;
+        public PlayerID playerID;
+        internal MeshRenderer render;
+        public bool isRemote;
+
+        public bool ToggleHornet(bool show)
+        {
+            if (!HornetExists()) return false;
+
+            Log.LogInfo($"Toggling Hornet: {show}");
+
+            //var render = hornet.GetComponent<MeshRenderer>();
+            render.enabled = show;
+            shouldBeShown = show;
+
+            ToggleNametag(show);
+
+            return true;
+        }
+
+        public void EnsureHornetHidden()
+        {
+            if (!HornetExists()) return;
+            if (shouldBeShown) return;
+
+            if (render.enabled == true) render.enabled = false;
+        }
+
+        public bool HornetExists()
+        {
+            if (hornet == null) SetHornet();
+            return hornet != null;
+        }
+
+        public virtual void SetHornet()
+        {
+            Log.LogInfo($"Setting hornet for {playerID}");
+            var player = PlayerManager.GetPlayerManager(playerID)?.playerAvatar;
+
+            if (player?.PlayerObject == null)
+            {
+                Log.LogError($"{playerID} PlayerObject is null");
+                return;
+            }
+
+            Log.LogInfo(player.PlayerObject.name);
+            hornet = player.PlayerObject;
+
+            if (hornet == null)
+            {
+                Log.LogError("Hornet not found! OH NO!");
+                return;
+            }
+
+            render = hornet.GetComponent<MeshRenderer>();
+        }
+
+        public void ToggleNametag(bool show)
+        {
+            if (!HornetExists()) return;
+
+            var nametag = hornet.GetComponent<Transform>().Find("Username");
+            nametag?.gameObject.SetActive(show);
+        }
+    }
+}
