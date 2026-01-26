@@ -1,15 +1,10 @@
 ﻿using PropHuntMod.Utils;
 using PropHuntMod.Utils.Networking;
-using SSMP.Api.Client;
-using SSMP.Api.Command.Server;
 using SSMP.Api.Server;
 using SSMP.Api.Server.Networking;
+using SSMP.Game.Settings;
 using SSMP.Networking.Packet;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace PropHuntMod
@@ -22,22 +17,13 @@ namespace PropHuntMod
         public Vector3? propLocation;
         public float? propRotation;
         public IServerPlayer playerAvatar => PropHuntServer._serverApi.ServerManager.GetPlayer(id);
+        public int swapCount = 0;
         public ServerPlayer(ushort id)
         {
             this.id = id;
         }
     }
 
-    internal class ServerStartCommand : IServerCommand
-    {
-        public bool AuthorizedOnly => false;
-        public string Trigger => "/prophunt start";
-        public string[] Aliases => new[] { "" };
-        public void Execute(ICommandSender sender, string[] args)
-        {
-            PropHuntServer.sender.BroadcastSingleData(CustomPackets.ForcePropSwap, new ForcePropSwapData());
-        }
-    }
 
     public class PropHuntServer : ServerAddon
     {
@@ -46,29 +32,27 @@ namespace PropHuntMod
         public override uint ApiVersion => Config.SSMPApiVersion;
         public override bool NeedsNetwork => true;
 
+        internal static bool started = false;
 
-        readonly Dictionary<ushort, ServerPlayer> players = new Dictionary<ushort, ServerPlayer>();
+        public static PropHuntServer instance;
 
 
-        internal static IServerAddonNetworkReceiver<CustomPackets> receiver = null;
-        internal static IServerAddonNetworkSender<CustomPackets> sender = null;
+        readonly static Dictionary<ushort, ServerPlayer> players = new Dictionary<ushort, ServerPlayer>();
+
+
         internal static IServerApi _serverApi = null;
 
         public override void Initialize(IServerApi serverApi)
         {
-            //instance = this;
+            instance = this;
             _serverApi = serverApi;
-            Log.LogInfo("Prop Hunt Loaded.");
+            this.Logger.Info("Prop Hunt Loaded.");
 
-            receiver = serverApi.NetServer.GetNetworkReceiver<CustomPackets>(this, Network.InstantiatePacket);
-            sender = serverApi.NetServer.GetNetworkSender<CustomPackets>(this);
 
-            receiver.RegisterPacketHandler<PropSwapData>(CustomPackets.PropSwap, OnPropSwap);
-            receiver.RegisterPacketHandler<PropLocationData>(CustomPackets.PropLocation, OnPropLocation);
-            receiver.RegisterPacketHandler<HideStatusData>(CustomPackets.HideStatus, OnHideStatus);
-            receiver.RegisterPacketHandler<PropFoundData>(CustomPackets.PropFound, OnPropFound);
+            ServerNetwork.Init(serverApi, this);
 
-            serverApi.CommandManager.RegisterCommand(new ServerStartCommand());
+            serverApi.CommandManager.RegisterCommand(new Commands.StartGameCommand());
+            serverApi.CommandManager.RegisterCommand(new Commands.StopGameCommand());
 
             serverApi.ServerManager.PlayerConnectEvent += (IServerPlayer player) =>
             {
@@ -82,17 +66,7 @@ namespace PropHuntMod
 
         }
 
-        public void Broadcast(ushort senderID, CustomPackets packetID, IPacketData data)
-        {
-            foreach (var player in this.ServerApi.ServerManager.Players)
-            {
-                if (player.Id == senderID) continue;
-
-                sender.SendSingleData(packetID, data);
-            }
-        }
-
-        ServerPlayer GetPlayer(ushort playerID)
+        internal static ServerPlayer GetPlayer(ushort playerID)
         {
             var hasPlayer = players.TryGetValue(playerID, out var player);
             if (!hasPlayer)
@@ -104,73 +78,15 @@ namespace PropHuntMod
             return player;
         }
 
-        void OnPropSwap(ushort id, PropSwapData data)
+        public void Announce(string announcement)
         {
-            var player = GetPlayer(id);
-            player.propName = string.IsNullOrEmpty(data.propName) ? null : data.propName;
-
-
-            PropSwapData sendData = new PropSwapData
-            {
-                Id = id,
-                propName = data.propName
-            };
-            Broadcast(id, CustomPackets.PropSwap, sendData);
+            _serverApi.ServerManager.BroadcastMessage(announcement);
         }
-
-        void OnPropLocation(ushort id, PropLocationData data)
+        public void Message(ushort recipientID, string message)
         {
-            var player = GetPlayer(id);
-            player.propLocation = data.propPosition;
-            player.propRotation = data.propRotation;
-
-            PropLocationData sendData = new PropLocationData
-            {
-                Id = id,
-                propPosition = data.propPosition,
-                propRotation = data.propRotation
-            };
-            Broadcast(id, CustomPackets.PropLocation, sendData);
+            _serverApi.ServerManager.SendMessage(recipientID, message);
         }
-        void OnHideStatus(ushort id, HideStatusData data)
-        {
-            GetPlayer(id).hidden = data.isHiding;
-
-            HideStatusData sendData = new HideStatusData
-            {
-                Id = id,
-                isHiding = data.isHiding
-            };
-            Broadcast(id, CustomPackets.HideStatus, sendData);
-        }
-        void OnPropFound(ushort id, PropFoundData data)
-        {
-            var owner = GetPlayer(data.propOwnerID);
-            owner.propName = null;
-            owner.propLocation = null;
-            owner.propRotation = null;
-            foreach (var player in this.ServerApi.ServerManager.Players)
-            {
-                if (player.Id == id) continue;
-
-                PropFoundData sendData = new PropFoundData
-                {
-                    Id = id,
-                    isClientFound = player.Id == data.propOwnerID,
-                    propOwnerID = data.propOwnerID,
-                };
-
-                sender.SendSingleData(CustomPackets.PropFound, sendData);
-            }
-
-            string winner = DetermineWinner();
-            if (winner != null)
-            {
-                sender.BroadcastSingleData(CustomPackets.GameOver, new GameOverData { winnerUsername = winner });
-            }
-        }
-
-        string DetermineWinner()
+        public string DetermineWinner()
         {
             string winnerName = null;
             foreach (var player in players.Values)
@@ -183,6 +99,47 @@ namespace PropHuntMod
             }
 
             return winnerName;
+        }
+        public void ResetSwapCounts()
+        {
+            foreach (var player in players.Values)
+            {
+                player.swapCount = 0;
+            }
+        }
+        public void GameStart()
+        {
+            ResetSwapCounts();
+            EnsureSettings();
+            ServerNetwork.BroadcastForcePropSwap();
+            started = true;
+            Announce("The game has begun! Good luck!");
+        }
+        public void GameOver(string winner, bool canceled = false)
+        {
+            ServerNetwork.BroadcastGameOver(winner);
+            
+            if (canceled) Announce("The game has been stopped!");
+            else Announce($"{winner} was the last bug standing! Congrats!");
+            
+            started = false;
+            ResetSwapCounts();            
+        }
+
+        void EnsureSettings()
+        {
+            var settings = ServerApi.ServerManager.ServerSettings;
+            ServerSettings newSettings = new ServerSettings();
+
+            newSettings.AllowSkins = settings.AllowSkins;
+            newSettings.DisplayNames = settings.DisplayNames;
+            newSettings.OnlyBroadcastMapIconWithCompass = settings.OnlyBroadcastMapIconWithCompass;
+
+            newSettings.TeamsEnabled = settings.TeamsEnabled; // true; // teams aren't supported yet?
+            newSettings.AlwaysShowMapIcons = false;
+            newSettings.IsPvpEnabled = false;
+
+            ServerApi.ServerManager.ApplyServerSettings(newSettings);
         }
     }
 }

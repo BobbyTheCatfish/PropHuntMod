@@ -1,36 +1,22 @@
 ﻿using BepInEx;
 using HarmonyLib;
-//using PropHuntMod.Modifications;
 using UnityEngine;
 using System.Collections.Generic;
-//using PropHuntMod.Utils.Networking;
 using PropHuntMod.Utils;
-using SSMP.Api.Server;
 using SSMP.Api.Client;
 using SSMP.Game;
 using System.Linq;
 using PropHuntMod.Utils.Networking;
 using PropHuntMod.Modifications;
 
-/**
- * FEATURE LIST
- * Hide/Show Hornet
- * Spawn and attach a game object (prop) to hornet
- * Move the prop in x/y/z
- * Dynamically get game objects in current scene
- * Add more props other than breakable ones (corpses, enemies?, etc)
- * Slow down attacks (Currently disabled)
- *
- * 
- * TODO:
- * Integrate with multiplayer mod
- *  - Find out which player is which
- *  - Send prop information packets
- * 
- */
-
 namespace PropHuntMod
 {
+    public enum Teams
+    {
+        Hunter = SSMP.Game.Team.Lifeblood,
+        Seeker = SSMP.Game.Team.Grimm
+    }
+
     public class PropHuntClient : ClientAddon
     {
         protected override string Name => Config.ModName;
@@ -40,20 +26,32 @@ namespace PropHuntMod
 
         public override void Initialize(IClientApi clientApi)
         {
-            Log.LogInfo("Prop Hunt Loaded.");
 
             PropHuntMod.Initialize(clientApi);
-            Network.Init(clientApi, this);
+            
+            Log.LogInfo("Prop Hunt Loaded.");
+            ClientNetwork.Init(clientApi, this);
 
+            // Handle connects and disconnects
             clientApi.ClientManager.PlayerConnectEvent += (IClientPlayer player) =>
             {
+                Log.LogInfo($"Player {player.Username} connected");
                 PlayerManager.GetPlayerManager(player.Id);
             };
 
             clientApi.ClientManager.PlayerDisconnectEvent += (IClientPlayer player) =>
             {
+                Log.LogInfo($"Player {player.Username} disconnected");
                 PropHuntMod.playerManager.Remove(player.Id);
             };
+
+            //clientApi.CommandManager.RegisterCommand(new Commands.ClientStartCommand());
+            //clientApi.CommandManager.RegisterCommand(new Commands.ClientStopCommand());
         }
+
+        //public static bool IsHunter()
+        //{
+        //    return PropHuntMod.client.ClientManager.Team == Team.Grimm;
+        //}
     }
 }
