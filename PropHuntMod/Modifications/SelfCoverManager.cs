@@ -43,20 +43,29 @@ namespace PropHuntMod.Modifications
             SelfHornetManager hornet = SelfHornetManager.instance;
             if (!hornet.HornetExists()) return;
 
-            if (direction == Direction.Left) x -= distance;
-            else if (direction == Direction.Right) x += distance;
+            var flipped = hornet.hornet.transform.GetScaleX() < 1;
+            if (direction == Direction.Left)
+            {
+                if (flipped) x += distance;
+                else x -= distance;
+            }
+            else if (direction == Direction.Right)
+            {
+                if (flipped) x -= distance;
+                else x += distance;
+            }
             else if (direction == Direction.Up) y += distance;
             else if (direction == Direction.Down) y -= distance;
             else if (direction == Direction.Front) z -= distance;
             else if (direction == Direction.Back) z += distance;
-            else if (direction == Direction.RotateLeft) rotation -= distance * 10;
-            else if (direction == Direction.RotateRight) rotation += distance * 10;
+            else if (direction == Direction.RotateLeft) rotation += distance * 10;
+            else if (direction == Direction.RotateRight) rotation -= distance * 10;
             else if (direction == Direction.Reset)
             {
                 x = 0;
                 y = 0;
                 z = 0;
-                SetPropLocation(0);
+                rotation = 0;
             }
             else
             {
@@ -64,14 +73,16 @@ namespace PropHuntMod.Modifications
                 return;
             }
 
-            x = Mathf.Clamp(x, -2, 2);
-            y = Mathf.Clamp(y, -4, 4);
-            z = Mathf.Clamp(z, -4, 4);
+            var hp = Vector3.zero;// hornet.hornet.transform.position;
+
+            x = Mathf.Clamp(x, hp.x - 2, hp.x + 2);
+            y = Mathf.Clamp(y, hp.y - 4, hp.y + 4);
+            z = Mathf.Clamp(z, hp.z - 4, hp.z + 4);
 
             if (rotation >= 360) rotation -= 360;
             else if (rotation < 0) rotation += 360;
 
-            Log.LogInfo($"Hornet position: {hornet.hornet.transform.position}");
+            //Log.LogInfo($"Hornet position: {hornet.hornet.transform.position}");
 
             SetPropLocation(new Vector3(x, y, z), rotation);
             movedRecently = true;

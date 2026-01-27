@@ -32,8 +32,12 @@ namespace PropHuntMod.Modifications
         {
             if (Config.disableDamage == true)
             {
-                alertRange.enabled = false;
-                return false;
+                var isEnemy = alertRange.transform.parent.gameObject.layer == (int)PhysLayers.ENEMIES;
+                if (isEnemy)
+                {
+                    alertRange.enabled = false;
+                    return false;
+                }
             }
             return true;
         }

@@ -17,8 +17,8 @@ namespace PropHuntMod.Modifications
         //public string currentScene;
         public PlayerID playerID;
         internal bool isRemote = true;
-        internal Vector3 position => cover.transform.localPosition;
-        internal float rotation => cover?.transform.GetRotation2D() ?? 0;
+        internal Vector3 position => cover?.transform.localPosition ?? Vector3.zero;
+        internal float rotation => cover?.transform.GetLocalRotation2D() ?? 0;
         public bool IsHiding => cover != null;
         public void SetPropLocation(Vector3 location)
         {
@@ -39,7 +39,7 @@ namespace PropHuntMod.Modifications
                 return;
             }
 
-            cover.transform.SetRotation2D(rotation);
+            cover.transform.SetLocalRotation2D(rotation);
         }
 
         public void SetPropLocation(Vector3 location, float rotation)
@@ -92,6 +92,7 @@ namespace PropHuntMod.Modifications
             {
                 Log.LogInfo("Creating prop");
                 this.cover = GameObject.Instantiate(cover, hornet.hornet.transform);
+                SetPropLocation(Vector3.zero, 0);
 
                 cover.SetActive(true);
                 coverOGName = cover.name;

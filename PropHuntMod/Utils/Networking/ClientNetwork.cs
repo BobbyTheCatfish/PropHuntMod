@@ -68,51 +68,30 @@ namespace PropHuntMod.Utils.Networking
          ********************/
         static void OnPropSwap(FromServer.PropSwap data)
         {
-            string propName = data.propName;
             PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
-            player.ResetCoverPosition();
+            player.SetProp(data.propName);
 
-            if (propName == "")
-            {
-                player.currentCoverObjName = null;
-            }
-            else
-            {
-                player.currentCoverObjName = propName;
-            }
-
-            player.EnsurePropCover();
+            Log.LogInfo($"{data.Id} prop set to {data.propName}");
         }
 
         static void OnForcePropSwap(FromServer.ForcePropSwap data)
         {
             SelfCoverManager.instance.EnableProp();
+            Log.LogInfo("Forced prop sawp");
         }
 
-        static void OnPropLocation(FromServer.PropLocation data)
+        public static void OnPropLocation(FromServer.PropLocation data)
         {
             PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
+            player.SetPropLocation(data.propPosition, data.propRotation);
 
-            player.currentCoverObjLocation = data.propPosition;
-            player.currentCoverObjRotation = data.propRotation;
-
-            if (PlayerManager.IsHostInSameRoom(data.Id))
-            {
-                player.coverManager.SetPropLocation(data.propPosition);
-            }
             Log.LogInfo($"{data.Id} prop moved to {data.propPosition}, {data.propRotation}");
         }
 
         static void OnHideStatus(FromServer.HideStatus data)
         {
             PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
-
-            player.hornetManager.shouldBeShown = !data.isHiding;
-
-            if (PlayerManager.IsHostInSameRoom(data.Id))
-            {
-                player.hornetManager.ToggleHornet(!data.isHiding);
-            }
+            player.SetHideStatus(data.isHiding);
 
             Log.LogInfo($"{data.Id} hiding status set to {data.isHiding}");
         }
@@ -127,7 +106,7 @@ namespace PropHuntMod.Utils.Networking
             else
             {
                 var player = PlayerManager.GetPlayerManager(data.propOwnerID);
-                player.coverManager.DisableProp(player.hornetManager);
+                player.SetProp("");
                 Log.LogInfo($"{player.playerAvatar.Username} has been found");
             }
         }
@@ -135,7 +114,7 @@ namespace PropHuntMod.Utils.Networking
         static void OnGameOver(FromServer.GameOver data)
         {
             SelfCoverManager.instance.DisableProp();
-            string winner = data.winnerUsername;
+            //string winner = data.winnerUsername;
         }
     }
 }

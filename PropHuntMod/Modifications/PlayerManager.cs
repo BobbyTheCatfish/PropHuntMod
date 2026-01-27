@@ -29,11 +29,10 @@ namespace PropHuntMod.Modifications
             coverManager.playerID = playerID;
 
             PropHuntMod.client.ClientManager.TryGetPlayer(playerID, out var remotePlayer);
-            //if (!IsRemotePlayer(playerID))
-            //{
-            //    Log.LogError($"{playerID} is local.");
-            //    return;
-            //}
+            if (remotePlayer?.PlayerObject?.tag == "Player")
+            {
+                throw new Exception($"Player {remotePlayer.Id} ({remotePlayer.Username}) is not remote.");
+            }
 
             PropHuntMod.playerManager.Add(playerID, this);
 
@@ -50,18 +49,11 @@ namespace PropHuntMod.Modifications
 
             return player;
         }
-        //public static bool IsRemotePlayer(ushort playerID)
-        //{
-        //    bool isRemote = playerID != 0 && playerID != null;
-        //    Log.LogInfo($"isRemote: {isRemote}");
-        //    return isRemote;
-        //}
-        internal static bool IsHostInSameRoom(ushort playerID)
+        bool IsHostInSameRoom()
         {
-            var player = GetPlayerManager(playerID);
-            if (player == null || player.playerAvatar == null) return false;
+            if (playerAvatar == null) return false;
 
-            bool result = player.playerAvatar.IsInLocalScene; // == PropHuntMod.cover.currentScene;
+            bool result = playerAvatar.IsInLocalScene; // == PropHuntMod.cover.currentScene;
 
             if (result) Log.LogInfo($"{playerID} is in the same room");
             else Log.LogInfo($"{playerID} is in another room, you are in {SceneManager.GetActiveScene().name}");
@@ -77,7 +69,7 @@ namespace PropHuntMod.Modifications
                 return;
             }
 
-            if (IsHostInSameRoom(playerID))
+            if (IsHostInSameRoom())
             {
                 if (PropValidation.currentSceneObjects == null) PropValidation.GetAllProps();
                 var toClone = PropValidation.currentSceneObjects.GetSpecific(o => o.name == currentCoverObjName);
@@ -96,10 +88,38 @@ namespace PropHuntMod.Modifications
             }
         }
 
+        public void SetProp(string name)
+        {
+            if (string.IsNullOrEmpty(name)) name = "";
+
+            currentCoverObjName = name;
+            ResetCoverPosition();
+            EnsurePropCover();
+        }
+
+        public void SetPropLocation(Vector3 location, float rotation)
+        {
+            currentCoverObjLocation = location;
+            currentCoverObjRotation = rotation;
+
+            if (IsHostInSameRoom())
+            {
+                coverManager.SetPropLocation(location, rotation);
+            }
+        }
+
+        public void SetHideStatus(bool hiding)
+        {
+            hornetManager.shouldBeShown = !hiding;
+            if (IsHostInSameRoom())
+            {
+                hornetManager.ToggleHornet(!hiding);
+            }
+        }
+
         public void ResetCoverPosition()
         {
-            currentCoverObjLocation = Vector3.zero;
-            currentCoverObjRotation = 0;
+            SetPropLocation(Vector3.zero, 0);
         }
     }
 }
