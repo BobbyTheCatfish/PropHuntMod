@@ -2,6 +2,8 @@
 using SSMP.Api.Server;
 using SSMP.Api.Server.Networking;
 using SSMP.Networking.Packet;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace PropHuntMod.Utils.Networking
@@ -34,10 +36,18 @@ namespace PropHuntMod.Utils.Networking
             });
         }
 
-        public static void BroadcastForcePropSwap()
+        public static void BroadcastForcePropSwap(List<ServerPlayer> exclude)
         {
             Log.LogInfo("Broadcasting force prop swap");
-            sender.BroadcastSingleData(CustomPackets.ForcePropSwap, new FromServer.ForcePropSwap());
+            if (exclude.Count > 0)
+            {
+                foreach (var player in PropHuntServer._serverApi.ServerManager.Players)
+                {
+                    if (exclude.Any(p => p.id == player.Id)) continue;
+                    sender.SendSingleData(CustomPackets.ForcePropSwap, new FromServer.ForcePropSwap());
+                }
+            }
+            //sender.BroadcastSingleData(CustomPackets.ForcePropSwap, new FromServer.ForcePropSwap());
         }
 
         public static void ForwardPropLocation(ushort id, Vector3 propPosition, float propRotation)
@@ -139,6 +149,7 @@ namespace PropHuntMod.Utils.Networking
             owner.propName = null;
             owner.propLocation = null;
             owner.propRotation = null;
+            owner.seeker = true;
 
             ForwardPropFound(id, data.propOwnerID);
 

@@ -5,6 +5,7 @@ using SSMP.Api.Server.Networking;
 using SSMP.Game.Settings;
 using SSMP.Networking.Packet;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace PropHuntMod
@@ -13,6 +14,7 @@ namespace PropHuntMod
     {
         public ushort id;
         public bool hidden = false;
+        public bool seeker = false;
         public string propName;
         public Vector3? propLocation;
         public float? propRotation;
@@ -107,11 +109,38 @@ namespace PropHuntMod
                 player.swapCount = 0;
             }
         }
+        void PickSeekers(int count = 1)
+        {
+            ResetSeekers();
+            count = Mathf.Clamp(count, 1, players.Count - 1);
+            for (int i = 0; i < count; i++)
+            {
+                var validSeekers = players.Values.Where(p => !p.seeker).ToList();
+                if (validSeekers.Count == 0) return;
+
+                var seeker = validSeekers[Random.Range(0, validSeekers.Count - 1)];
+                seeker.seeker = true;
+            }
+        }
+        void ResetSeekers()
+        {
+            foreach (var player in players.Values)
+                player.seeker = false;
+        }
         public void GameStart()
         {
+            if (players.Count < 2)
+            {
+                Announce("...Well that's awkward. I can't start a game without two people!");
+                return;
+            }
             ResetSwapCounts();
+            PickSeekers();
+
             EnsureSettings();
-            ServerNetwork.BroadcastForcePropSwap();
+            
+            ServerNetwork.BroadcastForcePropSwap(players.Values.Where(p => p.seeker).ToList());
+            
             started = true;
             Announce("The game has begun! Good luck!");
         }
@@ -123,7 +152,8 @@ namespace PropHuntMod
             else Announce($"{winner} was the last bug standing! Congrats!");
             
             started = false;
-            ResetSwapCounts();            
+            ResetSwapCounts();
+            ResetSeekers();
         }
 
         void EnsureSettings()
