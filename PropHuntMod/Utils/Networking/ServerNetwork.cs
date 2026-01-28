@@ -53,6 +53,8 @@ namespace PropHuntMod.Utils.Networking
         public static void ForwardPropLocation(ushort id, Vector3 propPosition, float propRotation)
         {
             Log.LogInfo($"Broadcasting prop location from {id}: {propPosition}, {propRotation}");
+
+            BaseCoverManager.ConstrainPropLocation(ref propPosition, ref propRotation);
             Broadcast(id, CustomPackets.PropLocation, new FromServer.PropLocation
             {
                 Id= id,

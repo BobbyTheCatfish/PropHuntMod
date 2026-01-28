@@ -26,7 +26,6 @@ namespace PropHuntMod
 
         public override void Initialize(IClientApi clientApi)
         {
-
             PropHuntMod.Initialize(clientApi);
             
             Log.LogInfo("Prop Hunt Loaded.");

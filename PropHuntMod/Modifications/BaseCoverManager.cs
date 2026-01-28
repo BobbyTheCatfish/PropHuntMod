@@ -49,8 +49,18 @@ namespace PropHuntMod.Modifications
                 Log.LogError("No cover, can't set prop rotation");
                 return;
             }
+            ConstrainPropLocation(ref location, ref rotation);
+
             SetPropLocation(location);
             SetPropLocation(rotation);
+        }
+        public static void ConstrainPropLocation(ref Vector3 location, ref float rotation)
+        {
+            location.x = Mathf.Clamp(location.x, -2, 2);
+            location.y = Mathf.Clamp(location.y, -4, 4);
+            location.z = Mathf.Clamp(location.z, -4, 4);
+
+            rotation = rotation % 360;
         }
 
         public virtual bool DisableProp(BaseHornetManager manager, bool logOnFail = true)

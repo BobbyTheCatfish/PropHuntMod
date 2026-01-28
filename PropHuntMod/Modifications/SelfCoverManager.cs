@@ -73,18 +73,10 @@ namespace PropHuntMod.Modifications
                 return;
             }
 
-            var hp = Vector3.zero;// hornet.hornet.transform.position;
-
-            x = Mathf.Clamp(x, hp.x - 2, hp.x + 2);
-            y = Mathf.Clamp(y, hp.y - 4, hp.y + 4);
-            z = Mathf.Clamp(z, hp.z - 4, hp.z + 4);
-
-            if (rotation >= 360) rotation -= 360;
-            else if (rotation < 0) rotation += 360;
 
             //Log.LogInfo($"Hornet position: {hornet.hornet.transform.position}");
-
-            SetPropLocation(new Vector3(x, y, z), rotation);
+            Vector3 newLocation = new Vector3(x, y, z);
+            SetPropLocation(newLocation, rotation);
             movedRecently = true;
         }
 
