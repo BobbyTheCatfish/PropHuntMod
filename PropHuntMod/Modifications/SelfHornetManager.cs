@@ -37,7 +37,7 @@ namespace PropHuntMod.Modifications
 
         public override void SetHornet()
         {
-            hornet = GameObject.Find("Hero_Hornet (Clone)");
+            hornet = GameObject.Find("Hero_Hornet(Clone)");
             if (hornet == null)
             {
                 Debug.LogError("SELF HORNET NOT FOUND");

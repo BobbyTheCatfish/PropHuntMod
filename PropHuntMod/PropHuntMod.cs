@@ -33,6 +33,7 @@ namespace PropHuntMod
 {
     using PlayerID = UInt16;
     [BepInPlugin("com.bobbythecatfish.prophunt", Utils.Config.ModName, Utils.Config.ModVersion)]
+    [BepInDependency("ssmp")]
     [BepInProcess("Hollow Knight Silksong.exe")]
     public class PropHuntMod : BaseUnityPlugin
     {
@@ -51,6 +52,8 @@ namespace PropHuntMod
         {
             Utils.Config.LoadConfig(Config);
             Log.SetLogger(base.Logger);
+            SSMP.Api.Client.ClientAddon.RegisterAddon(new PropHuntClient());
+            SSMP.Api.Server.ServerAddon.RegisterAddon(new PropHuntServer());
         }
         public static void Initialize(IClientApi clientApi)
         {

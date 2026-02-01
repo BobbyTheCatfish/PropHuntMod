@@ -156,7 +156,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "C:\Users\BobbyTC\source\repos\PropHuntMod\PropHuntMod\bin\Debug\PropHuntMod.dll" "H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\SSMP" /Y
-xcopy "C:\Users\BobbyTC\source\repos\PropHuntMod\PropHuntMod\bin\Debug\PropHuntMod.pdb" "H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\SSMP" /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "C:\Users\BobbyTC\source\repos\PropHuntMod\PropHuntMod\bin\Debug\PropHuntMod.dll" "H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\PropHunt" /Y
+xcopy "C:\Users\BobbyTC\source\repos\PropHuntMod\PropHuntMod\bin\Debug\PropHuntMod.pdb" "H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\PropHunt" /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>
