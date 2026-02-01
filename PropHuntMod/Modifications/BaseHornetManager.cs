@@ -70,7 +70,11 @@ namespace PropHuntMod.Modifications
         {
             if (!HornetExists()) return;
 
-            var nametag = hornet.GetComponent<Transform>().Find("Username");
+            Transform nametag;
+            if (hornet.transform.parent) nametag = hornet.transform.parent.Find("Username");
+            else nametag = hornet.transform.Find("Username");
+
+            Log.LogInfo($"Nametag: {nametag}, setting to {show}");
             nametag?.gameObject.SetActive(show);
         }
     }
