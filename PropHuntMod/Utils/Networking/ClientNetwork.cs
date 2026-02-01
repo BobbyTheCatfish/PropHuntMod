@@ -27,8 +27,8 @@ namespace PropHuntMod.Utils.Networking
             Log.LogInfo($"Sending prop location: {propPosition}, {propRotation}");
             sender.SendSingleData(CustomPackets.PropLocation, new FromClient.PropLocation
             {
-                propPosition = propPosition,
-                propRotation = propRotation
+                PropPosition = propPosition,
+                PropRotation = propRotation
             });
         }
 
@@ -37,7 +37,7 @@ namespace PropHuntMod.Utils.Networking
             Log.LogInfo($"Sending hide status: {isHiding}");
             sender.SendSingleData(CustomPackets.HideStatus, new FromClient.HideStatus
             {
-                isHiding = isHiding
+                IsHiding = isHiding
             });
         }
 
@@ -46,7 +46,7 @@ namespace PropHuntMod.Utils.Networking
             Log.LogInfo($"Sending prop found: {propOwnerID}");
             sender.SendSingleData(CustomPackets.PropFound, new FromClient.PropFound
             {
-                propOwnerID = propOwnerID
+                PropOwnerID = propOwnerID
             });
         }
 
@@ -95,29 +95,29 @@ namespace PropHuntMod.Utils.Networking
         public static void OnPropLocation(FromServer.PropLocation data)
         {
             PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
-            player.SetPropLocation(data.propPosition, data.propRotation);
+            player.SetPropLocation(data.PropPosition, data.PropRotation);
 
-            Log.LogInfo($"{data.Id} prop moved to {data.propPosition}, {data.propRotation}");
+            Log.LogInfo($"{data.Id} prop moved to {data.PropPosition}, {data.PropRotation}");
         }
 
         static void OnHideStatus(FromServer.HideStatus data)
         {
             PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
-            player.SetHideStatus(data.isHiding);
+            player.SetHideStatus(data.IsHiding);
 
-            Log.LogInfo($"{data.Id} hiding status set to {data.isHiding}");
+            Log.LogInfo($"{data.Id} hiding status set to {data.IsHiding}");
         }
 
         static void OnPropFound(FromServer.PropFound data)
         {
-            if (data.isClientFound)
+            if (data.IsClientFound)
             {
                 Log.LogInfo("I've been found!");
                 SelfCoverManager.instance.DisableProp();
             }
             else
             {
-                var player = PlayerManager.GetPlayerManager(data.propOwnerID);
+                var player = PlayerManager.GetPlayerManager(data.PropOwnerID);
                 player.SetProp("");
                 Log.LogInfo($"{player.playerAvatar.Username} has been found");
             }

@@ -40,9 +40,8 @@ namespace PropHuntMod
         internal SelfHornetManager hornet = new SelfHornetManager();
         internal SelfCoverManager cover = new SelfCoverManager();
         //private static AttackCooldownPatches attackPatches = new AttackCooldownPatches(config);
-        private static NoDamage noDamage = new NoDamage();
+        private static readonly NoDamage noDamage = new NoDamage();
         internal static Dictionary<PlayerID, PlayerManager> playerManager = new Dictionary<PlayerID, PlayerManager>();
-        HeroController heroController => HeroController.instance;
         internal static IClientApi client;
         internal static bool modEnabled = false;
 
@@ -74,6 +73,21 @@ namespace PropHuntMod
             modEnabled = false;
         }
 
+        bool IsInputDisabled()
+        {
+            // pause menu, inventory, etc
+            if (HeroController.instance.IsInputBlocked()) return true;
+
+            // Prevent keybinds if chat window or other text input is up
+            GameObject selection = EventSystem.current.currentSelectedGameObject;
+            if (selection != null)
+            {
+                if (selection.GetComponent<InputField>()?.gameObject.activeInHierarchy ?? false) return true;
+            }
+
+            return false;
+        }
+
         private void Update()
         {
             if (!modEnabled) return;
@@ -84,9 +98,9 @@ namespace PropHuntMod
             }
 
             // No keybinds if inputs are blocked
-            if (heroController != null)
+            if (HeroController.instance != null)
             {
-                if (heroController.IsInputBlocked()) return;
+                if (HeroController.instance.IsInputBlocked()) return;
             }
 
 
@@ -102,16 +116,16 @@ namespace PropHuntMod
             }
 
             // TOGGLE VISIBILITY
-            if (Input.GetKeyDown(Utils.Config.hideHornetKey))
+            if (Input.GetKeyDown(Utils.Config.HideHornetKey))
             {
                 hornet.ToggleHornet();
             }
             // SET PROP
-            if (Input.GetKeyDown(Utils.Config.swapPropKey))
+            if (Input.GetKeyDown(Utils.Config.SwapPropKey))
             {
                 cover.EnableProp();
             }
-            if (Input.GetKeyDown(Utils.Config.resetKey))
+            if (Input.GetKeyDown(Utils.Config.ResetKey))
             {
                 cover.DisableProp(hornet);
             }

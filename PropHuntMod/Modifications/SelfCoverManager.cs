@@ -35,10 +35,10 @@ namespace PropHuntMod.Modifications
                 return;
             }
 
-            var x = position.x;
-            var y = position.y;
-            var z = position.z;
-            var rotation = this.rotation;
+            var x = Position.x;
+            var y = Position.y;
+            var z = Position.z;
+            var rotation = this.Rotation;
 
             SelfHornetManager hornet = SelfHornetManager.instance;
             if (!hornet.HornetExists()) return;
@@ -90,7 +90,7 @@ namespace PropHuntMod.Modifications
             }
 
             movedRecently = false;
-            ClientNetwork.SendPropLocation(position, rotation);
+            ClientNetwork.SendPropLocation(Position, Rotation);
         }
 
         public void EnableProp()

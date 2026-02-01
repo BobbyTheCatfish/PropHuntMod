@@ -26,51 +26,51 @@ namespace PropHuntMod.Utils.Networking.FromClient
     {
         public bool IsReliable => true;
         public bool DropReliableDataIfNewerExists => true;
-        public Vector3 propPosition { get; set; }
-        public float propRotation { get; set; }
+        public Vector3 PropPosition { get; set; }
+        public float PropRotation { get; set; }
         public virtual void WriteData(IPacket packet)
         {
-            packet.Write(propPosition.x);
-            packet.Write(propPosition.y);
-            packet.Write(propPosition.z);
+            packet.Write(PropPosition.x);
+            packet.Write(PropPosition.y);
+            packet.Write(PropPosition.z);
 
-            packet.Write(propRotation);
+            packet.Write(PropRotation);
         }
 
         public virtual void ReadData(IPacket packet)
         {
-            propPosition = new Vector3(packet.ReadFloat(), packet.ReadFloat(), packet.ReadFloat());
-            propRotation = packet.ReadFloat();
+            PropPosition = new Vector3(packet.ReadFloat(), packet.ReadFloat(), packet.ReadFloat());
+            PropRotation = packet.ReadFloat();
         }
     }
     public class HideStatus : IPacketData
     {
         public bool IsReliable => true;
         public bool DropReliableDataIfNewerExists => true;
-        public bool isHiding { get; set; }
+        public bool IsHiding { get; set; }
 
         public virtual void WriteData(IPacket packet)
         {
-            packet.Write(isHiding);
+            packet.Write(IsHiding);
         }
 
         public virtual void ReadData(IPacket packet)
         {
-            isHiding = packet.ReadBool();
+            IsHiding = packet.ReadBool();
         }
     }
     public class PropFound : IPacketData
     {
         public bool IsReliable => true;
         public bool DropReliableDataIfNewerExists => true;
-        public ushort propOwnerID { get; set; }
+        public ushort PropOwnerID { get; set; }
         public virtual void WriteData(IPacket packet)
         {
-            packet.Write(propOwnerID);
+            packet.Write(PropOwnerID);
         }
         public virtual void ReadData(IPacket packet)
         {
-            propOwnerID = packet.ReadUShort();
+            PropOwnerID = packet.ReadUShort();
         }
     }
     public static class Packets

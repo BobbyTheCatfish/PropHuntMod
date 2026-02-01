@@ -12,9 +12,11 @@ namespace PropHuntMod.Modifications
         // Instakill for hiders
         [HarmonyPrefix]
         [HarmonyPatch(typeof(HeroController), "TakeDamage")]
+        #pragma warning disable IDE0060 // Remove unused parameter
         public static void TakeDamage(HeroController __instance, GameObject go, CollisionSide damageSide, ref int damageAmount, HazardType hazardType, DamagePropertyFlags damagePropertyFlags = DamagePropertyFlags.None)
+        #pragma warning restore IDE0060 // Remove unused parameter
         {
-            if (!Config.disableDamage) return;
+            if (!Config.DisableDamage) return;
 
             //if (go.name == "Bone Goomba") // Used for testing
             if (go.tag == "Player" && SelfCoverManager.instance.IsHiding && INSTA_KILL)
@@ -30,7 +32,7 @@ namespace PropHuntMod.Modifications
 
         static bool DisableAlertRange(AlertRange alertRange)
         {
-            if (Config.disableDamage == true)
+            if (Config.DisableDamage == true)
             {
                 var isEnemy = alertRange.transform.parent.gameObject.layer == (int)PhysLayers.ENEMIES;
                 if (isEnemy)

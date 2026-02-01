@@ -66,8 +66,8 @@ namespace PropHuntMod.Utils.Networking
             Broadcast(id, CustomPackets.PropLocation, new FromServer.PropLocation
             {
                 Id= id,
-                propPosition = propPosition,
-                propRotation = propRotation
+                PropPosition = propPosition,
+                PropRotation = propRotation
             });
         }
 
@@ -77,7 +77,7 @@ namespace PropHuntMod.Utils.Networking
             Broadcast(id, CustomPackets.HideStatus, new FromServer.HideStatus
             {
                 Id = id,
-                isHiding = isHiding
+                IsHiding = isHiding
             });
         }
 
@@ -90,8 +90,8 @@ namespace PropHuntMod.Utils.Networking
 
                 FromServer.PropFound sendData = new FromServer.PropFound
                 {
-                    isClientFound = player.Id == propOwnerID,
-                    propOwnerID = propOwnerID,
+                    IsClientFound = player.Id == propOwnerID,
+                    PropOwnerID = propOwnerID,
                 };
 
                 sender.SendSingleData(CustomPackets.PropFound, sendData, player.Id);
@@ -103,7 +103,7 @@ namespace PropHuntMod.Utils.Networking
             Log.LogInfo("Broadcasting game over");
             sender.BroadcastSingleData(CustomPackets.GameOver, new FromServer.GameOver
             {
-                winnerUsername = winner
+                WinnerUsername = winner
             });
         }
 
@@ -153,27 +153,27 @@ namespace PropHuntMod.Utils.Networking
                 return;
             }
 
-            player.propLocation = data.propPosition;
-            player.propRotation = data.propRotation;
+            player.propLocation = data.PropPosition;
+            player.propRotation = data.PropRotation;
 
-            ForwardPropLocation(id, data.propPosition, data.propRotation);
+            ForwardPropLocation(id, data.PropPosition, data.PropRotation);
         }
 
         static void OnHideStatus(ushort id, FromClient.HideStatus data)
         {
             var player = PropHuntServer.GetPlayer(id);
-            if (player.seeker && data.isHiding)
+            if (player.seeker && data.IsHiding)
             {
                 PropHuntServer.instance.Message(id, "You're a seeker! You can't hide this round.");
                 return;
             }
-            player.hidden = data.isHiding;
-            ForwardHideStatus(id, data.isHiding);
+            player.hidden = data.IsHiding;
+            ForwardHideStatus(id, data.IsHiding);
         }
 
         static void OnPropFound(ushort id, FromClient.PropFound data)
         {
-            var owner = PropHuntServer.GetPlayer(data.propOwnerID);
+            var owner = PropHuntServer.GetPlayer(data.PropOwnerID);
             var finder = PropHuntServer.GetPlayer(id);
 
             if (PropHuntServer.started && owner.seeker)
@@ -192,7 +192,7 @@ namespace PropHuntMod.Utils.Networking
             owner.propRotation = 0;
             owner.seeker = true;
 
-            ForwardPropFound(id, data.propOwnerID);
+            ForwardPropFound(id, data.PropOwnerID);
 
             
             PropHuntServer.instance.Announce($"{owner.playerAvatar.Username} was found by {finder.playerAvatar.Username}!");

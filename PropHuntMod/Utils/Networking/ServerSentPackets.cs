@@ -72,16 +72,16 @@ namespace PropHuntMod.Utils.Networking.FromServer
     }
     public class PropFound : FromClient.PropFound
     {
-        public bool isClientFound { get; set; }
+        public bool IsClientFound { get; set; }
         public override void WriteData(IPacket packet)
         {
-            packet.Write(isClientFound);
+            packet.Write(IsClientFound);
             base.WriteData(packet);
         }
 
         public override void ReadData(IPacket packet)
         {
-            isClientFound = packet.ReadBool();
+            IsClientFound = packet.ReadBool();
             base.ReadData(packet);
         }
     }
@@ -89,15 +89,15 @@ namespace PropHuntMod.Utils.Networking.FromServer
     {
         public bool IsReliable => true;
         public bool DropReliableDataIfNewerExists => true;
-        public string winnerUsername { get; set; } = "";
+        public string WinnerUsername { get; set; } = "";
         public void WriteData(IPacket packet)
         {
-            packet.Write(winnerUsername);
+            packet.Write(WinnerUsername);
         }
 
         public void ReadData(IPacket packet)
         {
-            winnerUsername = packet.ReadString();
+            WinnerUsername = packet.ReadString();
         }
     }
     public static class Packets

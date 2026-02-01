@@ -18,11 +18,11 @@ namespace PropHuntMod.Utils
         static ConfigEntry<KeyCode> _hideHornetKey;
         static ConfigEntry<KeyCode> _resetKey;
 
-        public static bool disableDamage { get { return _disableDamage.Value; } }
+        public static bool DisableDamage => _disableDamage.Value;
         //public static float attackCooldown { get { return _attackCooldown.Value; } }
-        public static KeyCode swapPropKey { get { return _swapPropKey.Value; } }
-        public static KeyCode hideHornetKey { get { return _hideHornetKey.Value; } }
-        public static KeyCode resetKey { get { return _resetKey.Value; } }
+        public static KeyCode SwapPropKey => _swapPropKey.Value;
+        public static KeyCode HideHornetKey => _hideHornetKey.Value;
+        public static KeyCode ResetKey => _resetKey.Value;
 
         public static void LoadConfig(ConfigFile Config)
         {

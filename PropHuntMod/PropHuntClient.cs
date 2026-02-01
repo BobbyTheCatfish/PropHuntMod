@@ -38,19 +38,19 @@ namespace PropHuntMod
             ClientNetwork.Init(clientApi, this);
 
             // Handle connects and disconnects
-            clientApi.ClientManager.PlayerConnectEvent += (IClientPlayer player) =>
+            clientApi.ClientManager.PlayerConnectEvent += player =>
             {
                 Log.LogInfo($"Player {player.Username} connected");
                 PlayerManager.GetPlayerManager(player.Id);
             };
 
-            clientApi.ClientManager.PlayerDisconnectEvent += (IClientPlayer player) =>
+            clientApi.ClientManager.PlayerDisconnectEvent += player =>
             {
                 Log.LogInfo($"Player {player.Username} disconnected");
                 PropHuntMod.playerManager.Remove(player.Id);
             };
 
-            clientApi.ClientManager.PlayerEnterSceneEvent += (IClientPlayer player) =>
+            clientApi.ClientManager.PlayerEnterSceneEvent += player =>
             {
                 Log.LogInfo($"Player {player.Username} entered your scene");
 

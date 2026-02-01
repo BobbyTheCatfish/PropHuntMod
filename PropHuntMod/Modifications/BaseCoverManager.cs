@@ -17,8 +17,8 @@ namespace PropHuntMod.Modifications
         //public string currentScene;
         public PlayerID playerID;
         internal bool isRemote = true;
-        internal Vector3 position => cover?.transform.localPosition ?? Vector3.zero;
-        internal float rotation => cover?.transform.GetLocalRotation2D() ?? 0;
+        internal Vector3 Position => cover?.transform.localPosition ?? Vector3.zero;
+        internal float Rotation => cover?.transform.GetLocalRotation2D() ?? 0;
         public bool IsHiding => cover != null;
         public void SetPropLocation(Vector3 location)
         {
@@ -60,7 +60,7 @@ namespace PropHuntMod.Modifications
             location.y = Mathf.Clamp(location.y, -4, 4);
             location.z = Mathf.Clamp(location.z, -4, 4);
 
-            rotation = rotation % 360;
+            rotation %= 360;
         }
 
         public virtual bool DisableProp(BaseHornetManager manager, bool logOnFail = true)
