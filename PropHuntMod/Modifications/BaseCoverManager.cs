@@ -234,6 +234,7 @@ namespace PropHuntMod.Modifications
             //Log.LogInfo($"{other.name} - {other.tag}");
             if (other.tag == "Nail Attack" && !SelfCoverManager.instance.IsHiding)
             {
+                if (!other.GetComponentInParent<HeroController>()) return;
                 PlayerManager.GetPlayerManager(playerID).coverManager.OnHit();
             }
         }
