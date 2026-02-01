@@ -48,6 +48,10 @@ namespace PropHuntMod
             //clientApi.CommandManager.RegisterCommand(new Commands.ClientStopCommand());
         }
 
+        public static void AddLocalMessage(string message)
+        {
+            PropHuntMod.client.UiManager.ChatBox.AddMessage(message);
+        }
         //public static bool IsHunter()
         //{
         //    return PropHuntMod.client.ClientManager.Team == Team.Grimm;

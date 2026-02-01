@@ -45,6 +45,7 @@ namespace PropHuntMod
         internal static IClientApi client;
         internal static bool modEnabled = false;
 
+        internal static bool showHitboxes = false;
 
         void Awake()
         {
@@ -94,7 +95,7 @@ namespace PropHuntMod
             GameObject selection = EventSystem.current.currentSelectedGameObject;
             if (selection != null)
             {
-                if (selection.GetComponent<InputField>() != null) return;
+                if (selection.GetComponent<InputField>()?.gameObject.activeInHierarchy ?? false) return;
             }
 
             // TOGGLE VISIBILITY
@@ -145,7 +146,11 @@ namespace PropHuntMod
         internal static void OnSceneChange(SceneLoad __instance)
         {
             if (!modEnabled) return;
-
+            if (GameManager.instance.GameState == GlobalEnums.GameState.MAIN_MENU)
+            {
+                Log.LogInfo("Begin", GameManager.instance.GameState);
+                return;
+            }
             SelfCoverManager.instance.DisableProp();
             Log.LogInfo($"Changing scene to {__instance.TargetSceneName}");
             //cover.currentScene = __instance.TargetSceneName;
@@ -162,13 +167,14 @@ namespace PropHuntMod
         internal static void OnNextLevelReady()
         {
             if (!modEnabled) return;
+            if (GameManager.instance.GameState == GlobalEnums.GameState.MAIN_MENU)
+            {
+                Log.LogInfo(GameManager.instance.GameState);
+                return;
+            }
 
             PropValidation.GetAllProps();
-            Debug.Log($"Ensuring cover for {playerManager.Count} players");
-            foreach (var player in playerManager.Values)
-            {
-                player.EnsurePropCover();
-            }
+            PlayerManager.EnsureAllPropCovers();
         }
 
         //[HarmonyPrefix]

@@ -66,6 +66,15 @@ namespace PropHuntMod
                 players.Remove(player.Id);
             };
 
+            //serverApi.ServerManager.PlayerEnterSceneEvent += (IServerPlayer player) =>
+            //{
+            //    ServerNetwork.Broadcast(player.Id, CustomPackets.SceneChange, new Utils.Networking.FromServer.SceneChange
+            //    {
+            //        Id = player.Id,
+            //        scene = player.CurrentScene
+            //    });
+            //};
+
         }
 
         internal static ServerPlayer GetPlayer(ushort playerID)

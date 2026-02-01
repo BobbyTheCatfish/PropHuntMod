@@ -29,19 +29,21 @@ namespace PropHuntMod.Modifications
             coverManager.playerID = playerID;
 
             PropHuntMod.client.ClientManager.TryGetPlayer(playerID, out var remotePlayer);
-            if (remotePlayer?.PlayerObject?.tag == "Player")
-            {
-                throw new Exception($"Player {remotePlayer.Id} ({remotePlayer.Username}) is not remote.");
-            }
+            //if (remotePlayer?.PlayerContainer?.tag == "Player")
+            //{
+            //    throw new Exception($"Player {remotePlayer.Id} ({remotePlayer.Username}) is not remote.");
+            //}
 
-            PropHuntMod.playerManager.Add(playerID, this);
 
             if (remotePlayer == null)
             {
-                Log.LogError($"No remotePlayer for {playerID}");
+                Log.LogError($"No remotePlayer for {playerID}. Are they remote?");
                 return;
             }
+
+            PropHuntMod.playerManager.Add(playerID, this);
         }
+
         public static PlayerManager GetPlayerManager(PlayerID playerID)
         {
             PropHuntMod.playerManager.TryGetValue(playerID, out var player);
@@ -49,11 +51,14 @@ namespace PropHuntMod.Modifications
 
             return player;
         }
-        bool IsHostInSameRoom()
+        public bool IsHostInSameRoom()
         {
             if (playerAvatar == null) return false;
 
-            bool result = playerAvatar.IsInLocalScene; // == PropHuntMod.cover.currentScene;
+            Log.LogInfo($"{playerID} IsInLocalScene: {playerAvatar.IsInLocalScene}");
+
+            //bool result = scene == SceneManager.GetActiveScene().name;
+            bool result = playerAvatar.IsInLocalScene;
 
             if (result) Log.LogInfo($"{playerID} is in the same room");
             else Log.LogInfo($"{playerID} is in another room, you are in {SceneManager.GetActiveScene().name}");
@@ -120,6 +125,15 @@ namespace PropHuntMod.Modifications
         public void ResetCoverPosition()
         {
             SetPropLocation(Vector3.zero, 0);
+        }
+
+        public static void EnsureAllPropCovers()
+        {
+            Debug.Log($"Ensuring cover for {PropHuntMod.playerManager.Count} players");
+            foreach (var player in PropHuntMod.playerManager.Values)
+            {
+                player.EnsurePropCover();
+            }
         }
     }
 }

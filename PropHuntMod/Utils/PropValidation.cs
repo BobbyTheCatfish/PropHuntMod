@@ -156,7 +156,7 @@ namespace PropHuntMod.Utils
                 if (renderer == null) continue;
 
                 if (props.Any(o => IsGameObjectDuplicate(renderer, o))) continue;
-                Log.LogInfo($"{gameObject.name} - {gameObject.layer} YES");
+                //Log.LogInfo($"{gameObject.name} - {gameObject.layer} YES");
                 props.Add(gameObject);
             }
 
@@ -191,7 +191,7 @@ namespace PropHuntMod.Utils
                 foreach (var component in components)
                 {
                     //Log.LogInfo(component + " removed");
-                    if (keepOnParent && component.gameObject != gameObject.gameObject) Component.Destroy(component);
+                    if (!keepOnParent || component.gameObject != gameObject.gameObject) Component.Destroy(component);
                 }
             }
 
@@ -218,7 +218,6 @@ namespace PropHuntMod.Utils
             GameObject.Instantiate(parent, hornetTransform);
             //parent.transform.SetPosition2D(hornetTransform.position);
             //parent.transform.SetParent(hornetTransform);
-            parent.SetActive(false);
 
             List<GameObject> allProps = new List<GameObject>();
 
@@ -237,44 +236,170 @@ namespace PropHuntMod.Utils
                 }
 
                 if (cover == null) continue;
-                Log.LogInfo(cover.name);
+                //Log.LogInfo(cover.name);
 
                 StripProp(cover);
 
                 // Add hit detection
-                Renderer[] renderers = parent.GetComponentsInChildren<Renderer>();
+                Renderer[] renderers = cover.GetComponentsInChildren<Renderer>(false).Where(r => !(r is LineRenderer) && !(r is ParticleSystemRenderer)).ToArray();
+
                 if (renderers.Length == 0)
                 {
                     Log.LogError("No renderers found");
                 }
                 else
                 {
-                    Bounds combinedBounds = renderers[0].bounds;
+                    Bounds combinedBounds = renderers[0]?.bounds ?? new Bounds();
 
-                    for (int i = 1; i < renderers.Length; i++)
+                    foreach (var r in renderers)
                     {
-                        combinedBounds.Encapsulate(renderers[i].bounds);
+                        var name = r.name.ToLower();
+                        if (name.StartsWith("haze") || name.StartsWith("light") || name == "lit") continue;
+                        Log.LogInfo(r, r.name, r.bounds);
+                        combinedBounds.Encapsulate(r.bounds);
                     }
+                    //Log.LogInfo(renderers[0].bounds);
 
                     var collider = cover.AddComponent<BoxCollider2D>();
                     collider.isTrigger = true;
-                    collider.offset = cover.transform.InverseTransformPoint(combinedBounds.center);
+                    collider.offset = Vector2.zero;//cover.transform.InverseTransformPoint(combinedBounds.center);
                     collider.size = combinedBounds.size;
 
                     var body = cover.AddComponentIfNotPresent<Rigidbody2D>();
                     body.bodyType = RigidbodyType2D.Kinematic;
 
+                    cover.AddComponent<LineRenderer>();
+                    cover.AddComponent<DebugViewCollider>();
+
                     cover.AddComponent<TriggerHandler>();
+
+                    //foreach (Renderer renderer in renderers)
+                    //{
+                    //    renderer.gameObject.AddComponentIfNotPresent<LineRenderer>();
+                    //    renderer.gameObject.AddComponent<DebugViewBounds>();
+                    //}
                 }
 
                 allProps.Add(cover);
             }
 
+            parent.SetActive(false);
             currentSceneObjects = new NoRepeat<GameObject>(allProps);
         }
         public static void ResetProps()
         {
             currentSceneObjects = null;
+        }
+    }
+
+    class DebugViewCollider : MonoBehaviour
+    {
+        Color borderColor = Color.cyan;
+        float lineWidth = 0.05f;
+
+        LineRenderer lineRenderer;
+        BoxCollider2D collider;
+
+        bool show => PropHuntMod.showHitboxes;
+
+        void Awake()
+        {
+            collider = GetComponent<BoxCollider2D>();
+            lineRenderer = GetComponent<LineRenderer>();
+
+            lineRenderer.loop = true;
+            lineRenderer.useWorldSpace = true;
+            lineRenderer.startWidth = lineWidth;
+            lineRenderer.endWidth = lineWidth;
+            lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            lineRenderer.startColor = borderColor;
+            lineRenderer.endColor = borderColor;
+        }
+
+        void LateUpdate()
+        {
+            if (show) DrawBox(collider);
+            else lineRenderer.positionCount = 0;
+
+        }
+
+        void DrawBox(BoxCollider2D box)
+        {
+            Vector2 size = box.size * 0.5f;
+            Vector2 offset = box.offset;
+
+            Vector3[] points = new Vector3[4];
+            points[0] = offset + new Vector2(-size.x, -size.y);
+            points[1] = offset + new Vector2(size.x, -size.y);
+            points[2] = offset + new Vector2(size.x, size.y);
+            points[3] = offset + new Vector2(-size.x, size.y);
+
+            SetPositions(points);
+        }
+
+        void SetPositions(Vector3[] localPoints)
+        {
+            lineRenderer.positionCount = localPoints.Length;
+
+            for (int i = 0; i < localPoints.Length; i++)
+            {
+                lineRenderer.SetPosition(i, transform.TransformPoint(localPoints[i]));
+            }
+        }
+    }
+
+    class DebugViewBounds : MonoBehaviour
+    {
+        LineRenderer lineRenderer;
+        Renderer[] renderers;
+        Color borderColor = Color.red;
+        float lineWidth = 0.05f;
+
+        void Awake()
+        {
+            lineRenderer = GetComponent<LineRenderer>();
+
+            lineRenderer.loop = true;
+            lineRenderer.useWorldSpace = true;
+            lineRenderer.startWidth = lineWidth;
+            lineRenderer.endWidth = lineWidth;
+            lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            lineRenderer.startColor = borderColor;
+            lineRenderer.endColor = borderColor;
+
+            renderers = GetComponents<Renderer>();
+        }
+
+        void LateUpdate()
+        {
+            foreach (Renderer renderer in renderers)
+            {
+                DrawBox(renderer);
+            }
+        }
+
+        void DrawBox(Renderer renderer)
+        {
+            Vector2 size = renderer.localBounds.size.DivideElements(2.1f, 2.1f);
+            Vector2 offset = renderer.localBounds.center;
+
+            Vector3[] points = new Vector3[4];
+            points[0] = offset + new Vector2(-size.x, -size.y);
+            points[1] = offset + new Vector2(size.x, -size.y);
+            points[2] = offset + new Vector2(size.x, size.y);
+            points[3] = offset + new Vector2(-size.x, size.y);
+
+            SetPositions(points);
+        }
+
+        void SetPositions(Vector3[] localPoints)
+        {
+            lineRenderer.positionCount = localPoints.Length;
+
+            for (int i = 0; i < localPoints.Length; i++)
+            {
+                lineRenderer.SetPosition(i, transform.TransformPoint(localPoints[i]));
+            }
         }
     }
 }

@@ -1,12 +1,6 @@
-﻿using PropHuntMod.Utils;
-using PropHuntMod.Utils.Networking;
+﻿using PropHuntMod.Modifications;
 using SSMP.Api.Command.Client;
 using SSMP.Api.Command.Server;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PropHuntMod.Commands
 {
@@ -41,6 +35,35 @@ namespace PropHuntMod.Commands
             }
 
             PropHuntServer.instance.GameOver("[canceled]", true);
+        }
+    }
+
+    internal class ShowHitboxes : IClientCommand
+    {
+        public bool AuthorizedOnly => false;
+        public string Trigger => "/hitboxes";
+        public string[] Aliases => new string[] { };
+        public void Execute(string[] args)
+        {
+            if (!SelfCoverManager.instance.IsHiding && !PropHuntMod.showHitboxes)
+            {
+                PropHuntClient.AddLocalMessage("Cannot enable hitboxes when not hiding.");
+                return;
+            }
+            PropHuntClient.AddLocalMessage("Turning hitboxes " + (PropHuntMod.showHitboxes ? "off": "on"));
+            PropHuntMod.showHitboxes = !PropHuntMod.showHitboxes;
+        }
+    }
+
+    internal class Sync : IClientCommand
+    {
+        public bool AuthorizedOnly => false;
+        public string Trigger => "/sync";
+        public string[] Aliases => new string[] { };
+        public void Execute(string[] args)
+        {
+            PropHuntClient.AddLocalMessage($"Syncing props for {PropHuntMod.playerManager.Count} players");
+            PlayerManager.EnsureAllPropCovers();
         }
     }
 }
