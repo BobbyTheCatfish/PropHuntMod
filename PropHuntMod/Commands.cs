@@ -34,7 +34,7 @@ namespace PropHuntMod.Commands
                 return;
             }
 
-            PropHuntServer.instance.GameOver("[canceled]", true);
+            PropHuntServer.instance.CheckGameOver("[canceled]", true);
         }
     }
 
@@ -45,12 +45,12 @@ namespace PropHuntMod.Commands
         public string[] Aliases => new string[] { };
         public void Execute(string[] args)
         {
-            if (!SelfCoverManager.instance.IsHiding && !PropHuntMod.showHitboxes)
+            if (!PropHuntClient.isSeeker && !PropHuntMod.showHitboxes)
             {
-                PropHuntClient.AddLocalMessage("Cannot enable hitboxes when not hiding.");
+                PropHuntClient.LocalMessage("Cannot enable hitboxes when seeking.");
                 return;
             }
-            PropHuntClient.AddLocalMessage("Turning hitboxes " + (PropHuntMod.showHitboxes ? "off": "on"));
+            PropHuntClient.LocalMessage("Turning hitboxes " + (PropHuntMod.showHitboxes ? "off": "on"));
             PropHuntMod.showHitboxes = !PropHuntMod.showHitboxes;
         }
     }
@@ -62,7 +62,7 @@ namespace PropHuntMod.Commands
         public string[] Aliases => new string[] { };
         public void Execute(string[] args)
         {
-            PropHuntClient.AddLocalMessage($"Syncing props for {PropHuntMod.playerManager.Count} players");
+            PropHuntClient.LocalMessage($"Syncing props for {PropHuntMod.playerManager.Count} players");
             PlayerManager.EnsureAllPropCovers();
         }
     }

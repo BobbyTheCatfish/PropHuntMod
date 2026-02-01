@@ -25,6 +25,11 @@ namespace PropHuntMod
         public override uint ApiVersion => Config.SSMPApiVersion;
         public override bool NeedsNetwork =>  true;
 
+        public static bool roundStarted = false;
+        public static bool isSeeker = false;
+        public static ushort propSwaps = 0;
+        public static ushort maxPropSwaps = 0;
+
         public override void Initialize(IClientApi clientApi)
         {
             PropHuntMod.Initialize(clientApi);
@@ -48,6 +53,7 @@ namespace PropHuntMod
             clientApi.ClientManager.PlayerEnterSceneEvent += (IClientPlayer player) =>
             {
                 Log.LogInfo($"Player {player.Username} entered your scene");
+
                 var manager = PlayerManager.GetPlayerManager(player.Id);
                 manager.hornetManager.SetHornet();
                 manager.EnsurePropCover();
@@ -60,7 +66,7 @@ namespace PropHuntMod
             //clientApi.CommandManager.RegisterCommand(new Commands.ClientStopCommand());
         }
 
-        public static void AddLocalMessage(string message)
+        public static void LocalMessage(string message)
         {
             PropHuntMod.client.UiManager.ChatBox.AddMessage(message);
         }

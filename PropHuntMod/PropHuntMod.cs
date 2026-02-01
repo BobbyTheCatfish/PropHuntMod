@@ -151,7 +151,7 @@ namespace PropHuntMod
                 Log.LogInfo("Begin", GameManager.instance.GameState);
                 return;
             }
-            SelfCoverManager.instance.DisableProp();
+            SelfCoverManager.instance.DisableProp(false, true);
             Log.LogInfo($"Changing scene to {__instance.TargetSceneName}");
             //cover.currentScene = __instance.TargetSceneName;
             PropValidation.ResetProps();
@@ -174,7 +174,13 @@ namespace PropHuntMod
             }
 
             PropValidation.GetAllProps();
-            PlayerManager.EnsureAllPropCovers();
+
+            if (PropHuntClient.roundStarted && !PropHuntClient.isSeeker)
+            {
+                SelfCoverManager.instance.EnableProp();
+            }
+
+            //PlayerManager.EnsureAllPropCovers();
         }
 
         //[HarmonyPrefix]

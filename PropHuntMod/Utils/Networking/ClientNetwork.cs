@@ -56,10 +56,10 @@ namespace PropHuntMod.Utils.Networking
             receiver = clientApi.NetClient.GetNetworkReceiver<CustomPackets>(clientAddon, FromServer.Packets.Instantiate);
 
             receiver.RegisterPacketHandler<FromServer.PropSwap>(CustomPackets.PropSwap, OnPropSwap);
-            receiver.RegisterPacketHandler<FromServer.ForcePropSwap>(CustomPackets.ForcePropSwap, OnForcePropSwap);
             receiver.RegisterPacketHandler<FromServer.PropLocation>(CustomPackets.PropLocation, OnPropLocation);
             receiver.RegisterPacketHandler<FromServer.HideStatus>(CustomPackets.HideStatus, OnHideStatus);
             receiver.RegisterPacketHandler<FromServer.PropFound>(CustomPackets.PropFound, OnPropFound);
+            receiver.RegisterPacketHandler<FromServer.RoundStart>(CustomPackets.RoundStart, OnRoundStart);
             receiver.RegisterPacketHandler<FromServer.GameOver>(CustomPackets.GameOver, OnGameOver);
         }
 
@@ -74,10 +74,22 @@ namespace PropHuntMod.Utils.Networking
             Log.LogInfo($"{data.Id} prop set to {data.propName}");
         }
 
-        static void OnForcePropSwap(FromServer.ForcePropSwap data)
+        static void OnRoundStart(FromServer.RoundStart data)
         {
+            PropHuntClient.roundStarted = true;
+            PropHuntClient.isSeeker = data.IsSeeker;
+            PropHuntClient.propSwaps = 0;
+            PropHuntClient.maxPropSwaps = data.PropSwapLimit;
+
+            if (data.IsSeeker)
+            {
+                PropHuntClient.LocalMessage("You're a seeker!");
+                SelfCoverManager.instance.DisableProp(false);
+                return;
+            }
+
             SelfCoverManager.instance.EnableProp();
-            Log.LogInfo("Forced prop sawp");
+            PropHuntClient.LocalMessage("You're hiding this round!");
         }
 
         public static void OnPropLocation(FromServer.PropLocation data)
@@ -113,6 +125,10 @@ namespace PropHuntMod.Utils.Networking
 
         static void OnGameOver(FromServer.GameOver data)
         {
+            PropHuntClient.roundStarted = false;
+            PropHuntClient.isSeeker = false;
+            PropHuntClient.propSwaps = 0;
+
             SelfCoverManager.instance.DisableProp();
             //string winner = data.winnerUsername;
         }

@@ -13,7 +13,7 @@ namespace PropHuntMod.Modifications
     internal class BaseCoverManager
     {
         internal GameObject cover;
-        internal string coverOGName = "";
+        //internal string coverOGName = "";
         //public string currentScene;
         public PlayerID playerID;
         internal bool isRemote = true;
@@ -73,7 +73,7 @@ namespace PropHuntMod.Modifications
 
             GameObject.Destroy(cover);
             cover = null;
-            coverOGName = "";
+            //coverOGName = "";
             manager.ToggleHornet(true);
 
             return true;
@@ -105,7 +105,7 @@ namespace PropHuntMod.Modifications
                 SetPropLocation(Vector3.zero, 0);
 
                 cover.SetActive(true);
-                coverOGName = cover.name;
+                //coverOGName = cover.name;
 
                 this.cover.layer = (int)PhysLayers.HERO_BOX;
                 hornet.ToggleHornet(false);
@@ -218,10 +218,10 @@ namespace PropHuntMod.Modifications
     {
         public PlayerID playerID;
         public bool isRemote;
-        void Awake()
-        {
-            Debug.Log("Hey, i'm on!");
-        }
+        //void Awake()
+        //{
+            //Debug.Log("Hey, i'm on!");
+        //}
 
         void OnTriggerEnter2D(Collider2D other)
         {
@@ -232,7 +232,7 @@ namespace PropHuntMod.Modifications
                 return;
             }
             //Log.LogInfo($"{other.name} - {other.tag}");
-            if (other.tag == "Nail Attack" && !SelfCoverManager.instance.IsHiding)
+            if (other.tag == "Nail Attack" && (PropHuntClient.roundStarted ? PropHuntClient.isSeeker : !SelfCoverManager.instance.IsHiding))
             {
                 if (!other.GetComponentInParent<HeroController>()) return;
                 PlayerManager.GetPlayerManager(playerID).coverManager.OnHit();

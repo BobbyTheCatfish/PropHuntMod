@@ -23,12 +23,22 @@ namespace PropHuntMod.Utils.Networking.FromServer
             base.ReadData(packet);
         }
     }
-    public class ForcePropSwap : IPacketData
+    public class RoundStart : IPacketData
     {
         public bool IsReliable => true;
         public bool DropReliableDataIfNewerExists => true;
-        public void WriteData(IPacket packet) { }
-        public void ReadData(IPacket packet) { }
+        public bool IsSeeker;
+        public ushort PropSwapLimit;
+        public void WriteData(IPacket packet)
+        {
+            packet.Write(IsSeeker);
+            packet.Write(PropSwapLimit);
+        }
+        public void ReadData(IPacket packet)
+        {
+            IsSeeker = packet.ReadBool();
+            PropSwapLimit = packet.ReadUShort();
+        }
     }
     public class PropLocation : FromClient.PropLocation
     {
@@ -98,8 +108,8 @@ namespace PropHuntMod.Utils.Networking.FromServer
             {
                 case CustomPackets.PropSwap:
                     return new PropSwap();
-                case CustomPackets.ForcePropSwap:
-                    return new ForcePropSwap();
+                case CustomPackets.RoundStart:
+                    return new RoundStart();
                 case CustomPackets.PropLocation:
                     return new PropLocation();
                 case CustomPackets.HideStatus:

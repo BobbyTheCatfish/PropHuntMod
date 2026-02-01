@@ -16,8 +16,8 @@ namespace PropHuntMod
         public bool hidden = false;
         public bool seeker = false;
         public string propName;
-        public Vector3? propLocation;
-        public float? propRotation;
+        public Vector3 propLocation = Vector3.zero;
+        public float propRotation = 0;
         public IServerPlayer playerAvatar => PropHuntServer._serverApi.ServerManager.GetPlayer(id);
         public int swapCount = 0;
         public ServerPlayer(ushort id)
@@ -58,23 +58,19 @@ namespace PropHuntMod
 
             serverApi.ServerManager.PlayerConnectEvent += (IServerPlayer player) =>
             {
-                GetPlayer(player.Id);
+                var p = GetPlayer(player.Id);
+                if (started)
+                {
+                    p.seeker = true;
+                    ServerNetwork.SendRoundStart(player.Id);
+                }
             };
 
             serverApi.ServerManager.PlayerDisconnectEvent += (IServerPlayer player) =>
             {
                 players.Remove(player.Id);
+                CheckGameOver(player.Username);
             };
-
-            //serverApi.ServerManager.PlayerEnterSceneEvent += (IServerPlayer player) =>
-            //{
-            //    ServerNetwork.Broadcast(player.Id, CustomPackets.SceneChange, new Utils.Networking.FromServer.SceneChange
-            //    {
-            //        Id = player.Id,
-            //        scene = player.CurrentScene
-            //    });
-            //};
-
         }
 
         internal static ServerPlayer GetPlayer(ushort playerID)
@@ -102,7 +98,7 @@ namespace PropHuntMod
             string winnerName = null;
             foreach (var player in players.Values)
             {
-                if (player.propName != null)
+                if (!string.IsNullOrEmpty(player.propName))
                 {
                     if (winnerName != null) return null;
                     winnerName = player.playerAvatar.Username;
@@ -122,19 +118,27 @@ namespace PropHuntMod
         {
             ResetSeekers();
             count = Mathf.Clamp(count, 1, players.Count - 1);
+            Log.LogInfo($"Choosing {count} seekers");
             for (int i = 0; i < count; i++)
             {
-                var validSeekers = players.Values.Where(p => !p.seeker).ToList();
-                if (validSeekers.Count == 0) return;
+                var validSeekers = players.Values.Where(p => p.seeker == false).ToList();
+                if (validSeekers.Count == 0)
+                {
+                    Log.LogInfo($"Ran out of seekers to choose (Picked {i}/{count})");
+                    return;
+                }
 
-                var seeker = validSeekers[Random.Range(0, validSeekers.Count - 1)];
+                var seeker = validSeekers.GetRandomElement();
                 seeker.seeker = true;
+                Log.LogDebug($"{seeker} is a seeker");
             }
         }
         void ResetSeekers()
         {
             foreach (var player in players.Values)
+            {
                 player.seeker = false;
+            }
         }
         public void GameStart()
         {
@@ -148,17 +152,20 @@ namespace PropHuntMod
 
             EnsureSettings();
             
-            ServerNetwork.BroadcastForcePropSwap(players.Values.Where(p => p.seeker).ToList());
+            ServerNetwork.BroadcastRoundStart();
             
             started = true;
             Announce("The game has begun! Good luck!");
         }
-        public void GameOver(string winner, bool canceled = false)
+        public void CheckGameOver(string usernameHit, bool canceled = false)
         {
-            ServerNetwork.BroadcastGameOver(winner);
+            bool winner = players.Values.All(p => string.IsNullOrEmpty(p.propName));
+            if (!winner && !canceled) return;
+
+            ServerNetwork.BroadcastGameOver(usernameHit);
             
-            if (canceled) Announce("The game has been stopped!");
-            else Announce($"{winner} was the last bug standing! Congrats!");
+            if (canceled) Announce("The game has been stopped early!");
+            else Announce($"{usernameHit} was the last bug standing! Congrats!");
             
             started = false;
             ResetSwapCounts();

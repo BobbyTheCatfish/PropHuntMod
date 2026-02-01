@@ -9,7 +9,7 @@ namespace PropHuntMod.Utils.Networking
     public enum CustomPackets
     {
         PropSwap,
-        ForcePropSwap,
+        RoundStart,
         PropLocation,
         HideStatus,
         PropFound,

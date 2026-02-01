@@ -36,19 +36,27 @@ namespace PropHuntMod.Utils.Networking
             });
         }
 
-        public static void BroadcastForcePropSwap(List<ServerPlayer> exclude)
+        public static void BroadcastRoundStart()
         {
-            Log.LogInfo("Broadcasting force prop swap");
-            if (exclude.Count > 0)
+            Log.LogInfo("Broadcasting round start");
+            foreach (var player in PropHuntServer._serverApi.ServerManager.Players)
             {
-                foreach (var player in PropHuntServer._serverApi.ServerManager.Players)
-                {
-                    if (exclude.Any(p => p.id == player.Id)) continue;
-                    sender.SendSingleData(CustomPackets.ForcePropSwap, new FromServer.ForcePropSwap());
-                }
+                SendRoundStart(player.Id);
             }
-            //sender.BroadcastSingleData(CustomPackets.ForcePropSwap, new FromServer.ForcePropSwap());
         }
+
+        public static void SendRoundStart(ushort id)
+        {
+            var player = PropHuntServer.GetPlayer(id);
+            var data = new FromServer.RoundStart
+            {
+                IsSeeker = player.seeker,
+                PropSwapLimit = Config.MaxSwapCount
+            };
+
+            sender.SendSingleData(CustomPackets.RoundStart, data);
+        }
+
 
         public static void ForwardPropLocation(ushort id, Vector3 propPosition, float propRotation)
         {
@@ -123,7 +131,12 @@ namespace PropHuntMod.Utils.Networking
                 return;
             }
 
-            PropHuntServer.started = true;
+            if (player.seeker)
+            {
+                PropHuntServer.instance.Message(id, "You're a seeker! You can't hide this round.");
+                return;
+            }
+
             player.propName = string.IsNullOrEmpty(data.propName) ? null : data.propName;
             player.swapCount++;
 
@@ -133,6 +146,13 @@ namespace PropHuntMod.Utils.Networking
         static void OnPropLocation(ushort id, FromClient.PropLocation data)
         {
             var player = PropHuntServer.GetPlayer(id);
+
+            if (player.seeker)
+            {
+                PropHuntServer.instance.Message(id, "You're a seeker! You can't hide this round.");
+                return;
+            }
+
             player.propLocation = data.propPosition;
             player.propRotation = data.propRotation;
 
@@ -141,27 +161,45 @@ namespace PropHuntMod.Utils.Networking
 
         static void OnHideStatus(ushort id, FromClient.HideStatus data)
         {
-            PropHuntServer.GetPlayer(id).hidden = data.isHiding;
+            var player = PropHuntServer.GetPlayer(id);
+            if (player.seeker && data.isHiding)
+            {
+                PropHuntServer.instance.Message(id, "You're a seeker! You can't hide this round.");
+                return;
+            }
+            player.hidden = data.isHiding;
             ForwardHideStatus(id, data.isHiding);
         }
 
         static void OnPropFound(ushort id, FromClient.PropFound data)
         {
             var owner = PropHuntServer.GetPlayer(data.propOwnerID);
+            var finder = PropHuntServer.GetPlayer(id);
+
+            if (PropHuntServer.started && owner.seeker)
+            {
+                PropHuntServer.instance.Message(id, "That player is a seeker!");
+                return;
+            }
+            else if (PropHuntServer.started && !finder.seeker)
+            {
+                PropHuntServer.instance.Message(id, "You're not a seeker! You can't find people this round.");
+                return;
+            }
+
             owner.propName = null;
-            owner.propLocation = null;
-            owner.propRotation = null;
+            owner.propLocation = Vector3.zero;
+            owner.propRotation = 0;
             owner.seeker = true;
 
             ForwardPropFound(id, data.propOwnerID);
 
-            var finder = PropHuntServer.GetPlayer(id);
+            
             PropHuntServer.instance.Announce($"{owner.playerAvatar.Username} was found by {finder.playerAvatar.Username}!");
 
-            string winner = PropHuntServer.instance.DetermineWinner();
-            if (winner != null)
+            if (PropHuntServer.started)
             {
-                PropHuntServer.instance.GameOver(winner);
+                PropHuntServer.instance.CheckGameOver(owner.playerAvatar.Username);
             }
         }
     }

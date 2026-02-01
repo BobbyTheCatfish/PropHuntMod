@@ -100,22 +100,35 @@ namespace PropHuntMod.Modifications
                 PropValidation.GetAllProps();
             }
 
+            if (IsSeeker()) return;
+
+            if (PropHuntClient.maxPropSwaps > 0 && PropHuntClient.propSwaps >= PropHuntClient.maxPropSwaps)
+            {
+                PropHuntClient.LocalMessage($"You've reached the max number of prop swaps (${PropHuntClient.maxPropSwaps}).");
+                return;
+            }
+
             var newCover = PropValidation.currentSceneObjects.GetRandom();
             EnableProp(newCover);
         }
 
         public bool EnableProp(GameObject cover)
         {
+            if (IsSeeker()) return false;
             var success = base.EnableProp(SelfHornetManager.instance, cover);
-            if (success) ClientNetwork.SendPropSwap(cover.name);
+            if (success)
+            {
+                ClientNetwork.SendPropSwap(cover.name);
+                PropHuntClient.propSwaps++;
+            }
 
             return success;
         }
 
-        public bool DisableProp(bool logOnFail = true)
+        public bool DisableProp(bool logOnFail = true, bool isSceneChange = false)
         {
             var success = base.DisableProp(SelfHornetManager.instance, logOnFail);
-            if (success) ClientNetwork.SendPropSwap("");
+            if (success && !isSceneChange) ClientNetwork.SendPropSwap("");
 
             return success;
         }
@@ -123,6 +136,16 @@ namespace PropHuntMod.Modifications
         public override void OnHit()
         {
             Log.LogError("UH OH! ON HIT IS SUPPOSED TO BE A REMOTE PLAYER!");
+        }
+
+        bool IsSeeker()
+        {
+            if (PropHuntClient.isSeeker)
+            {
+                PropHuntClient.LocalMessage("You're a seeker! You can't enable props right now.");
+                return true;
+            }
+            return false;
         }
 
         // To hide the original methods

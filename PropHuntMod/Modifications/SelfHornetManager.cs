@@ -24,6 +24,11 @@ namespace PropHuntMod.Modifications
 
         public new bool ToggleHornet(bool show)
         {
+            if (PropHuntClient.isSeeker && !show)
+            {
+                PropHuntClient.LocalMessage("You're a seeker, you can't hide yourself!");
+                return false;
+            }
             var success = base.ToggleHornet(show);
             if (success) ClientNetwork.SendHideStatus(!show);
 
@@ -32,7 +37,7 @@ namespace PropHuntMod.Modifications
 
         public override void SetHornet()
         {
-            hornet = GameObject.FindGameObjectWithTag("Player");
+            hornet = GameObject.Find("Hero_Hornet (Clone)");
             if (hornet == null)
             {
                 Debug.LogError("SELF HORNET NOT FOUND");
