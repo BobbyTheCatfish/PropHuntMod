@@ -8,6 +8,7 @@ using SSMP.Game;
 using System.Linq;
 using PropHuntMod.Utils.Networking;
 using PropHuntMod.Modifications;
+using UnityEngine.SceneManagement;
 
 namespace PropHuntMod
 {
@@ -43,6 +44,17 @@ namespace PropHuntMod
                 Log.LogInfo($"Player {player.Username} disconnected");
                 PropHuntMod.playerManager.Remove(player.Id);
             };
+
+            clientApi.ClientManager.PlayerEnterSceneEvent += (IClientPlayer player) =>
+            {
+                Log.LogInfo($"Player {player.Username} entered your scene");
+                var manager = PlayerManager.GetPlayerManager(player.Id);
+                manager.hornetManager.SetHornet();
+                manager.EnsurePropCover();
+            };
+
+            clientApi.CommandManager.RegisterCommand(new Commands.ShowHitboxes());
+            clientApi.CommandManager.RegisterCommand(new Commands.Sync());
 
             //clientApi.CommandManager.RegisterCommand(new Commands.ClientStartCommand());
             //clientApi.CommandManager.RegisterCommand(new Commands.ClientStopCommand());
