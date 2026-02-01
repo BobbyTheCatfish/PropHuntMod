@@ -119,7 +119,7 @@ namespace PropHuntMod.Utils.Networking
             {
                 var player = PlayerManager.GetPlayerManager(data.PropOwnerID);
                 player.SetProp("");
-                Log.LogInfo($"{player.playerAvatar.Username} has been found");
+                Log.LogInfo($"{player.PlayerAvatar.Username} has been found");
             }
         }
 

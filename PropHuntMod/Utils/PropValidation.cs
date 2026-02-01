@@ -15,10 +15,10 @@ namespace PropHuntMod.Utils
     internal static class PropValidation
     {
         static readonly string[] extraNames = { "corpse", "quest_board" };
-        static PhysLayers[] invalidLayers = { PhysLayers.ENEMIES, PhysLayers.HERO_ATTACK };
+        static readonly PhysLayers[] invalidLayers = { PhysLayers.ENEMIES, PhysLayers.HERO_ATTACK };
         public static NoRepeat<GameObject> currentSceneObjects;
 
-        static Type[] allowedTypes =
+        static readonly Type[] allowedTypes =
         {
             typeof(Transform),
             typeof(MeshFilter),
@@ -295,12 +295,12 @@ namespace PropHuntMod.Utils
     class DebugViewCollider : MonoBehaviour
     {
         Color borderColor = Color.cyan;
-        float lineWidth = 0.05f;
+        readonly float lineWidth = 0.05f;
 
         LineRenderer lineRenderer;
         BoxCollider2D collider;
 
-        bool show => PropHuntMod.showHitboxes;
+        bool Show => PropHuntMod.showHitboxes;
 
         void Awake()
         {
@@ -318,7 +318,7 @@ namespace PropHuntMod.Utils
 
         void LateUpdate()
         {
-            if (show) DrawBox(collider);
+            if (Show) DrawBox(collider);
             else lineRenderer.positionCount = 0;
 
         }
@@ -353,7 +353,7 @@ namespace PropHuntMod.Utils
         LineRenderer lineRenderer;
         Renderer[] renderers;
         Color borderColor = Color.red;
-        float lineWidth = 0.05f;
+        readonly float lineWidth = 0.05f;
 
         void Awake()
         {

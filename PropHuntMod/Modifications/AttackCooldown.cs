@@ -8,7 +8,7 @@ namespace PropHuntMod.Modifications
 {
     internal class AttackCooldownPatches
     {
-        TraceListener listener = new ConsoleTraceListener();
+        readonly TraceListener listener = new ConsoleTraceListener();
         public AttackCooldownPatches()
         {
             Trace.Listeners.Add(listener);
@@ -24,7 +24,9 @@ namespace PropHuntMod.Modifications
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(HeroController), "CanAttack")]
+#pragma warning disable IDE0060 // Remove unused parameter
         public static void Attack(HeroController __instance)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             var stack = new StackTrace(true);
             Console.WriteLine(stack.ToString());

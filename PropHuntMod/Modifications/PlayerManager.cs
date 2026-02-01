@@ -12,7 +12,7 @@ namespace PropHuntMod.Modifications
         public BaseHornetManager hornetManager;
         public BaseCoverManager coverManager;
 
-        public IClientPlayer playerAvatar => PropHuntMod.client.ClientManager.GetPlayer(playerID);
+        public IClientPlayer PlayerAvatar => PropHuntMod.client.ClientManager.GetPlayer(playerID);
         public string currentCoverObjName = "";
         public Vector3 currentCoverObjLocation = Vector3.zero;
         public float currentCoverObjRotation = 0;
@@ -53,12 +53,12 @@ namespace PropHuntMod.Modifications
         }
         public bool IsHostInSameRoom()
         {
-            if (playerAvatar == null) return false;
+            if (PlayerAvatar == null) return false;
 
-            Log.LogInfo($"{playerID} IsInLocalScene: {playerAvatar.IsInLocalScene}");
+            Log.LogInfo($"{playerID} IsInLocalScene: {PlayerAvatar.IsInLocalScene}");
 
             //bool result = scene == SceneManager.GetActiveScene().name;
-            bool result = playerAvatar.IsInLocalScene;
+            bool result = PlayerAvatar.IsInLocalScene;
 
             if (result) Log.LogInfo($"{playerID} is in the same room");
             else Log.LogInfo($"{playerID} is in another room, you are in {SceneManager.GetActiveScene().name}");

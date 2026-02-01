@@ -195,11 +195,11 @@ namespace PropHuntMod.Utils.Networking
             ForwardPropFound(id, data.PropOwnerID);
 
             
-            PropHuntServer.instance.Announce($"{owner.playerAvatar.Username} was found by {finder.playerAvatar.Username}!");
+            PropHuntServer.instance.Announce($"{owner.PlayerAvatar.Username} was found by {finder.PlayerAvatar.Username}!");
 
             if (PropHuntServer.started)
             {
-                PropHuntServer.instance.CheckGameOver(owner.playerAvatar.Username);
+                PropHuntServer.instance.CheckGameOver(owner.PlayerAvatar.Username);
             }
         }
     }

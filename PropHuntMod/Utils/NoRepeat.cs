@@ -8,8 +8,8 @@ namespace NoRepeat
     public class NoRepeat<T>
     {
         private List<T> used;
-        private List<T> inputValues;
-        private Random random = new Random();
+        private readonly List<T> inputValues;
+        private readonly Random random = new Random();
         public NoRepeat(List<T> values)
         {
             inputValues = values;

@@ -46,7 +46,7 @@ namespace PropHuntMod.Modifications
         public virtual void SetHornet()
         {
             Log.LogInfo($"Setting hornet for {playerID}");
-            var player = PlayerManager.GetPlayerManager(playerID)?.playerAvatar;
+            var player = PlayerManager.GetPlayerManager(playerID)?.PlayerAvatar;
 
             if (player?.PlayerObject == null)
             {

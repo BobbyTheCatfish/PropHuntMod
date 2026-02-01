@@ -18,7 +18,7 @@ namespace PropHuntMod
         public string propName;
         public Vector3 propLocation = Vector3.zero;
         public float propRotation = 0;
-        public IServerPlayer playerAvatar => PropHuntServer._serverApi.ServerManager.GetPlayer(id);
+        public IServerPlayer PlayerAvatar => PropHuntServer._serverApi.ServerManager.GetPlayer(id);
         public int swapCount = 0;
         public ServerPlayer(ushort id)
         {
@@ -56,7 +56,7 @@ namespace PropHuntMod
             serverApi.CommandManager.RegisterCommand(new Commands.StartGameCommand());
             serverApi.CommandManager.RegisterCommand(new Commands.StopGameCommand());
 
-            serverApi.ServerManager.PlayerConnectEvent += (IServerPlayer player) =>
+            serverApi.ServerManager.PlayerConnectEvent += player =>
             {
                 var p = GetPlayer(player.Id);
                 if (started)
@@ -66,7 +66,7 @@ namespace PropHuntMod
                 }
             };
 
-            serverApi.ServerManager.PlayerDisconnectEvent += (IServerPlayer player) =>
+            serverApi.ServerManager.PlayerDisconnectEvent += player =>
             {
                 players.Remove(player.Id);
                 CheckGameOver(player.Username);
@@ -101,7 +101,7 @@ namespace PropHuntMod
                 if (!string.IsNullOrEmpty(player.propName))
                 {
                     if (winnerName != null) return null;
-                    winnerName = player.playerAvatar.Username;
+                    winnerName = player.PlayerAvatar.Username;
                 }
             }
 
@@ -175,15 +175,16 @@ namespace PropHuntMod
         void EnsureSettings()
         {
             var settings = ServerApi.ServerManager.ServerSettings;
-            ServerSettings newSettings = new ServerSettings();
+            ServerSettings newSettings = new ServerSettings
+            {
+                AllowSkins = settings.AllowSkins,
+                DisplayNames = settings.DisplayNames,
+                OnlyBroadcastMapIconWithCompass = settings.OnlyBroadcastMapIconWithCompass,
 
-            newSettings.AllowSkins = settings.AllowSkins;
-            newSettings.DisplayNames = settings.DisplayNames;
-            newSettings.OnlyBroadcastMapIconWithCompass = settings.OnlyBroadcastMapIconWithCompass;
-
-            newSettings.TeamsEnabled = settings.TeamsEnabled; // true; // teams aren't supported yet?
-            newSettings.AlwaysShowMapIcons = false;
-            newSettings.IsPvpEnabled = false;
+                TeamsEnabled = settings.TeamsEnabled, // true; // teams aren't supported yet?
+                AlwaysShowMapIcons = false,
+                IsPvpEnabled = false
+            };
 
             ServerApi.ServerManager.ApplyServerSettings(newSettings);
         }
