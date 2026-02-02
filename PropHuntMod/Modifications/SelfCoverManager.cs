@@ -128,7 +128,11 @@ namespace PropHuntMod.Modifications
         public bool DisableProp(bool logOnFail = true, bool isSceneChange = false)
         {
             var success = base.DisableProp(SelfHornetManager.instance, logOnFail);
-            if (success && !isSceneChange) ClientNetwork.SendPropSwap("");
+            if (success && !isSceneChange)
+            {
+                ClientNetwork.SendPropSwap("");
+                PropHuntMod.showHitboxes = false;
+            }
 
             return success;
         }
