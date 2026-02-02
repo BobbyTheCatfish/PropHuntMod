@@ -7,6 +7,7 @@ using SSMP.Api.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -76,7 +77,9 @@ namespace PropHuntMod
         bool IsInputDisabled()
         {
             // pause menu, inventory, etc
-            if (HeroController.instance.IsInputBlocked()) return true;
+            if (HeroController.instance?.IsInputBlocked() ?? false) return true;
+            //if (client.UiManager.ChatBox.IsOpen) return true;
+            if (GameManager.SilentInstance?.GameState == GlobalEnums.GameState.MAIN_MENU) return true;
 
             // Prevent keybinds if chat window or other text input is up
             GameObject selection = EventSystem.current.currentSelectedGameObject;
@@ -98,22 +101,12 @@ namespace PropHuntMod
             }
 
             // No keybinds if inputs are blocked
-            if (HeroController.instance != null)
-            {
-                if (HeroController.instance.IsInputBlocked()) return;
-            }
+            if (IsInputDisabled()) return;
 
 
             /**************
              *  KEYBINDS  *
              **************/
-
-            // Prevent keybinds if chat window or other text input is up
-            GameObject selection = EventSystem.current.currentSelectedGameObject;
-            if (selection != null)
-            {
-                if (selection.GetComponent<InputField>()?.gameObject.activeInHierarchy ?? false) return;
-            }
 
             // TOGGLE VISIBILITY
             if (Input.GetKeyDown(Utils.Config.HideHornetKey))
@@ -163,9 +156,9 @@ namespace PropHuntMod
         internal static void OnSceneChange(SceneLoad __instance)
         {
             if (!modEnabled) return;
-            if (GameManager.instance.GameState == GlobalEnums.GameState.MAIN_MENU)
+            if (GameManager.SilentInstance.GameState == GlobalEnums.GameState.MAIN_MENU)
             {
-                Log.LogInfo("Begin", GameManager.instance.GameState);
+                Log.LogInfo("Begin", GameManager.SilentInstance.GameState);
                 return;
             }
             SelfCoverManager.instance.DisableProp(false, true);
@@ -184,9 +177,9 @@ namespace PropHuntMod
         internal static void OnNextLevelReady()
         {
             if (!modEnabled) return;
-            if (GameManager.instance.GameState == GlobalEnums.GameState.MAIN_MENU)
+            if (GameManager.SilentInstance.GameState == GlobalEnums.GameState.MAIN_MENU)
             {
-                Log.LogInfo(GameManager.instance.GameState);
+                Log.LogInfo(GameManager.SilentInstance.GameState);
                 return;
             }
 

@@ -37,6 +37,20 @@ namespace PropHuntMod
             Log.LogInfo("Prop Hunt Loaded.");
             ClientNetwork.Init(clientApi, this);
 
+            clientApi.ClientManager.ConnectEvent += () =>
+            {
+                string[] helpTextCommands = new string[]
+                {
+                    "Prop Hunt Commands:",
+                    "/hunt: starts a round",
+                    "/stop: stops a round",
+                    "/sync: syncs other player's props",
+                };
+
+                foreach (string command in helpTextCommands)
+                    LocalMessage(command);
+            };
+
             // Handle connects and disconnects
             clientApi.ClientManager.PlayerConnectEvent += player =>
             {
