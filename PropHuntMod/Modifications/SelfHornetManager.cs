@@ -22,7 +22,7 @@ namespace PropHuntMod.Modifications
             ToggleHornet(!shouldBeShown);
         }
 
-        public new bool ToggleHornet(bool show)
+        public override bool ToggleHornet(bool show)
         {
             if (PropHuntClient.isSeeker && !show)
             {
@@ -30,7 +30,13 @@ namespace PropHuntMod.Modifications
                 return false;
             }
             var success = base.ToggleHornet(show);
-            if (success) ClientNetwork.SendHideStatus(!show);
+            if (success)
+            {
+                ClientNetwork.SendHideStatus(!show);
+                hornet.transform.Find("Charm Effects/White Circlet Light").gameObject.SetActive(show);
+                hornet.transform.Find("Charm Effects/Wisp Lantern Light").gameObject.SetActive(show);
+                hornet.transform.Find("HeroLight").gameObject.SetActive(show);
+            }
 
             return success;
         }

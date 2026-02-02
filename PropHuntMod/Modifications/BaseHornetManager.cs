@@ -14,7 +14,7 @@ namespace PropHuntMod.Modifications
         internal MeshRenderer render;
         public bool isRemote;
 
-        public bool ToggleHornet(bool show)
+        public virtual bool ToggleHornet(bool show)
         {
             if (!HornetExists()) return false;
 
