@@ -12,6 +12,7 @@ namespace PropHuntMod.Modifications
     internal class SelfHornetManager : BaseHornetManager
     {
         public static SelfHornetManager instance;
+        GameObject obscurance;
         public SelfHornetManager()
         {
             isRemote = false;
@@ -50,6 +51,39 @@ namespace PropHuntMod.Modifications
                 return;
             }
             render = hornet.GetComponent<MeshRenderer>();
+        }
+
+        public void SetSeekerObscure(bool enabled)
+        {
+            if (obscurance == null)
+            {
+                var cam = GameCameras.instance.tk2dCam;
+                obscurance = new GameObject("SEEKER OBSCURANCE");
+                obscurance.transform.SetParentReset(cam.transform);
+                obscurance.transform.SetScale2D(new Vector2(100, 100));
+                obscurance.transform.SetLocalPositionZ(3);
+
+                var sprite = obscurance.AddComponent<SpriteRenderer>();
+                var copySprite = cam.transform.Find("Masker Blackout").GetComponent<SpriteRenderer>();
+                sprite.sprite = copySprite.sprite;
+                sprite.material = copySprite.material;
+
+                obscurance.SetActive(false);
+            }
+            if (enabled)
+            {
+                HeroController.instance.AddInputBlocker(obscurance);
+                obscurance.SetActive(true);
+            }
+            else
+            {
+                HeroController.instance.RemoveInputBlocker(obscurance);
+                obscurance.SetActive(false);
+            }
+                //if (!HornetExists()) return;
+            //    Vector3 rotation = GameCameras.instance.transform.rotation.eulerAngles;
+            //rotation.y = enabled ? 180 : 0;
+            //GameCameras.instance.transform.rotation = Quaternion.Euler(rotation);
         }
     }
 }

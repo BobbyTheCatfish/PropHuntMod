@@ -11,6 +11,7 @@ namespace PropHuntMod.Utils
         public const string ModVersion = "1.0.0";
         public const int SSMPApiVersion = 1;
         public const int MaxSwapCount = 0;
+        public const int SeekerCountdown = 30;
 
         static ConfigEntry<bool> _disableDamage;
         //static ConfigEntry<float> _attackCooldown;

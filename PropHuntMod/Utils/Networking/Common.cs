@@ -15,5 +15,6 @@ namespace PropHuntMod.Utils.Networking
         PropFound,
         //Heartbeat,
         GameOver,
+        SeekerStart
     }
 }

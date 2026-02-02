@@ -1,9 +1,10 @@
 {
   "name": "Prop_Hunt",
   "description": "It's like hide and seek, but with objects",
-  "version_number": "0.1.1",
+  "version_number": "1.0.0",
   "dependencies": [
-    "SSMP-0.0.6"
+    "BepInEx-BepInExPack_Silksong-5.4.2304",
+    "SSMP-SSMP-0.0.6"
   ],
   "website_url": "https://github.com/BobbyTheCatfish/PropHuntMod"
 }

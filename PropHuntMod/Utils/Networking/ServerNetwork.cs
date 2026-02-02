@@ -54,7 +54,7 @@ namespace PropHuntMod.Utils.Networking
                 PropSwapLimit = Config.MaxSwapCount
             };
 
-            sender.SendSingleData(CustomPackets.RoundStart, data);
+            sender.SendSingleData(CustomPackets.RoundStart, data, id);
         }
 
 
@@ -105,6 +105,16 @@ namespace PropHuntMod.Utils.Networking
             {
                 WinnerUsername = winner
             });
+        }
+
+        public static void BroadcastSeekerStart()
+        {
+            Log.LogInfo("Broadcasting seeker start");
+            foreach (var player in PropHuntServer._serverApi.ServerManager.Players)
+            {
+                var p = PropHuntServer.GetPlayer(player.Id);
+                if (p.seeker) sender.SendSingleData(CustomPackets.SeekerStart, new FromServer.SeekerStart(), player.Id);
+            }
         }
 
         public static void Init(IServerApi serverApi, ServerAddon serverAddon)

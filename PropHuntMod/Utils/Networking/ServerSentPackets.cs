@@ -85,6 +85,19 @@ namespace PropHuntMod.Utils.Networking.FromServer
             base.ReadData(packet);
         }
     }
+
+    public class SeekerStart : IPacketData
+    {
+        public bool IsReliable => true;
+        public bool DropReliableDataIfNewerExists => true;
+        public void WriteData(IPacket packet)
+        {
+        }
+
+        public void ReadData(IPacket packet)
+        {
+        }
+    }
     public class GameOver : IPacketData
     {
         public bool IsReliable => true;
@@ -118,6 +131,8 @@ namespace PropHuntMod.Utils.Networking.FromServer
                     return new PropFound();
                 case CustomPackets.GameOver:
                     return new GameOver();
+                case CustomPackets.SeekerStart:
+                    return new SeekerStart();
                 default:
                     throw new NotImplementedException(packetID.ToString());
             }

@@ -61,6 +61,7 @@ namespace PropHuntMod.Utils.Networking
             receiver.RegisterPacketHandler<FromServer.PropFound>(CustomPackets.PropFound, OnPropFound);
             receiver.RegisterPacketHandler<FromServer.RoundStart>(CustomPackets.RoundStart, OnRoundStart);
             receiver.RegisterPacketHandler<FromServer.GameOver>(CustomPackets.GameOver, OnGameOver);
+            receiver.RegisterPacketHandler<FromServer.SeekerStart>(CustomPackets.SeekerStart, OnSeekerStart);
         }
 
         /********************
@@ -84,6 +85,7 @@ namespace PropHuntMod.Utils.Networking
             if (data.IsSeeker)
             {
                 PropHuntClient.LocalMessage("You're a seeker!");
+                SelfHornetManager.instance.SetSeekerObscure(true);
                 SelfCoverManager.instance.DisableProp(false);
                 return;
             }
@@ -131,6 +133,17 @@ namespace PropHuntMod.Utils.Networking
 
             SelfCoverManager.instance.DisableProp();
             //string winner = data.winnerUsername;
+        }
+
+        static void OnSeekerStart(FromServer.SeekerStart data)
+        {
+            if (!PropHuntClient.isSeeker)
+            {
+                Log.LogFatal("OnSeekerStart received, but I'm not a seeker.");
+                return;
+            }
+
+            SelfHornetManager.instance.SetSeekerObscure(false);
         }
     }
 }
