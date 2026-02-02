@@ -50,6 +50,17 @@ namespace PropHuntMod.Utils.Networking
             });
         }
 
+        public static void SendSync(string propName, Vector3 propPosition, float propRotation)
+        {
+            Log.LogInfo($"Sending sync data: {propName}, {propPosition}, {propRotation}");
+            sender.SendSingleData(CustomPackets.Sync, new FromClient.Sync
+            {
+                PropName = propName,
+                PropLocation = propPosition,
+                PropRotation = propRotation
+            });
+        }
+
         public static void Init(IClientApi clientApi, ClientAddon clientAddon)
         {
             sender = clientApi.NetClient.GetNetworkSender<CustomPackets>(clientAddon);
@@ -57,11 +68,12 @@ namespace PropHuntMod.Utils.Networking
 
             receiver.RegisterPacketHandler<FromServer.PropSwap>(CustomPackets.PropSwap, OnPropSwap);
             receiver.RegisterPacketHandler<FromServer.PropLocation>(CustomPackets.PropLocation, OnPropLocation);
-            receiver.RegisterPacketHandler<FromServer.HideStatus>(CustomPackets.HideStatus, OnHideStatus);
             receiver.RegisterPacketHandler<FromServer.PropFound>(CustomPackets.PropFound, OnPropFound);
             receiver.RegisterPacketHandler<FromServer.RoundStart>(CustomPackets.RoundStart, OnRoundStart);
             receiver.RegisterPacketHandler<FromServer.GameOver>(CustomPackets.GameOver, OnGameOver);
             receiver.RegisterPacketHandler<FromServer.SeekerStart>(CustomPackets.SeekerStart, OnSeekerStart);
+
+            if (Config.AllowDebugFeatures) receiver.RegisterPacketHandler<FromServer.HideStatus>(CustomPackets.HideStatus, OnHideStatus);
         }
 
         /********************

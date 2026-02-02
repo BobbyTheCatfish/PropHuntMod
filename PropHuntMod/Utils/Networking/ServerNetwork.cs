@@ -124,8 +124,10 @@ namespace PropHuntMod.Utils.Networking
 
             receiver.RegisterPacketHandler<FromClient.PropSwap>(CustomPackets.PropSwap, OnPropSwap);
             receiver.RegisterPacketHandler<FromClient.PropLocation>(CustomPackets.PropLocation, OnPropLocation);
-            receiver.RegisterPacketHandler<FromClient.HideStatus>(CustomPackets.HideStatus, OnHideStatus);
             receiver.RegisterPacketHandler<FromClient.PropFound>(CustomPackets.PropFound, OnPropFound);
+            receiver.RegisterPacketHandler<FromClient.Sync>(CustomPackets.Sync, OnSync);
+
+            if (Config.AllowDebugFeatures) receiver.RegisterPacketHandler<FromClient.HideStatus>(CustomPackets.HideStatus, OnHideStatus);
         }
 
         /********************
@@ -167,6 +169,31 @@ namespace PropHuntMod.Utils.Networking
             player.propRotation = data.PropRotation;
 
             ForwardPropLocation(id, data.PropPosition, data.PropRotation);
+        }
+        
+        static void OnSync(ushort id, FromClient.Sync data)
+        {
+            var player = PropHuntServer.GetPlayer(id);
+
+            if (player.seeker)
+            {
+                player.propName = "";
+                player.propRotation = 0;
+                player.propLocation = Vector3.zero;
+            }
+            else
+            {
+                player.propName = data.PropName;
+                player.propLocation = data.PropLocation;
+                player.propRotation = data.PropRotation;
+            }
+
+            BaseCoverManager.ConstrainPropLocation(ref player.propLocation, ref player.propRotation);
+
+            ForwardPropSwap(id, player.propName);
+            ForwardPropLocation(id, player.propLocation, player.propRotation);
+
+            PropHuntServer.instance.CheckGameOver(player.PlayerAvatar.Username);
         }
 
         static void OnHideStatus(ushort id, FromClient.HideStatus data)

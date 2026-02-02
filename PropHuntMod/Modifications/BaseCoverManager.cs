@@ -58,7 +58,7 @@ namespace PropHuntMod.Modifications
         {
             location.x = Mathf.Clamp(location.x, -2, 2);
             location.y = Mathf.Clamp(location.y, -4, 4);
-            location.z = Mathf.Clamp(location.z, -4, 4);
+            location.z = Mathf.Clamp(location.z, -8, 8);
 
             rotation %= 360;
         }
@@ -102,6 +102,8 @@ namespace PropHuntMod.Modifications
             {
                 Log.LogInfo("Creating prop");
                 this.cover = GameObject.Instantiate(cover, hornet.hornet.transform);
+                this.cover.name = cover.name;
+
                 SetPropLocation(Vector3.zero, 0);
 
                 cover.SetActive(true);

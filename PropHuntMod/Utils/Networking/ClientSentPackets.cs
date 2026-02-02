@@ -73,6 +73,35 @@ namespace PropHuntMod.Utils.Networking.FromClient
             PropOwnerID = packet.ReadUShort();
         }
     }
+
+    public class Sync : IPacketData
+    {
+        public bool IsReliable => true;
+        public bool DropReliableDataIfNewerExists => true;
+        public string PropName { get; set; }
+        public Vector3 PropLocation { get; set; }
+        public float PropRotation { get; set; }
+
+        public virtual void WriteData(IPacket packet)
+        {
+            packet.Write(PropName);
+
+            packet.Write(PropLocation.x);
+            packet.Write(PropLocation.y);
+            packet.Write(PropLocation.z);
+            
+            packet.Write(PropRotation);
+        }
+
+        public virtual void ReadData(IPacket packet)
+        {
+            PropName = packet.ReadString();
+
+            PropLocation = new Vector3(packet.ReadFloat(), packet.ReadFloat(), packet.ReadFloat());
+            PropRotation = packet.ReadFloat();
+        }
+    }
+
     public static class Packets
     {
         internal static IPacketData Instantiate(CustomPackets packetID)
@@ -87,6 +116,8 @@ namespace PropHuntMod.Utils.Networking.FromClient
                     return new HideStatus();
                 case CustomPackets.PropFound:
                     return new PropFound();
+                case CustomPackets.Sync:
+                    return new Sync();
                 default:
                     throw new NotImplementedException(packetID.ToString());
             }

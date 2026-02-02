@@ -1,4 +1,5 @@
 ﻿using PropHuntMod.Modifications;
+using PropHuntMod.Utils.Networking;
 using SSMP.Api.Command.Client;
 using SSMP.Api.Command.Server;
 
@@ -64,6 +65,9 @@ namespace PropHuntMod.Commands
         {
             PropHuntClient.LocalMessage($"Syncing props for {PropHuntMod.playerManager.Count} players");
             PlayerManager.EnsureAllPropCovers();
+
+            var cover = SelfCoverManager.instance;
+            ClientNetwork.SendSync(cover.cover?.name ?? "", cover.Position, cover.Rotation);
         }
     }
 }

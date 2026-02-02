@@ -13,7 +13,7 @@ namespace PropHuntMod.Utils.Networking
         PropLocation,
         HideStatus,
         PropFound,
-        //Heartbeat,
+        Sync,
         GameOver,
         SeekerStart
     }
