@@ -20,6 +20,8 @@ namespace PropHuntMod.Modifications
         }
         public void ToggleHornet()
         {
+            if (!Config.AllowDebugFeatures && !SelfCoverManager.instance.IsHiding) return;
+            
             ToggleHornet(!shouldBeShown);
         }
 
@@ -33,7 +35,8 @@ namespace PropHuntMod.Modifications
             var success = base.ToggleHornet(show);
             if (success)
             {
-                ClientNetwork.SendHideStatus(!show);
+                if (Config.AllowDebugFeatures) ClientNetwork.SendHideStatus(!show);
+
                 hornet.transform.Find("Charm Effects/White Circlet Light").gameObject.SetActive(show);
                 hornet.transform.Find("Charm Effects/Wisp Lantern Light").gameObject.SetActive(show);
                 hornet.transform.Find("HeroLight").gameObject.SetActive(show);

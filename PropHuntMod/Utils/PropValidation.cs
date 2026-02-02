@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -51,7 +52,7 @@ namespace PropHuntMod.Utils
                 var props = ExtraProps.props.FirstOrDefault(k => scene.StartsWith(k.Key)).Value;
 
                 if (props == null) return false;
-                Log.LogError("success");
+                //Log.LogError("success");
                 var renderer = gameObject.GetComponent<SpriteRenderer>();
                 if (renderer == null || renderer.sprite == null) return false;
                 if (renderer.color != Color.white) return false;
@@ -73,7 +74,7 @@ namespace PropHuntMod.Utils
 
             if (Regex.IsMatch(gameObject.name, "^pebble$|^junk_push|^Small_bell_push|^weaver_corpse_shrine", RegexOptions.IgnoreCase))
             {
-                Log.LogInfo($"{gameObject.name} - banned");
+                //Log.LogInfo($"{gameObject.name} - banned");
                 return false;
             }
             if (gameObject.name.Contains("(Clone)"))
@@ -118,7 +119,7 @@ namespace PropHuntMod.Utils
                 var oldObjRenderer = GetRenderer(existingGameObject);
                 //Log.LogInfo(oldObjRenderer.sprite);
                 
-                if (oldObjRenderer == null || oldObjRenderer.sprite == null || newObjRenderer == null || newObjRenderer.sprite == null) return false;
+                if (oldObjRenderer?.sprite == null || newObjRenderer?.sprite == null) return false;
 
                 return oldObjRenderer.sprite.name == newObjRenderer.sprite.name;
             }
@@ -151,7 +152,7 @@ namespace PropHuntMod.Utils
                 if (!IsValidProp(scene, gameObject)) continue;
                 //Log.LogInfo($"{gameObject.name} - {gameObject.layer} MAYBE");
 
-                if (gameObject.name == "Bonechurch_Shop") Log.LogInfo("valid prop");
+                LogSpecificObj(gameObject.name, "valid prop");
                 var renderer = GetRenderer(gameObject);
                 if (renderer == null) continue;
 
@@ -167,7 +168,8 @@ namespace PropHuntMod.Utils
         {
             string row = $"{scene},{props.Count},\"{string.Join("\n", props.Select(x => x.name))}\"";
 
-            var file = File.AppendText("H:\\SteamLibrary\\steamapps\\common\\Hollow Knight Silksong\\BepInEx\\plugins\\prophunt\\PropReport.csv");
+            var filepath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "PropReport.csv");
+            var file = File.AppendText(filepath);
             file.WriteLine(row);
             file.Close();
         }
@@ -255,7 +257,7 @@ namespace PropHuntMod.Utils
                     {
                         var name = r.name.ToLower();
                         if (name.StartsWith("haze") || name.StartsWith("light") || name == "lit") continue;
-                        Log.LogInfo(r, r.name, r.bounds);
+                        //Log.LogInfo(r, r.name, r.bounds);
                         combinedBounds.Encapsulate(r.bounds);
                     }
                     //Log.LogInfo(renderers[0].bounds);

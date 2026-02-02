@@ -54,8 +54,6 @@ There are a few keybinds for this mod, which can be changed within BepInEx Confi
 
 `P` -> `Prop` (Hide as a prop)
 
-`H` -> `Hide` (Hides hornet without a prop, used for debug only)
-
 `R` -> `Reset` (Unhide and unprop)
 
 

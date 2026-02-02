@@ -157,7 +157,17 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "C:\Users\BobbyTC\source\repos\PropHuntMod\PropHuntMod\bin\Debug\PropHuntMod.dll" "H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\PropHunt" /Y
-xcopy "C:\Users\BobbyTC\source\repos\PropHuntMod\PropHuntMod\bin\Debug\PropHuntMod.pdb" "H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\PropHunt" /Y</PostBuildEvent>
+    <PostBuildEvent>set PLUGIN_DIR=H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\PropHunt
+set RELEASE_DIR=$(ProjectDir)\bin\release
+
+xcopy "$(TargetDir)\PropHuntMod.dll" "%25PLUGIN_DIR%25" /Y
+xcopy "$(TargetDir)\PropHuntMod.pdb" "%25PLUGIN_DIR%25" /Y
+
+xcopy "$(TargetDir)\PropHuntMod.dll" "%25RELEASE_DIR%25" /Y
+xcopy "$(TargetDir)\PropHuntMod.dll" "%25RELEASE_DIR%25" /Y
+xcopy "$(SolutionDir)\icon.png" "%25RELEASE_DIR%25" /Y
+xcopy "$(ProjectDir)\manifest.json" "%25RELEASE_DIR%25" /Y
+xcopy "$(ProjectDir)\README.md" "%25RELEASE_DIR%25" /Y
+tar -a -c -f "$(ProjectDir)\bin\PropHuntMod.zip" "%25RELEASE_DIR%25"</PostBuildEvent>
   </PropertyGroup>
 </Project>

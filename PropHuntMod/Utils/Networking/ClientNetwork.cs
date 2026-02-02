@@ -116,6 +116,7 @@ namespace PropHuntMod.Utils.Networking
             {
                 Log.LogInfo("I've been found!");
                 SelfCoverManager.instance.DisableProp();
+                if (PropHuntClient.roundStarted) PropHuntClient.isSeeker = true;
             }
             else
             {
@@ -140,7 +141,7 @@ namespace PropHuntMod.Utils.Networking
             if (!PropHuntClient.isSeeker)
             {
                 Log.LogFatal("OnSeekerStart received, but I'm not a seeker.");
-                return;
+                //return;
             }
 
             SelfHornetManager.instance.SetSeekerObscure(false);
