@@ -35,7 +35,7 @@ namespace PropHuntMod.Commands
                 return;
             }
 
-            PropHuntServer.instance.CheckGameOver("[canceled]", true);
+            PropHuntServer.instance.CheckGameOver(null, true);
         }
     }
 

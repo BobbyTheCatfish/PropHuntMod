@@ -29,15 +29,18 @@ namespace PropHuntMod.Utils.Networking.FromServer
         public bool DropReliableDataIfNewerExists => true;
         public bool IsSeeker;
         public ushort PropSwapLimit;
+        public int SeekerWaitTime;
         public void WriteData(IPacket packet)
         {
             packet.Write(IsSeeker);
             packet.Write(PropSwapLimit);
+            packet.Write(SeekerWaitTime);
         }
         public void ReadData(IPacket packet)
         {
             IsSeeker = packet.ReadBool();
             PropSwapLimit = packet.ReadUShort();
+            SeekerWaitTime = packet.ReadInt();
         }
     }
     public class PropLocation : FromClient.PropLocation
@@ -102,15 +105,21 @@ namespace PropHuntMod.Utils.Networking.FromServer
     {
         public bool IsReliable => true;
         public bool DropReliableDataIfNewerExists => true;
-        public string WinnerUsername { get; set; } = "";
+        public string WinnerUsername { get; set; }
+        public bool IsWinner { get; set; }
+        public bool WasCanceled { get; set; }
         public void WriteData(IPacket packet)
         {
             packet.Write(WinnerUsername);
+            packet.Write(IsWinner);
+            packet.Write(WasCanceled);
         }
 
         public void ReadData(IPacket packet)
         {
             WinnerUsername = packet.ReadString();
+            IsWinner = packet.ReadBool();
+            WasCanceled = packet.ReadBool();
         }
     }
     public static class Packets

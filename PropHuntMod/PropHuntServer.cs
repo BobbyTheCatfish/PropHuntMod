@@ -111,7 +111,7 @@ namespace PropHuntMod
             serverApi.ServerManager.PlayerDisconnectEvent += player =>
             {
                 players.Remove(player.Id);
-                CheckGameOver(player.Username);
+                CheckGameOver(player);
             };
         }
 
@@ -203,15 +203,15 @@ namespace PropHuntMod
             seekerTimer = new SeekerTimer(seekerCountdown);
 
         }
-        public void CheckGameOver(string usernameHit, bool canceled = false)
+        public void CheckGameOver(IServerPlayer playerHit, bool canceled = false)
         {
             bool winner = players.Values.All(p => string.IsNullOrEmpty(p.propName));
             if (!winner && !canceled) return;
 
-            ServerNetwork.BroadcastGameOver(usernameHit);
+            ServerNetwork.BroadcastGameOver(playerHit, canceled);
             
             if (canceled) Announce("The game has been stopped early!");
-            else Announce($"{usernameHit} was the last bug standing! Congrats!");
+            else Announce($"{playerHit.Username} was the last bug standing! Congrats!");
             
             started = false;
             ResetSwapCounts();

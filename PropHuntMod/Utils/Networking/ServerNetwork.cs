@@ -51,7 +51,8 @@ namespace PropHuntMod.Utils.Networking
             var data = new FromServer.RoundStart
             {
                 IsSeeker = player.seeker,
-                PropSwapLimit = Config.MaxSwapCount
+                PropSwapLimit = Config.MaxSwapCount,
+                SeekerWaitTime = Config.SeekerCountdown
             };
 
             sender.SendSingleData(CustomPackets.RoundStart, data, id);
@@ -98,13 +99,19 @@ namespace PropHuntMod.Utils.Networking
             }
         }
 
-        public static void BroadcastGameOver(string winner)
+        public static void BroadcastGameOver(IServerPlayer winner, bool canceled)
         {
             Log.LogInfo("Broadcasting game over");
-            sender.BroadcastSingleData(CustomPackets.GameOver, new FromServer.GameOver
+            foreach (var player in PropHuntServer._serverApi.ServerManager.Players)
             {
-                WinnerUsername = winner
-            });
+                var data = new FromServer.GameOver
+                {
+                    IsWinner = !canceled && winner?.Id == player.Id,
+                    WasCanceled = canceled,
+                    WinnerUsername = winner?.Username ?? "Nobody"
+                };
+                sender.SendSingleData(CustomPackets.GameOver, data, player.Id);
+            }
         }
 
         public static void BroadcastSeekerStart()
@@ -193,7 +200,7 @@ namespace PropHuntMod.Utils.Networking
             ForwardPropSwap(id, player.propName);
             ForwardPropLocation(id, player.propLocation, player.propRotation);
 
-            PropHuntServer.instance.CheckGameOver(player.PlayerAvatar.Username);
+            PropHuntServer.instance.CheckGameOver(player.PlayerAvatar);
         }
 
         static void OnHideStatus(ushort id, FromClient.HideStatus data)
@@ -236,7 +243,7 @@ namespace PropHuntMod.Utils.Networking
 
             if (PropHuntServer.started)
             {
-                PropHuntServer.instance.CheckGameOver(owner.PlayerAvatar.Username);
+                PropHuntServer.instance.CheckGameOver(owner.PlayerAvatar);
             }
         }
     }

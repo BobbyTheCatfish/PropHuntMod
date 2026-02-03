@@ -1,6 +1,7 @@
 ﻿using PropHuntMod.Modifications;
 using SSMP.Api.Client;
 using SSMP.Api.Client.Networking;
+using System.Reflection;
 using UnityEngine;
 
 namespace PropHuntMod.Utils.Networking
@@ -99,14 +100,19 @@ namespace PropHuntMod.Utils.Networking
                 PropHuntClient.LocalMessage("You're a seeker!");
                 SelfHornetManager.instance.SetSeekerObscure(true);
                 SelfCoverManager.instance.DisableProp(false);
+                EffectsManager.SetTitle("SEEKER", $"Wait time: {data.SeekerWaitTime}", "YOUR ROLE:");
                 return;
+            }
+            else
+            {
+                EffectsManager.SetTitle("HIDER", "", "YOUR ROLE:");
             }
 
             SelfCoverManager.instance.EnableProp();
             PropHuntClient.LocalMessage("You're hiding this round!");
         }
 
-        public static void OnPropLocation(FromServer.PropLocation data)
+        static void OnPropLocation(FromServer.PropLocation data)
         {
             PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
             player.SetPropLocation(data.PropPosition, data.PropRotation);
@@ -136,6 +142,7 @@ namespace PropHuntMod.Utils.Networking
                 player.SetProp("");
                 Log.LogInfo($"{player.PlayerAvatar.Username} has been found");
             }
+            EffectsManager.PlayFoundSound(data.IsClientFound);
         }
 
         static void OnGameOver(FromServer.GameOver data)
@@ -145,6 +152,11 @@ namespace PropHuntMod.Utils.Networking
             PropHuntClient.propSwaps = 0;
 
             SelfCoverManager.instance.DisableProp();
+            EffectsManager.PlayGameOverSound(!data.WasCanceled && data.IsWinner);
+
+            var mainText = data.WasCanceled ? "Round Canceled" : data.IsWinner ? "You Won!" : "Round Complete";
+            var subText = data.IsWinner || data.WasCanceled ? "" : $"{data.WinnerUsername} won!";
+            EffectsManager.SetTitle(mainText, subText);
             //string winner = data.winnerUsername;
         }
 
