@@ -34,30 +34,33 @@
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\core\0Harmony.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\core\BepInEx.dll</HintPath>
-    </Reference>
-    <Reference Include="com.rlabrecque.steamworks.net, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\com.rlabrecque.steamworks.net.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\PlayMaker.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="SSMP">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\SSMP\SSMP.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -69,52 +72,67 @@
     <Reference Include="System.Xml" />
     <Reference Include="TeamCherry.BuildBot">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\TeamCherry.BuildBot.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="TeamCherry.Cinematics">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\TeamCherry.Cinematics.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="TeamCherry.Localization">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\TeamCherry.Localization.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="TeamCherry.NestedFadeGroup">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\TeamCherry.NestedFadeGroup.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="TeamCherry.SharedUtils">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\TeamCherry.SharedUtils.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="TeamCherry.Splines">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\TeamCherry.Splines.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="TeamCherry.TK2D">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\TeamCherry.TK2D.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -130,13 +148,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
     <Compile Include="PropHuntClient.cs" />
     <Compile Include="PropHuntServer.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\ModConfiguration.cs" />
     <Compile Include="Modifications\BaseHornetManager.cs" />
@@ -149,15 +163,15 @@
     <Compile Include="Utils\NoRepeat.cs" />
     <Compile Include="PropHuntMod.cs" />
     <Compile Include="Utils\PropValidation.cs" />
+    <Content Include="icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="PropHuntModOld.txt" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="manifest.json" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    <None Include="manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Compile Include="Utils\ExtraProps.cs" />
     <None Include="README.md" />
@@ -170,17 +184,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>set PLUGIN_DIR=H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\PropHunt
+    <PostBuildEvent>@echo off
+set PLUGIN_DIR=H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\PropHunt
 set RELEASE_DIR=$(ProjectDir)\bin\release
 
-xcopy "$(TargetDir)\PropHuntMod.dll" "%25PLUGIN_DIR%25" /Y
-xcopy "$(TargetDir)\PropHuntMod.pdb" "%25PLUGIN_DIR%25" /Y
-
-xcopy "$(TargetDir)\PropHuntMod.dll" "%25RELEASE_DIR%25" /Y
-xcopy "$(TargetDir)\PropHuntMod.dll" "%25RELEASE_DIR%25" /Y
-xcopy "$(SolutionDir)\icon.png" "%25RELEASE_DIR%25" /Y
-xcopy "$(ProjectDir)\manifest.json" "%25RELEASE_DIR%25" /Y
-xcopy "$(ProjectDir)\README.md" "%25RELEASE_DIR%25" /Y
-tar -a -c -f "$(ProjectDir)\bin\PropHuntMod.zip" "%25RELEASE_DIR%25"</PostBuildEvent>
+xcopy "$(TargetDir)" "%25PLUGIN_DIR%25" /E /I /Y
+tar -a -c -f "$(ProjectDir)\bin\PropHuntMod.zip" $(ProjectDir)\bin\Debug"</PostBuildEvent>
   </PropertyGroup>
 </Project>

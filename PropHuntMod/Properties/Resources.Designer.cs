@@ -59,5 +59,25 @@ namespace PropHuntMod.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] icon {
+            get {
+                object obj = ResourceManager.GetObject("icon", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] manifest {
+            get {
+                object obj = ResourceManager.GetObject("manifest", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }
