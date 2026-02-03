@@ -162,6 +162,7 @@
     <Compile Include="Utils\Networking\ServerSentPackets.cs" />
     <Compile Include="Utils\NoRepeat.cs" />
     <Compile Include="PropHuntMod.cs" />
+    <Compile Include="Utils\PropMovementControls.cs" />
     <Compile Include="Utils\PropValidation.cs" />
     <Content Include="icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -21,17 +21,28 @@ namespace PropHuntMod.Utils
         static ConfigEntry<KeyCode> _hideHornetKey;
         static ConfigEntry<KeyCode> _resetKey;
 
+        static ConfigEntry<KeyCode> _propMode;
+        static ConfigEntry<KeyCode> _propPositionReset;
+
         public static bool DisableDamage => _disableDamage.Value;
         //public static float attackCooldown { get { return _attackCooldown.Value; } }
         public static KeyCode SwapPropKey => _swapPropKey.Value;
         public static KeyCode HideHornetKey => _hideHornetKey?.Value ?? KeyCode.H;
         public static KeyCode ResetKey => _resetKey.Value;
 
+        public static KeyCode PropMode => _propMode.Value;
+        public static KeyCode PropPositionReset => _propPositionReset.Value;
+
         public static void LoadConfig(ConfigFile Config)
         {
+            
             _disableDamage = Config.Bind("General", "DisableDamage", true, "Disables all damage to the player with the exception of other players and terrain");
             _swapPropKey = Config.Bind("General", "KeySwapProp", KeyCode.P, "The key to swap props");
             _resetKey = Config.Bind("General", "KeyReset", KeyCode.R, "The key to unhide and remove the active prop");
+
+            _propMode = Config.Bind("Prop Movement (Controller/No Keypad)", "Mode Switch", KeyCode.JoystickButton11);
+            _propPositionReset = Config.Bind("Prop Movement (Controller/No Keypad)", "Reset Position", KeyCode.JoystickButton4);
+
             if (AllowDebugFeatures)
             {
                 _hideHornetKey = Config.Bind("General", "KeyHideHornet", KeyCode.H, "The key to hide hornet in the event that she becomes visible while hiding");

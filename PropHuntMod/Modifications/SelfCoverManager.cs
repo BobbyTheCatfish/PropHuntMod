@@ -26,6 +26,11 @@ namespace PropHuntMod.Modifications
             if (onlyOnce && !Input.GetKeyDown(key)) return;
             else if (!onlyOnce && !Input.GetKey(key)) return;
 
+            MoveProp(direction, onlyOnce);
+        }
+
+        public void MoveProp(Direction direction, bool onlyOnce = false)
+        {
             bool slowDown = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
             float distance = slowDown ? 0.01f : 0.1f;
 
