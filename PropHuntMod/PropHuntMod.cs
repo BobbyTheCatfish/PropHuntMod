@@ -177,11 +177,11 @@ namespace PropHuntMod
             if (!modEnabled) return;
             if (GameManager.SilentInstance.GameState == GlobalEnums.GameState.MAIN_MENU)
             {
-                Log.LogInfo("Begin", GameManager.SilentInstance.GameState);
+                //Log.LogInfo("Begin", GameManager.SilentInstance.GameState);
                 return;
             }
             SelfCoverManager.instance.DisableProp(false, true);
-            Log.LogInfo($"Changing scene to {__instance.TargetSceneName}");
+            //Log.LogInfo($"Changing scene to {__instance.TargetSceneName}");
             //cover.currentScene = __instance.TargetSceneName;
             PropValidation.ResetProps();
 
@@ -198,7 +198,7 @@ namespace PropHuntMod
             if (!modEnabled) return;
             if (GameManager.SilentInstance.GameState == GlobalEnums.GameState.MAIN_MENU)
             {
-                Log.LogInfo(GameManager.SilentInstance.GameState);
+                //Log.LogInfo(GameManager.SilentInstance.GameState);
                 return;
             }
 

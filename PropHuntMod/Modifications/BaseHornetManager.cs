@@ -54,7 +54,7 @@ namespace PropHuntMod.Modifications
                 return;
             }
 
-            Log.LogInfo(player.PlayerObject.name);
+            //Log.LogInfo(player.PlayerObject.name);
             hornet = player.PlayerObject;
 
             if (hornet == null)

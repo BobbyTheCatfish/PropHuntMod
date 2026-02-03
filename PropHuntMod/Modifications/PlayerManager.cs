@@ -55,7 +55,7 @@ namespace PropHuntMod.Modifications
         {
             if (PlayerAvatar == null) return false;
 
-            Log.LogInfo($"{playerID} IsInLocalScene: {PlayerAvatar.IsInLocalScene}");
+            //Log.LogInfo($"{playerID} IsInLocalScene: {PlayerAvatar.IsInLocalScene}");
 
             //bool result = scene == SceneManager.GetActiveScene().name;
             bool result = PlayerAvatar.IsInLocalScene;
@@ -80,7 +80,9 @@ namespace PropHuntMod.Modifications
                 var toClone = PropValidation.currentSceneObjects.GetSpecific(o => o.name == currentCoverObjName);
                 if (toClone == null)
                 {
-                    Log.LogError($"Unable to find GameObject {currentCoverObjName} for {playerID}");
+                    var errorMsg = $"Unable to find GameObject {currentCoverObjName} for player #{playerID} ({PlayerAvatar.Username})";
+                    PropHuntClient.LocalMessage($"ERROR: {errorMsg}");
+                    Log.LogError(errorMsg);
                     return;
                 }
 

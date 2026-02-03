@@ -18,7 +18,6 @@ namespace PropHuntMod.Modifications
         static AudioClip gameOverSound;
         public static void PlayFoundSound(bool isSelf)
         {
-            Log.LogInfo("Playing found sound");
             if (selfRevealSound == null) Init();
 
             PlaySound(isSelf ? selfRevealSound : otherRevealSound);
@@ -26,7 +25,6 @@ namespace PropHuntMod.Modifications
 
         public static void PlayGameOverSound(bool isWinner)
         {
-            Log.LogInfo("Playing game over sound");
             if (selfRevealSound == null) Init();
 
             PlaySound(gameOverSound);
@@ -35,8 +33,6 @@ namespace PropHuntMod.Modifications
             {
                 PlaySound(victorySound);
             }
-            Log.LogInfo("Playing win sound");
-
         }
 
         static void PlaySound(AudioClip audio)

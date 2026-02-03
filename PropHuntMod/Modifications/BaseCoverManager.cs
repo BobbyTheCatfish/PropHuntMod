@@ -84,6 +84,7 @@ namespace PropHuntMod.Modifications
             // Can't do anything
             if (cover == null)
             {
+                PropHuntClient.LocalMessage("There isn't any valid cover here. Try another room.");
                 Log.LogError("No valid cover found");
                 return false;
             }
