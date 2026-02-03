@@ -47,7 +47,7 @@ namespace PropHuntMod.Modifications
             source.PlayOneShot(audio);
         }
 
-        public static void SetTitle(string main, string sub = "", string super = "Prop Hunt", bool large = true)
+        public static void SetTitle(string main, string sub = "", string super = "Prop Hunt", bool large = true, float time = 4.75f)
         {
             // Set the FSM settings
             var title = GameCameras.instance.hudCamera.transform.Find("In-game/Area Title");
@@ -57,6 +57,7 @@ namespace PropHuntMod.Modifications
             FSMUtility.SetBool(fsm, "NPC Title", false);
             FSMUtility.SetBool(fsm, "Visited", !large);
             FSMUtility.SetString(fsm, "Area Event", eventName);
+            FSMUtility.SetFloat(fsm, "Unvisited Wait", time);
 
             // Add to the language
             var sheets = Traverse.Create(typeof(Language)).Field("_currentEntrySheets");
@@ -90,8 +91,14 @@ namespace PropHuntMod.Modifications
             otherRevealSound = audioClips.FirstOrDefault(a => a.name == "Garama_weak_collapse");
             selfRevealSound = audioClips.FirstOrDefault(a => a.name == "d3");
 
-            audioBundle = AssetBundle.GetAllLoadedAssetBundles().First(b => b.name == "9ebdb0e6cfbf616e44feed59c02848ad.bundle");
-            gameOverSound = audioBundle.LoadAllAssets<AudioClip>().FirstOrDefault(a => a.name ==  "dream_enter_pt_2");
+            audioBundle = AssetBundle.GetAllLoadedAssetBundles().First(b => b.name == "48a0f4259d782cbbf6fb20cdcc4f4e5f.bundle");
+            gameOverSound = audioBundle.LoadAllAssets<AudioClip>().FirstOrDefault(a => a.name == "slow_motion_effect_tone_with_texture");
+
+            //audioBundle = AssetBundle.GetAllLoadedAssetBundles().First(b => b.name == "45160b0885b9207aade8da6c49b4c729.bundle");
+            //gameOverSound = audioBundle.LoadAllAssets<AudioClip>().FirstOrDefault(a => a.name == "unravelled_boss_bg_head_dissapear");
+
+            //audioBundle = AssetBundle.GetAllLoadedAssetBundles().First(b => b.name == "9ebdb0e6cfbf616e44feed59c02848ad.bundle");
+            //gameOverSound = audioBundle.LoadAllAssets<AudioClip>().FirstOrDefault(a => a.name ==  "dream_enter_pt_2");
         }
     }
 }

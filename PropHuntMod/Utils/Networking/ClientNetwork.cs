@@ -88,7 +88,7 @@ namespace PropHuntMod.Utils.Networking
             Log.LogInfo($"{data.Id} prop set to {data.propName}");
         }
 
-        static void OnRoundStart(FromServer.RoundStart data)
+        public static void OnRoundStart(FromServer.RoundStart data)
         {
             PropHuntClient.roundStarted = true;
             PropHuntClient.isSeeker = data.IsSeeker;
@@ -100,7 +100,7 @@ namespace PropHuntMod.Utils.Networking
                 PropHuntClient.LocalMessage("You're a seeker!");
                 SelfHornetManager.instance.SetSeekerObscure(true);
                 SelfCoverManager.instance.DisableProp(false);
-                EffectsManager.SetTitle("SEEKER", $"Wait time: {data.SeekerWaitTime}", "YOUR ROLE:");
+                EffectsManager.SetTitle("SEEKER", $"Wait time: {data.SeekerWaitTime} seconds", "YOUR ROLE:", true, 10);
                 return;
             }
             else
@@ -157,7 +157,7 @@ namespace PropHuntMod.Utils.Networking
             var mainText = data.WasCanceled ? "Round Canceled" : data.IsWinner ? "You Won!" : "Round Complete";
             var subText = data.IsWinner || data.WasCanceled ? "" : $"{data.WinnerUsername} won!";
             EffectsManager.SetTitle(mainText, subText);
-            //string winner = data.winnerUsername;
+            GameManager.instance.FreezeMoment(GlobalEnums.FreezeMomentTypes.BossDeathSlow);
         }
 
         static void OnSeekerStart(FromServer.SeekerStart data)

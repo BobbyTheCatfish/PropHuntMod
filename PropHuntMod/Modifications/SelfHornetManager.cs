@@ -64,7 +64,7 @@ namespace PropHuntMod.Modifications
                 obscurance = new GameObject("SEEKER OBSCURANCE");
                 obscurance.transform.SetParentReset(cam.transform);
                 obscurance.transform.SetScale2D(new Vector2(100, 100));
-                obscurance.transform.SetLocalPositionZ(3);
+                obscurance.transform.SetLocalPositionZ(10);
 
                 var sprite = obscurance.AddComponent<SpriteRenderer>();
                 var copySprite = cam.transform.Find("Masker Blackout").GetComponent<SpriteRenderer>();
