@@ -1,10 +1,9 @@
 ﻿using HarmonyLib;
-using HutongGames.PlayMaker;
-using HutongGames.PlayMaker.Actions;
 using PropHuntMod.Utils;
-using SSMP.Util;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using TeamCherry.Localization;
 using UnityEngine;
 
@@ -16,6 +15,7 @@ namespace PropHuntMod.Modifications
         static AudioClip otherRevealSound;
         static AudioClip selfRevealSound;
         static AudioClip gameOverSound;
+        static ParticleSystem confetti;
         public static void PlayFoundSound(bool isSelf)
         {
             if (selfRevealSound == null) Init();
@@ -68,13 +68,19 @@ namespace PropHuntMod.Modifications
             title.gameObject.SetActive(true);
         }
 
+        public static void PlayConfetti()
+        {
+            if (confetti == null) Init();
+            confetti.Play();
+        }
+
         static void Init()
         {
             /****************
              *  LOAD AUDIO  *
              ****************/
-            var audioBundle = AssetBundle.GetAllLoadedAssetBundles().First(b => b.name == "7aa551f2bad7d3e8e7893d04de5ef978.bundle");
-            //var audioBundle = AssetBundle.LoadFromFile(bundlePath);
+            var loadedBundles = AssetBundle.GetAllLoadedAssetBundles();
+            var audioBundle = loadedBundles.First(b => b.name == "7aa551f2bad7d3e8e7893d04de5ef978.bundle");
 
             if (audioBundle == null)
             {
@@ -87,14 +93,32 @@ namespace PropHuntMod.Modifications
             otherRevealSound = audioClips.FirstOrDefault(a => a.name == "Garama_weak_collapse");
             selfRevealSound = audioClips.FirstOrDefault(a => a.name == "d3");
 
-            audioBundle = AssetBundle.GetAllLoadedAssetBundles().First(b => b.name == "48a0f4259d782cbbf6fb20cdcc4f4e5f.bundle");
+            audioBundle = loadedBundles.First(b => b.name == "48a0f4259d782cbbf6fb20cdcc4f4e5f.bundle");
             gameOverSound = audioBundle.LoadAllAssets<AudioClip>().FirstOrDefault(a => a.name == "slow_motion_effect_tone_with_texture");
 
-            //audioBundle = AssetBundle.GetAllLoadedAssetBundles().First(b => b.name == "45160b0885b9207aade8da6c49b4c729.bundle");
+            // Alternate game over sounds
+            //audioBundle = loadedBundles.First(b => b.name == "45160b0885b9207aade8da6c49b4c729.bundle");
             //gameOverSound = audioBundle.LoadAllAssets<AudioClip>().FirstOrDefault(a => a.name == "unravelled_boss_bg_head_dissapear");
 
-            //audioBundle = AssetBundle.GetAllLoadedAssetBundles().First(b => b.name == "9ebdb0e6cfbf616e44feed59c02848ad.bundle");
+            //audioBundle = loadedBundles.First(b => b.name == "9ebdb0e6cfbf616e44feed59c02848ad.bundle");
             //gameOverSound = audioBundle.LoadAllAssets<AudioClip>().FirstOrDefault(a => a.name ==  "dream_enter_pt_2");
+
+
+            /**************************
+             *  LOAD CONFETTI PREFAB  *
+             **************************/
+            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var bundle = AssetBundle.LoadFromFile(Path.Combine(dir, "confetti"));
+
+            var assets = bundle.LoadAllAssets();
+            GameObject confettiGO = assets.First(a => a is GameObject) as GameObject;
+            confettiGO = GameObject.Instantiate(confettiGO, GameCameras.instance.tk2dCam.transform);
+            confettiGO.transform.localPosition = new Vector3(0, -7.5f, 25);
+
+            confetti = confettiGO.GetComponent<ParticleSystem>();
+
+            var mat = assets.First(a => a is Material) as Material;
+            mat.shader = SelfHornetManager.instance.hornet.GetComponent<MeshRenderer>().material.shader;
         }
     }
 }

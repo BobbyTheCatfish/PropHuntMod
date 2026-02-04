@@ -63,6 +63,26 @@ namespace PropHuntMod.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] confetti {
+            get {
+                object obj = ResourceManager.GetObject("confetti", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] confetti_manifest {
+            get {
+                object obj = ResourceManager.GetObject("confetti_manifest", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] icon {
             get {
                 object obj = ResourceManager.GetObject("icon", resourceCulture);

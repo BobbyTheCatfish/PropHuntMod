@@ -102,26 +102,27 @@ namespace PropHuntMod
             if (IsInputDisabled()) return;
 
             // Effects testing
-            //if (Input.GetKeyDown(KeyCode.O))
-            //{
-            //    if (Input.GetKey(KeyCode.LeftShift)) EffectsManager.PlayFoundSound(true);
-            //    else if (Input.GetKey(KeyCode.RightShift)) EffectsManager.PlayFoundSound(false);
-            //    else if (Input.GetKey(KeyCode.LeftControl))
-            //    {
-            //        var data = new Utils.Networking.FromServer.GameOver { IsWinner = true, WasCanceled = false, WinnerUsername = "BobbyTC" };
-            //        Utils.Networking.ClientNetwork.OnGameOver(data);
-            //    }
-            //    else if (Input.GetKey(KeyCode.RightControl))
-            //    {
-            //        var data = new Utils.Networking.FromServer.GameOver { IsWinner = false, WasCanceled = false, WinnerUsername = "BobbyTC" };
-            //        Utils.Networking.ClientNetwork.OnGameOver(data);
-            //    }
-            //    else
-            //    {
-            //        var data = new Utils.Networking.FromServer.GameOver { IsWinner = false, WasCanceled = true, WinnerUsername = "Nobody" };
-            //        Utils.Networking.ClientNetwork.OnGameOver(data);
-            //    }
-            //}
+            if (Input.GetKeyDown(KeyCode.O))
+            {
+                EffectsManager.PlayConfetti();
+                //    if (Input.GetKey(KeyCode.LeftShift)) EffectsManager.PlayFoundSound(true);
+                //    else if (Input.GetKey(KeyCode.RightShift)) EffectsManager.PlayFoundSound(false);
+                //    else if (Input.GetKey(KeyCode.LeftControl))
+                //    {
+                //        var data = new Utils.Networking.FromServer.GameOver { IsWinner = true, WasCanceled = false, WinnerUsername = "BobbyTC" };
+                //        Utils.Networking.ClientNetwork.OnGameOver(data);
+                //    }
+                //    else if (Input.GetKey(KeyCode.RightControl))
+                //    {
+                //        var data = new Utils.Networking.FromServer.GameOver { IsWinner = false, WasCanceled = false, WinnerUsername = "BobbyTC" };
+                //        Utils.Networking.ClientNetwork.OnGameOver(data);
+                //    }
+                //    else
+                //    {
+                //        var data = new Utils.Networking.FromServer.GameOver { IsWinner = false, WasCanceled = true, WinnerUsername = "Nobody" };
+                //        Utils.Networking.ClientNetwork.OnGameOver(data);
+                //    }
+            }
 
             /**************
              *  KEYBINDS  *

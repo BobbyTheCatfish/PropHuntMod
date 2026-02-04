@@ -1,0 +1,35 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.0.64f1
+CRC: 2042646553
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 5244c461f35e9ab7c56a043f5da5a0d8
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 8ecd705232ee509950a81930a310babe
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 56af7b2b4a1ffc43d8a2bb7e1347fefc
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 198
+  Script: {instanceID: 0}
+- Class: 199
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Confetti/Confetti Material.mat
+- Assets/Prefabs/Confetti.prefab
+- Assets/Confetti/Sprintmaster_scenery__0005_pennant_small_confetti.png
+Dependencies: []
