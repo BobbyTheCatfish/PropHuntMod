@@ -296,13 +296,14 @@ namespace PropHuntMod.Utils
 
     class DebugViewCollider : MonoBehaviour
     {
-        Color borderColor = Color.cyan;
+        Color borderColor = Color.white;
         readonly float lineWidth = 0.05f;
 
         LineRenderer lineRenderer;
         BoxCollider2D collider;
 
-        bool Show => PropHuntMod.showHitboxes;
+        bool OverrideShow = false;
+        bool Show => PropHuntMod.showHitboxes || OverrideShow;
 
         void Awake()
         {
@@ -347,6 +348,11 @@ namespace PropHuntMod.Utils
             {
                 lineRenderer.SetPosition(i, transform.TransformPoint(localPoints[i]));
             }
+        }
+
+        public void BeforeDestroy()
+        {
+            OverrideShow = true;
         }
     }
 

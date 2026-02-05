@@ -6,6 +6,7 @@ using PropHuntMod.Utils;
 //using SilksongMultiplayer.NetworkData;
 using GlobalEnums;
 using System;
+using System.Timers;
 
 namespace PropHuntMod.Modifications
 {
@@ -77,6 +78,24 @@ namespace PropHuntMod.Modifications
             manager.ToggleHornet(true);
 
             return true;
+        }
+
+        public void FindProp(BaseHornetManager manager)
+        {
+            if (!IsHiding)
+            {
+                Log.LogError("No cover to disable");
+                return;
+            }
+
+            cover.transform.parent = null;
+            cover.GetComponent<DebugViewCollider>().BeforeDestroy();
+
+            var timer = new Timer(5 * 1000);
+            timer.Elapsed += (a, b) =>
+            {
+                DisableProp(manager, true);
+            };
         }
 
         public virtual bool EnableProp(BaseHornetManager hornet, GameObject cover)
