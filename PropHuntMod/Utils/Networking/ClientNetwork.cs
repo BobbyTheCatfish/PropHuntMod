@@ -151,6 +151,7 @@ namespace PropHuntMod.Utils.Networking
             PropHuntClient.isSeeker = false;
             PropHuntClient.propSwaps = 0;
 
+            SelfHornetManager.instance.SetSeekerObscure(false);
             SelfCoverManager.instance.DisableProp();
             EffectsManager.PlayGameOverSound(!data.WasCanceled && data.IsWinner);
 

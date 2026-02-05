@@ -220,21 +220,16 @@ namespace PropHuntMod.Utils.Networking
             var owner = PropHuntServer.GetPlayer(data.PropOwnerID);
             var finder = PropHuntServer.GetPlayer(id);
 
-            if (PropHuntServer.started && owner.seeker)
+            if (PropHuntServer.started)
             {
-                PropHuntServer.instance.Message(id, "That player is a seeker!");
-                return;
-            }
-            else if (PropHuntServer.started && !finder.seeker)
-            {
-                PropHuntServer.instance.Message(id, "You're not a seeker! You can't find people this round.");
-                return;
+                if (owner.seeker) PropHuntServer.instance.Message(id, "That player is a seeker!");
+                else if (!finder.seeker) PropHuntServer.instance.Message(id, "You're not a seeker! You can't find people this round.");
+                else owner.seeker = true;
             }
 
             owner.propName = null;
             owner.propLocation = Vector3.zero;
             owner.propRotation = 0;
-            owner.seeker = true;
 
             ForwardPropFound(id, data.PropOwnerID);
 

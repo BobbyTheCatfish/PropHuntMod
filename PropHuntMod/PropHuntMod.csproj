@@ -196,6 +196,7 @@ set PLUGIN_DIR=H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\p
 set RELEASE_DIR=$(ProjectDir)\bin\release
 
 xcopy "$(TargetDir)" "%25PLUGIN_DIR%25" /E /I /Y
-tar -a -c -f "$(ProjectDir)\bin\PropHuntMod.zip" $(ProjectDir)\bin\Debug"</PostBuildEvent>
+cd "$(ProjectDir)\bin\Debug"
+tar -c -a -f "$(ProjectDir)\bin\PropHuntMod.zip" *</PostBuildEvent>
   </PropertyGroup>
 </Project>

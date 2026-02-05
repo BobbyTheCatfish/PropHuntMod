@@ -46,8 +46,18 @@ namespace PropHuntMod
             timer.Start();
         }
 
+        public void CancelTimer()
+        {
+            if (timer != null)
+            {
+                timer.Stop();
+                timer = null;
+            }
+        }
+
         void SetSecondsTimer()
         {
+            if (!PropHuntServer.started) return;
             if (seconds == 0)
             {
                 PropHuntServer.instance.Announce("[Seekers]: Ready or not, here we come!");
@@ -129,10 +139,12 @@ namespace PropHuntMod
 
         public void Announce(string announcement)
         {
+            Log.LogInfo($"Announcement: {announcement}");
             _serverApi.ServerManager.BroadcastMessage(announcement);
         }
         public void Message(ushort recipientID, string message)
         {
+            Log.LogInfo($"Message to {recipientID}: {message}");
             _serverApi.ServerManager.SendMessage(recipientID, message);
         }
         public string DetermineWinner()
@@ -172,7 +184,7 @@ namespace PropHuntMod
 
                 var seeker = validSeekers.GetRandomElement();
                 seeker.seeker = true;
-                Log.LogDebug($"{seeker} is a seeker");
+                Log.LogDebug($"{seeker.PlayerAvatar.Username} is a seeker");
             }
         }
         void ResetSeekers()
@@ -205,12 +217,18 @@ namespace PropHuntMod
         }
         public void CheckGameOver(IServerPlayer playerHit, bool canceled = false)
         {
+            if (!started) return;
+
             bool winner = players.Values.All(p => string.IsNullOrEmpty(p.propName));
             if (!winner && !canceled) return;
 
             ServerNetwork.BroadcastGameOver(playerHit, canceled);
-            
-            if (canceled) Announce("The game has been stopped early!");
+
+            if (canceled)
+            {
+                Announce("The game has been stopped early!");
+                seekerTimer?.CancelTimer();
+            }
             else Announce($"{playerHit.Username} was the last bug standing! Congrats!");
             
             started = false;

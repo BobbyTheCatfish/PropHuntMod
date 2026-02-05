@@ -46,6 +46,9 @@ namespace PropHuntMod
 
         internal static bool showHitboxes = false;
 
+        internal static List<Action> nextFrameActions = new List<Action>();
+        static List<Action> _nextFrames = new List<Action>();
+
         void Awake()
         {
             Utils.Config.LoadConfig(Config);
@@ -88,10 +91,21 @@ namespace PropHuntMod
 
             return false;
         }
+        
 
         private void Update()
         {
             if (!modEnabled) return;
+
+            if (_nextFrames.Count > 0)
+            {
+                Log.LogInfo($"Executing {_nextFrames.Count} late actions");
+                foreach (var action in _nextFrames)
+                {
+                    action.Invoke();
+                }
+                _nextFrames.Clear();
+            }
 
             if (hornet.hornet != null)
             {
@@ -104,24 +118,24 @@ namespace PropHuntMod
             // Effects testing
             if (Input.GetKeyDown(KeyCode.O))
             {
-                EffectsManager.PlayConfetti();
-                //    if (Input.GetKey(KeyCode.LeftShift)) EffectsManager.PlayFoundSound(true);
-                //    else if (Input.GetKey(KeyCode.RightShift)) EffectsManager.PlayFoundSound(false);
-                //    else if (Input.GetKey(KeyCode.LeftControl))
-                //    {
-                //        var data = new Utils.Networking.FromServer.GameOver { IsWinner = true, WasCanceled = false, WinnerUsername = "BobbyTC" };
-                //        Utils.Networking.ClientNetwork.OnGameOver(data);
-                //    }
-                //    else if (Input.GetKey(KeyCode.RightControl))
-                //    {
-                //        var data = new Utils.Networking.FromServer.GameOver { IsWinner = false, WasCanceled = false, WinnerUsername = "BobbyTC" };
-                //        Utils.Networking.ClientNetwork.OnGameOver(data);
-                //    }
-                //    else
-                //    {
-                //        var data = new Utils.Networking.FromServer.GameOver { IsWinner = false, WasCanceled = true, WinnerUsername = "Nobody" };
-                //        Utils.Networking.ClientNetwork.OnGameOver(data);
-                //    }
+                //EffectsManager.PlayConfetti();
+                //if (Input.GetKey(KeyCode.LeftShift)) EffectsManager.PlayFoundSound(true);
+                //else if (Input.GetKey(KeyCode.RightShift)) EffectsManager.PlayFoundSound(false);
+                //else if (Input.GetKey(KeyCode.LeftControl))
+                //{
+                //    var data = new Utils.Networking.FromServer.GameOver { IsWinner = true, WasCanceled = false, WinnerUsername = "BobbyTC" };
+                //    Utils.Networking.ClientNetwork.OnGameOver(data);
+                //}
+                //else if (Input.GetKey(KeyCode.RightControl))
+                //{
+                //    var data = new Utils.Networking.FromServer.GameOver { IsWinner = false, WasCanceled = false, WinnerUsername = "BobbyTC" };
+                //    Utils.Networking.ClientNetwork.OnGameOver(data);
+                //}
+                //else
+                //{
+                //    var data = new Utils.Networking.FromServer.GameOver { IsWinner = false, WasCanceled = true, WinnerUsername = "Nobody" };
+                //    Utils.Networking.ClientNetwork.OnGameOver(data);
+                //}
             }
 
             /**************
@@ -167,6 +181,15 @@ namespace PropHuntMod
                 )
             {
                 cover.SendPropPosition();
+            }
+        }
+        void LateUpdate()
+        {
+            if (nextFrameActions.Count > 0)
+            {
+                Log.LogInfo($"Adding {nextFrameActions.Count} actions");
+                _nextFrames = nextFrameActions.ToList();
+                nextFrameActions.Clear();
             }
         }
 

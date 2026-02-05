@@ -65,7 +65,10 @@ namespace PropHuntMod.Modifications
 
             // Enable title
             title.Find("Title Large/Title_Fleur_Bot").localPosition = new Vector3(0, -5.92f, 0);
-            title.gameObject.SetActive(true);
+
+            // toggle off then on in order to clear current title
+            title.gameObject.SetActive(false);
+            PropHuntMod.nextFrameActions.Add(() => title.gameObject.SetActive(true));
         }
 
         public static void PlayConfetti()
