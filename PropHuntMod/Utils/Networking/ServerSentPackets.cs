@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -122,6 +123,33 @@ namespace PropHuntMod.Utils.Networking.FromServer
             WasCanceled = packet.ReadBool();
         }
     }
+
+    public class FailedAction : IPacketData
+    {
+        public bool IsReliable => true;
+        public bool DropReliableDataIfNewerExists => true;
+        public CustomPackets FailedPacket;
+        public CorrectionActions FixMethod;
+        public ushort AffectedID;
+        public int BypassTicketID;
+
+        public void WriteData(IPacket packet)
+        {
+            packet.Write((int)FailedPacket);
+            packet.Write((int)FixMethod);
+            packet.Write(AffectedID);
+            packet.Write(BypassTicketID);
+        }
+
+        public void ReadData(IPacket packet)
+        {
+            FailedPacket = (CustomPackets)packet.ReadInt();
+            FixMethod = (CorrectionActions)packet.ReadInt();
+            AffectedID = packet.ReadUShort();
+            BypassTicketID = packet.ReadUShort();
+        }
+    }
+
     public static class Packets
     {
         internal static IPacketData Instantiate(CustomPackets packetID)
@@ -142,6 +170,8 @@ namespace PropHuntMod.Utils.Networking.FromServer
                     return new GameOver();
                 case CustomPackets.SeekerStart:
                     return new SeekerStart();
+                case CustomPackets.FailedAction:
+                    return new FailedAction();
                 default:
                     throw new NotImplementedException(packetID.ToString());
             }

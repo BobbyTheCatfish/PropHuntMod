@@ -112,32 +112,32 @@ namespace PropHuntMod.Modifications
             EnableProp(newCover);
         }
 
-        public bool EnableProp(GameObject cover)
+        public bool EnableProp(GameObject cover, int ticket = -1)
         {
             if (IsSeeker()) return false;
             var success = base.EnableProp(SelfHornetManager.instance, cover);
             if (success)
             {
-                ClientNetwork.SendPropSwap(cover.name);
+                ClientNetwork.SendPropSwap(cover.name, ticket);
                 PropHuntClient.propSwaps++;
             }
 
             return success;
         }
 
-        public bool DisableProp(bool logOnFail = true, bool isSceneChange = false)
+        public bool DisableProp(bool logOnFail = true, bool isSceneChange = false, int ticket = -1)
         {
             var success = base.DisableProp(SelfHornetManager.instance, logOnFail);
             if (success && !isSceneChange)
             {
-                ClientNetwork.SendPropSwap("");
+                ClientNetwork.SendPropSwap("", ticket);
                 PropHuntMod.showHitboxes = false;
             }
 
             return success;
         }
 
-        public override void OnHit()
+        public override void OnHit(TriggerHandler handler)
         {
             Log.LogError("UH OH! ON HIT IS SUPPOSED TO BE A REMOTE PLAYER!");
         }

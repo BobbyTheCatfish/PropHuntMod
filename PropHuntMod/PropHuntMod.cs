@@ -3,10 +3,12 @@ using HarmonyLib;
 using PropHuntMod.Modifications;
 //using PropHuntMod.Utils.Networking;
 using PropHuntMod.Utils;
+using PropHuntMod.Utils.Networking;
 using SSMP.Api.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization.Formatters;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -23,7 +25,7 @@ using UnityEngine.UI;
  * 
  * TODO:
  * Integrate with multiplayer mod
- *  - Find out which player is which
+ *  - Find out which player is whichz
  *  - Send prop information packets
  * 
  */
@@ -36,6 +38,7 @@ namespace PropHuntMod
     [BepInProcess("Hollow Knight Silksong.exe")]
     public class PropHuntMod : BaseUnityPlugin
     {
+        internal static PropHuntMod Instance;
         internal SelfHornetManager hornet = new SelfHornetManager();
         internal SelfCoverManager cover = new SelfCoverManager();
         //private static AttackCooldownPatches attackPatches = new AttackCooldownPatches(config);
@@ -46,11 +49,17 @@ namespace PropHuntMod
 
         internal static bool showHitboxes = false;
 
+        internal static string CurrentScene;
+        internal static string PreviousScene;
+        internal static int SceneTransitionTicket = -1;
+        //internal static string PreviousGate;
+
         internal static List<Action> nextFrameActions = new List<Action>();
         static List<Action> _nextFrames = new List<Action>();
 
         void Awake()
         {
+            Instance = this;
             Utils.Config.LoadConfig(Config);
             Log.SetLogger(base.Logger);
             SSMP.Api.Client.ClientAddon.RegisterAddon(new PropHuntClient());
@@ -118,6 +127,11 @@ namespace PropHuntMod
             // Effects testing
             if (Input.GetKeyDown(KeyCode.O))
             {
+                //Utils.Networking.ClientNetwork.OnPropFound(new Utils.Networking.FromServer.PropFound
+                //{
+                //    IsClientFound = true,
+                //    PropOwnerID = 0
+                //});
                 //EffectsManager.PlayConfetti();
                 //if (Input.GetKey(KeyCode.LeftShift)) EffectsManager.PlayFoundSound(true);
                 //else if (Input.GetKey(KeyCode.RightShift)) EffectsManager.PlayFoundSound(false);
@@ -193,6 +207,28 @@ namespace PropHuntMod
             }
         }
 
+        // Store previous scene while in transition
+        //[HarmonyPrefix]
+        //[HarmonyPatch(typeof (TransitionPoint), "TryDoTransition")]
+        //internal static void OnDoSceneTransition(TransitionPoint __instance)
+        //{
+        //    var gm = GameManager.instance;
+        //    if (!gm || TransitionPoint.IsTransitionBlocked)
+        //    {
+        //        return;
+        //    }
+
+        //    var hc = HeroController.instance;
+        //    if (gm.GameState == GlobalEnums.GameState.ENTERING_LEVEL)
+        //    {
+        //        if (__instance.GetGatePosition() != GlobalEnums.GatePosition.bottom || !hc.isHeroInPosition || hc.Body.linearVelocity.y >= 0f)
+        //        {
+        //            PreviousScene = __instance.targetScene;
+        //            //PreviousGate = __instance.entryPoint;
+        //        }
+        //    }
+        //}
+
         // Disable prop on scene change
         [HarmonyPrefix]
         [HarmonyPatch(typeof(SceneLoad), "Begin")]
@@ -206,7 +242,8 @@ namespace PropHuntMod
             }
             SelfCoverManager.instance.DisableProp(false, true);
             //Log.LogInfo($"Changing scene to {__instance.TargetSceneName}");
-            //cover.currentScene = __instance.TargetSceneName;
+            PreviousScene = CurrentScene;
+            CurrentScene = __instance.TargetSceneName;
             PropValidation.ResetProps();
 
             //foreach (var player in playerManager.Values)
@@ -228,9 +265,23 @@ namespace PropHuntMod
 
             PropValidation.GetAllProps();
 
-            if (PropHuntClient.roundStarted && !PropHuntClient.isSeeker)
+            if (PropHuntClient.GameState != GameState.NotStarted && !PropHuntClient.isSeeker)
             {
-                SelfCoverManager.instance.EnableProp();
+                if (SceneTransitionTicket != -1)
+                {
+                    ClientErrorCorrection.RestoreLastProp(new Utils.Networking.FromServer.FailedAction
+                    {
+                        AffectedID = 0,
+                        BypassTicketID = SceneTransitionTicket,
+                        FailedPacket = CustomPackets.PropSwap,
+                        FixMethod = CorrectionActions.PreviousScene
+                    });
+                    SceneTransitionTicket = -1;
+                }
+                else
+                {
+                    SelfCoverManager.instance.EnableProp();
+                }
             }
 
             //PlayerManager.EnsureAllPropCovers();

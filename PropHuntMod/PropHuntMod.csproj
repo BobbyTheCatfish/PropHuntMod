@@ -150,15 +150,18 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="PropHuntClient.cs" />
-    <Compile Include="PropHuntServer.cs" />
+    <Compile Include="Server\PropHuntServer.cs" />
+    <Compile Include="Server\SeekerTimer.cs" />
+    <Compile Include="Server\ServerPlayer.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\ModConfiguration.cs" />
     <Compile Include="Modifications\BaseHornetManager.cs" />
     <Compile Include="Modifications\BaseCoverManager.cs" />
+    <Compile Include="Utils\Networking\ClientErrorCorrection.cs" />
     <Compile Include="Utils\Networking\ClientNetwork.cs" />
     <Compile Include="Utils\Networking\ClientSentPackets.cs" />
-    <Compile Include="Utils\Networking\Common.cs" />
+    <Compile Include="Utils\Enums.cs" />
     <Compile Include="Utils\Networking\ServerNetwork.cs" />
     <Compile Include="Utils\Networking\ServerSentPackets.cs" />
     <Compile Include="Utils\NoRepeat.cs" />

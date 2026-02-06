@@ -12,7 +12,7 @@ namespace PropHuntMod.Commands
         public string[] Aliases => new string[] { };
         public void Execute(ICommandSender sender, string[] args)
         {
-            if (PropHuntServer.started)
+            if (PropHuntServer.GameState != Utils.GameState.NotStarted)
             {
                 sender.SendMessage("The game has already started!");
                 return;
@@ -29,7 +29,7 @@ namespace PropHuntMod.Commands
         public string[] Aliases => new string[] { };
         public void Execute(ICommandSender sender, string[] args)
         {
-            if (!PropHuntServer.started)
+            if (PropHuntServer.GameState == Utils.GameState.NotStarted)
             {
                 sender.SendMessage("The game hasn't started yet!");
                 return;
