@@ -138,6 +138,7 @@
   <ItemGroup>
     <Compile Include="Commands.cs" />
     <Compile Include="Modifications\AttackCooldown.cs" />
+    <Compile Include="Modifications\EffectVerticalSweep.cs" />
     <Compile Include="Modifications\NoDamage.cs" />
     <Compile Include="Modifications\PlayerManager.cs" />
     <Compile Include="Modifications\SelfCoverManager.cs" />
@@ -163,30 +164,43 @@
     <Compile Include="Utils\NoRepeat.cs" />
     <Compile Include="PropHuntMod.cs" />
     <Compile Include="Utils\PropValidation.cs" />
-    <Content Include="icon.png">
+    <!-- <Content Include="Assets\icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </Content> -->
     <Content Include="PropHuntModOld.txt" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="confetti">
+    <Content Include="Assets\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>%(Filename)%(Extension)</TargetPath>
+    </Content>
+    <Content Include="README.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>%(Filename)%(Extension)</TargetPath>
+    </Content>
+    <Compile Include="Utils\ExtraProps.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- <ItemGroup>
+    <None Include="Assets\confetti.bundle">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="confetti.manifest">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="manifest.json">
+    <None Include="Assets\manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Compile Include="Utils\ExtraProps.cs" />
+    <None Include="Assets\sweepshader.bundle">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="README.md" />
+  </ItemGroup> -->
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

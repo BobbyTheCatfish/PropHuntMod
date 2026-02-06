@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using PropHuntMod.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace PropHuntMod.Modifications
         static AudioClip selfRevealSound;
         static AudioClip gameOverSound;
         static ParticleSystem confetti;
+        public static Shader SweepShader;
         public static void PlayFoundSound(bool isSelf)
         {
             if (selfRevealSound == null) Init();
@@ -77,29 +79,39 @@ namespace PropHuntMod.Modifications
             confetti.Play();
         }
 
+        public static void SweepGameObject(GameObject go, Action onFinish)
+        {
+            if (SweepShader == null) Init();
+
+            var sweep = go.AddComponent<EffectVerticalSweep>();
+            sweep.onComplete = onFinish;
+        }
+
         static void Init()
         {
             /****************
              *  LOAD AUDIO  *
              ****************/
             var loadedBundles = AssetBundle.GetAllLoadedAssetBundles();
-            var audioBundle = loadedBundles.First(b => b.name == "7aa551f2bad7d3e8e7893d04de5ef978.bundle");
+            var bundle = loadedBundles.First(b => b.name == "7aa551f2bad7d3e8e7893d04de5ef978.bundle");
 
-            if (audioBundle == null)
+            if (bundle == null)
             {
                 Log.LogInfo("Couldn't load audio bundle");
                 return;
             }
 
-            var audioClips = audioBundle.LoadAllAssets<AudioClip>();
+            var audioClips = bundle.LoadAllAssets<AudioClip>();
             victorySound = audioClips.FirstOrDefault(a => a.name == "sl3");
             otherRevealSound = audioClips.FirstOrDefault(a => a.name == "Garama_weak_collapse");
             selfRevealSound = audioClips.FirstOrDefault(a => a.name == "d3");
 
-            audioBundle = loadedBundles.First(b => b.name == "48a0f4259d782cbbf6fb20cdcc4f4e5f.bundle");
-            gameOverSound = audioBundle.LoadAllAssets<AudioClip>().FirstOrDefault(a => a.name == "slow_motion_effect_tone_with_texture");
+            bundle = loadedBundles.First(b => b.name == "48a0f4259d782cbbf6fb20cdcc4f4e5f.bundle");
+            gameOverSound = bundle.LoadAllAssets<AudioClip>().FirstOrDefault(a => a.name == "slow_motion_effect_tone_with_texture");
 
-            // Alternate game over sounds
+            Log.LogInfo("Audio loaded");
+
+            //Alternate game over sounds
             //audioBundle = loadedBundles.First(b => b.name == "45160b0885b9207aade8da6c49b4c729.bundle");
             //gameOverSound = audioBundle.LoadAllAssets<AudioClip>().FirstOrDefault(a => a.name == "unravelled_boss_bg_head_dissapear");
 
@@ -107,21 +119,66 @@ namespace PropHuntMod.Modifications
             //gameOverSound = audioBundle.LoadAllAssets<AudioClip>().FirstOrDefault(a => a.name ==  "dream_enter_pt_2");
 
 
+            /******************************
+             *  LOAD CUSTOM ASSET BUNDLE  *
+             ******************************/
+            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            
+            bundle = AssetBundle.LoadFromFile(Path.Combine(dir, "prophunt.bundle"));
+            var assets = bundle.LoadAllAssets();
+
+            foreach (var  asset in assets)
+            {
+                Log.LogInfo(asset.name, asset);
+            }
+
+            /******************************
+             *  LOAD SWEEP EFFECT SHADER  *
+             ******************************/
+            var shader = assets.First(a => a is Shader && a.name == "Unlit/SweeperNew") as Shader;
+            if (shader == null)
+            {
+                Log.LogError("SweepShader shader is null");
+                return;
+            }
+            SweepShader = shader;
+
+            Log.LogInfo("Sweep shader loaded");
+
+
             /**************************
              *  LOAD CONFETTI PREFAB  *
              **************************/
-            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var bundle = AssetBundle.LoadFromFile(Path.Combine(dir, "confetti"));
 
-            var assets = bundle.LoadAllAssets();
-            GameObject confettiGO = assets.First(a => a is GameObject) as GameObject;
+            GameObject confettiGO = assets.First(a => a is GameObject && a.name == "Confetti") as GameObject;
             confettiGO = GameObject.Instantiate(confettiGO, GameCameras.instance.tk2dCam.transform);
             confettiGO.transform.localPosition = new Vector3(0, -7.5f, 25);
 
             confetti = confettiGO.GetComponent<ParticleSystem>();
 
-            var mat = assets.First(a => a is Material) as Material;
-            mat.shader = SelfHornetManager.instance.hornet.GetComponent<MeshRenderer>().material.shader;
+            bundle.Unload(false);
+
+
+            bundle = loadedBundles.FirstOrDefault(b => b.name == "c3803556c9d1f4d00ecf06fd8fbe45f0.bundle");
+
+            bool unload = false;
+            if (bundle == null)
+            {
+                Log.LogInfo("Bundle not loaded. Loading now.");
+                var bundlePath = Path.Combine(BepInEx.Paths.ManagedPath, "../", "StreamingAssets", "aa", "StandaloneWindows64", "materials_assets_areaaqueductsprintmaster.bundle");
+                bundle = AssetBundle.LoadFromFile(bundlePath);
+                unload = true;
+            }
+
+            Log.LogInfo("bundle loaded");
+
+            var mat = bundle.LoadAsset<Material>("Assets/Materials/Particles/Confetti Particle.mat");
+            //var mat = materials.First(a => a.name.ToLower() == "confetti particle");
+            Log.LogInfo(mat.name);
+            confettiGO.GetComponent<ParticleSystemRenderer>().material = mat;
+
+            if (unload) bundle.Unload(false);
+            Log.LogInfo("Confetti loaded");
         }
     }
 }

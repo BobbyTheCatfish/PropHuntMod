@@ -301,9 +301,7 @@ namespace PropHuntMod.Utils
 
         LineRenderer lineRenderer;
         BoxCollider2D collider;
-
-        bool OverrideShow = false;
-        bool Show => PropHuntMod.showHitboxes || OverrideShow;
+        bool Show => PropHuntMod.showHitboxes;
 
         void Awake()
         {
@@ -348,11 +346,6 @@ namespace PropHuntMod.Utils
             {
                 lineRenderer.SetPosition(i, transform.TransformPoint(localPoints[i]));
             }
-        }
-
-        public void BeforeDestroy()
-        {
-            OverrideShow = true;
         }
     }
 
