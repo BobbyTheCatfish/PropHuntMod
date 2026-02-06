@@ -14,12 +14,13 @@ namespace PropHuntMod.Utils.Networking
         /******************
          * PACKET SENDERS *
          ******************/
-        public static void SendPropSwap(string propName)
+        public static void SendPropSwap(string propName, int ticket = -1)
         {
             Log.LogInfo($"Sending prop swap: {propName}");
             sender.SendSingleData(CustomPackets.PropSwap, new FromClient.PropSwap
             {
-                propName = propName
+                propName = propName,
+                TicketID = ticket,
             });
         }
 
@@ -33,12 +34,13 @@ namespace PropHuntMod.Utils.Networking
             });
         }
 
-        public static void SendHideStatus(bool isHiding)
+        public static void SendHideStatus(bool isHiding, int ticket = -1)
         {
             Log.LogInfo($"Sending hide status: {isHiding}");
             sender.SendSingleData(CustomPackets.HideStatus, new FromClient.HideStatus
             {
-                IsHiding = isHiding
+                IsHiding = isHiding,
+                TicketID = ticket
             });
         }
 
@@ -73,6 +75,7 @@ namespace PropHuntMod.Utils.Networking
             receiver.RegisterPacketHandler<FromServer.RoundStart>(CustomPackets.RoundStart, OnRoundStart);
             receiver.RegisterPacketHandler<FromServer.GameOver>(CustomPackets.GameOver, OnGameOver);
             receiver.RegisterPacketHandler<FromServer.SeekerStart>(CustomPackets.SeekerStart, OnSeekerStart);
+            receiver.RegisterPacketHandler<FromServer.FailedAction>(CustomPackets.FailedAction, ClientErrorCorrection.DiagnoseError);
 
             if (Config.AllowDebugFeatures) receiver.RegisterPacketHandler<FromServer.HideStatus>(CustomPackets.HideStatus, OnHideStatus);
         }
@@ -88,28 +91,41 @@ namespace PropHuntMod.Utils.Networking
             Log.LogInfo($"{data.Id} prop set to {data.propName}");
         }
 
-        public static void OnRoundStart(FromServer.RoundStart data)
+        static void OnRoundStart(FromServer.RoundStart data)
         {
-            PropHuntClient.roundStarted = true;
+            // Set game state
+            bool alreadyPlaying = data.SeekerWaitTime == 0;
+            if (alreadyPlaying) PropHuntClient.GameState = GameState.Playing;
+            else PropHuntClient.GameState = GameState.SeekerWait;
+
+            // Set hiding settings
             PropHuntClient.isSeeker = data.IsSeeker;
             PropHuntClient.propSwaps = 0;
             PropHuntClient.maxPropSwaps = data.PropSwapLimit;
 
+            // Display overlays and effects
             if (data.IsSeeker)
             {
                 PropHuntClient.LocalMessage("You're a seeker!");
-                SelfHornetManager.instance.SetSeekerObscure(true);
                 SelfCoverManager.instance.DisableProp(false);
-                EffectsManager.SetTitle("SEEKER", $"Wait time: {data.SeekerWaitTime} seconds", "YOUR ROLE:", true, 10);
+                if (!alreadyPlaying)
+                {
+                    SelfHornetManager.instance.SetSeekerObscure(true);
+                    EffectsManager.SetTitle("SEEKER", $"Wait time: {data.SeekerWaitTime} seconds", "YOUR ROLE:", true, 10);
+                }
+                else
+                {
+                    EffectsManager.SetTitle("SEEKER", $"It's go time!", "YOUR ROLE:", true, 10);
+                }
                 return;
             }
             else
             {
                 EffectsManager.SetTitle("HIDER", "", "YOUR ROLE:");
+                SelfCoverManager.instance.EnableProp();
+                PropHuntClient.LocalMessage("You're hiding this round!");
             }
 
-            SelfCoverManager.instance.EnableProp();
-            PropHuntClient.LocalMessage("You're hiding this round!");
         }
 
         static void OnPropLocation(FromServer.PropLocation data)
@@ -133,12 +149,14 @@ namespace PropHuntMod.Utils.Networking
             if (data.IsClientFound)
             {
                 Log.LogInfo("I've been found!");
-                SelfCoverManager.instance.DisableProp();
-                if (PropHuntClient.roundStarted) PropHuntClient.isSeeker = true;
+                SelfCoverManager.instance.FindProp(SelfHornetManager.instance);
+                //SelfCoverManager.instance.DisableProp();
+                if (PropHuntClient.GameState == GameState.Playing) PropHuntClient.isSeeker = true;
             }
             else
             {
                 var player = PlayerManager.GetPlayerManager(data.PropOwnerID);
+                player.coverManager.FindProp(player.hornetManager);
                 player.SetProp("");
                 Log.LogInfo($"{player.PlayerAvatar.Username} has been found");
             }
@@ -147,27 +165,26 @@ namespace PropHuntMod.Utils.Networking
 
         static void OnGameOver(FromServer.GameOver data)
         {
-            PropHuntClient.roundStarted = false;
+            PropHuntClient.GameState = GameState.NotStarted;
             PropHuntClient.isSeeker = false;
             PropHuntClient.propSwaps = 0;
 
+            SelfHornetManager.instance.SetSeekerObscure(false);
             SelfCoverManager.instance.DisableProp();
             EffectsManager.PlayGameOverSound(!data.WasCanceled && data.IsWinner);
 
             var mainText = data.WasCanceled ? "Round Canceled" : data.IsWinner ? "You Won!" : "Round Complete";
             var subText = data.IsWinner || data.WasCanceled ? "" : $"{data.WinnerUsername} won!";
             EffectsManager.SetTitle(mainText, subText);
+            if (data.IsWinner) EffectsManager.PlayConfetti();
             GameManager.instance.FreezeMoment(GlobalEnums.FreezeMomentTypes.BossDeathSlow);
         }
 
         static void OnSeekerStart(FromServer.SeekerStart data)
         {
-            if (!PropHuntClient.isSeeker)
-            {
-                Log.LogFatal("OnSeekerStart received, but I'm not a seeker.");
-                //return;
-            }
+            PropHuntClient.GameState = GameState.Playing;
 
+            if (!PropHuntClient.isSeeker) return;
             SelfHornetManager.instance.SetSeekerObscure(false);
         }
     }

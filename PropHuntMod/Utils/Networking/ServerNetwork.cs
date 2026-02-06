@@ -8,10 +8,50 @@ using UnityEngine;
 
 namespace PropHuntMod.Utils.Networking
 {
+    struct BypassTicket
+    {
+        public int Id;
+        public CorrectionActions action;
+
+        public BypassTicket(int Id = -1, CorrectionActions action = CorrectionActions.None)
+        {
+            this.Id = Id;
+            this.action = action;
+        }
+    }
+
     static class ServerNetwork
     {
         static IServerAddonNetworkSender<CustomPackets> sender;
         static IServerAddonNetworkReceiver<CustomPackets> receiver;
+        static readonly Dictionary<ushort, List<BypassTicket>> tickets = new Dictionary<ushort, List<BypassTicket>>();
+        static int TicketID = 0;
+
+        static BypassTicket GenerateTicket(ushort playerID, CorrectionActions action)
+        {
+            if (!tickets.ContainsKey(playerID))
+            {
+                tickets[playerID] = new List<BypassTicket>();
+            }
+
+            var ticket = new BypassTicket { action = action, Id = TicketID };
+            tickets[playerID].Add(ticket);
+
+            TicketID++;
+            return ticket;
+        }
+
+        static bool IsValidTicket(ushort playerID, int ticketID, params CorrectionActions[] action)
+        {
+            if (ticketID == -1) return false;
+            if (!tickets.ContainsKey(playerID)) return false;
+
+            var ticketIndex = tickets[playerID].FindIndex(t => t.Id == ticketID && action.Contains(t.action));
+            if (ticketIndex == -1) return false;
+
+            tickets[playerID].RemoveAt(ticketIndex);
+            return true;
+        }
 
         public static void Broadcast(ushort senderID, CustomPackets packetID, IPacketData data)
         {
@@ -21,6 +61,28 @@ namespace PropHuntMod.Utils.Networking
 
                 sender.SendSingleData(packetID, data, player.Id);
             }
+        }
+
+        static void FailedAction(ushort senderID, ushort affectedID, CustomPackets packetType, CorrectionActions fix)
+        {
+            // Generate ticket if needed
+            int ticketId = -1;
+            if (
+                fix == CorrectionActions.ToggleHornetFalse ||
+                fix == CorrectionActions.PreviousScene ||
+                fix == CorrectionActions.RestoreLastProp
+            )
+            {
+                ticketId = GenerateTicket(senderID, fix).Id;
+            }
+
+            sender.SendSingleData(CustomPackets.FailedAction, new FromServer.FailedAction
+            {
+                AffectedID = affectedID,
+                FailedPacket = packetType,
+                FixMethod = fix,
+                BypassTicketID = ticketId
+            }, senderID);
         }
 
         /******************
@@ -45,14 +107,14 @@ namespace PropHuntMod.Utils.Networking
             }
         }
 
-        public static void SendRoundStart(ushort id)
+        public static void SendRoundStart(ushort id, bool started = false)
         {
             var player = PropHuntServer.GetPlayer(id);
             var data = new FromServer.RoundStart
             {
                 IsSeeker = player.seeker,
                 PropSwapLimit = Config.MaxSwapCount,
-                SeekerWaitTime = Config.SeekerCountdown
+                SeekerWaitTime = started ? 0 : Config.SeekerCountdown - PropHuntServer.instance.SeekerTimer.seconds
             };
 
             sender.SendSingleData(CustomPackets.RoundStart, data, id);
@@ -87,8 +149,6 @@ namespace PropHuntMod.Utils.Networking
             Log.LogInfo($"Broadcasting prop found from {id}: {propOwnerID}");
             foreach (var player in PropHuntServer._serverApi.ServerManager.Players)
             {
-                if (player.Id == id) continue;
-
                 FromServer.PropFound sendData = new FromServer.PropFound
                 {
                     IsClientFound = player.Id == propOwnerID,
@@ -117,11 +177,7 @@ namespace PropHuntMod.Utils.Networking
         public static void BroadcastSeekerStart()
         {
             Log.LogInfo("Broadcasting seeker start");
-            foreach (var player in PropHuntServer._serverApi.ServerManager.Players)
-            {
-                var p = PropHuntServer.GetPlayer(player.Id);
-                if (p.seeker) sender.SendSingleData(CustomPackets.SeekerStart, new FromServer.SeekerStart(), player.Id);
-            }
+            sender.BroadcastSingleData(CustomPackets.SeekerStart, new FromServer.SeekerStart());
         }
 
         public static void Init(IServerApi serverApi, ServerAddon serverAddon)
@@ -144,20 +200,29 @@ namespace PropHuntMod.Utils.Networking
         {
             var player = PropHuntServer.GetPlayer(id);
 
-            if (Config.MaxSwapCount > 0 && player.swapCount >= Config.MaxSwapCount && PropHuntServer.started)
+            // Seekers can't hide
+            if (player.seeker && PropHuntServer.GameState != GameState.NotStarted)
             {
-                PropHuntServer.instance.Message(id, "You ran out of prop swaps and are de-synced! Is your mod/config up to date?");
+                PropHuntServer.instance.Message(id, "You're a seeker! You can't hide this round.");
+                FailedAction(id, id, CustomPackets.PropSwap, CorrectionActions.DisableClientProp);
                 return;
             }
 
-            if (player.seeker)
+            var swapCountExempt = IsValidTicket(id, data.TicketID, CorrectionActions.RestoreLastProp, CorrectionActions.PreviousScene);
+
+            // Limit number of prop swaps
+            if (Config.MaxSwapCount > 0 && player.swapCount >= Config.MaxSwapCount && PropHuntServer.GameState != GameState.NotStarted)
             {
-                PropHuntServer.instance.Message(id, "You're a seeker! You can't hide this round.");
-                return;
+                if (!swapCountExempt)
+                {
+                    PropHuntServer.instance.Message(id, "You ran out of prop swaps and are de-synced! Is your mod/config up to date?");
+                    FailedAction(id, id, CustomPackets.PropSwap, CorrectionActions.RestoreLastProp);
+                    return;
+                }
             }
 
             player.propName = string.IsNullOrEmpty(data.propName) ? null : data.propName;
-            player.swapCount++;
+            if (!swapCountExempt) player.swapCount++;
 
             ForwardPropSwap(id, data.propName);
         }
@@ -166,16 +231,21 @@ namespace PropHuntMod.Utils.Networking
         {
             var player = PropHuntServer.GetPlayer(id);
 
-            if (player.seeker)
+            // Seekers can't prop
+            if (player.seeker && PropHuntServer.GameState != GameState.NotStarted)
             {
                 PropHuntServer.instance.Message(id, "You're a seeker! You can't hide this round.");
+                FailedAction(id, id, CustomPackets.PropSwap, CorrectionActions.DisableClientProp);
                 return;
             }
 
             player.propLocation = data.PropPosition;
             player.propRotation = data.PropRotation;
 
-            ForwardPropLocation(id, data.PropPosition, data.PropRotation);
+            // Constrain location
+            BaseCoverManager.ConstrainPropLocation(ref player.propLocation, ref player.propRotation);
+
+            ForwardPropLocation(id, player.propLocation, player.propRotation);
         }
         
         static void OnSync(ushort id, FromClient.Sync data)
@@ -206,11 +276,16 @@ namespace PropHuntMod.Utils.Networking
         static void OnHideStatus(ushort id, FromClient.HideStatus data)
         {
             var player = PropHuntServer.GetPlayer(id);
-            if (player.seeker && data.IsHiding)
+            if (PropHuntServer.GameState != GameState.NotStarted)
             {
-                PropHuntServer.instance.Message(id, "You're a seeker! You can't hide this round.");
-                return;
+                if (player.seeker && data.IsHiding && !IsValidTicket(id, data.TicketID, CorrectionActions.ToggleHornetFalse))
+                {
+                    PropHuntServer.instance.Message(id, "You're a seeker! You can't hide this round.");
+                    FailedAction(id, id, CustomPackets.HideStatus, CorrectionActions.ToggleHornetTrue);
+                    return;
+                }
             }
+
             player.hidden = data.IsHiding;
             ForwardHideStatus(id, data.IsHiding);
         }
@@ -220,28 +295,45 @@ namespace PropHuntMod.Utils.Networking
             var owner = PropHuntServer.GetPlayer(data.PropOwnerID);
             var finder = PropHuntServer.GetPlayer(id);
 
-            if (PropHuntServer.started && owner.seeker)
+            if (PropHuntServer.GameState == GameState.SeekerWait)
             {
-                PropHuntServer.instance.Message(id, "That player is a seeker!");
+                PropHuntServer.instance.Message(id, "You're still in the waiting period. No seeking yet!");
+                FailedAction(id, data.PropOwnerID, CustomPackets.PropFound, CorrectionActions.RestoreTriggerHandler);
                 return;
             }
-            else if (PropHuntServer.started && !finder.seeker)
+
+            if (PropHuntServer.GameState == GameState.Playing)
             {
-                PropHuntServer.instance.Message(id, "You're not a seeker! You can't find people this round.");
+                if (owner.seeker)
+                {
+                    PropHuntServer.instance.Message(id, "That player is a seeker!");
+                    FailedAction(id, data.PropOwnerID, CustomPackets.PropFound, CorrectionActions.None);
+                }
+                else if (!finder.seeker)
+                {
+                    PropHuntServer.instance.Message(id, "You're not a seeker! You can't find people this round.");
+                    FailedAction(id, data.PropOwnerID, CustomPackets.PropFound, CorrectionActions.RestoreTriggerHandler);
+                }
+                else owner.seeker = true;
+            }
+
+            if (string.IsNullOrEmpty(owner.propName))
+            {
+                PropHuntServer.instance.Message(id, "That player has already been found. They might be out of sync.");
+                FailedAction(id, data.PropOwnerID, CustomPackets.PropFound, CorrectionActions.DisablePlayerProp);
                 return;
             }
 
             owner.propName = null;
             owner.propLocation = Vector3.zero;
             owner.propRotation = 0;
-            owner.seeker = true;
 
             ForwardPropFound(id, data.PropOwnerID);
 
             
             PropHuntServer.instance.Announce($"{owner.PlayerAvatar.Username} was found by {finder.PlayerAvatar.Username}!");
 
-            if (PropHuntServer.started)
+            if (PropHuntServer.GameState == GameState.Playing)
             {
                 PropHuntServer.instance.CheckGameOver(owner.PlayerAvatar);
             }

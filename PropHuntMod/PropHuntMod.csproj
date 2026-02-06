@@ -138,6 +138,7 @@
   <ItemGroup>
     <Compile Include="Commands.cs" />
     <Compile Include="Modifications\AttackCooldown.cs" />
+    <Compile Include="Modifications\EffectVerticalSweep.cs" />
     <Compile Include="Modifications\NoDamage.cs" />
     <Compile Include="Modifications\PlayerManager.cs" />
     <Compile Include="Modifications\SelfCoverManager.cs" />
@@ -149,37 +150,60 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="PropHuntClient.cs" />
-    <Compile Include="PropHuntServer.cs" />
+    <Compile Include="Server\PropHuntServer.cs" />
+    <Compile Include="Server\SeekerTimer.cs" />
+    <Compile Include="Server\ServerPlayer.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\ModConfiguration.cs" />
     <Compile Include="Modifications\BaseHornetManager.cs" />
     <Compile Include="Modifications\BaseCoverManager.cs" />
+    <Compile Include="Utils\Networking\ClientErrorCorrection.cs" />
     <Compile Include="Utils\Networking\ClientNetwork.cs" />
     <Compile Include="Utils\Networking\ClientSentPackets.cs" />
-    <Compile Include="Utils\Networking\Common.cs" />
+    <Compile Include="Utils\Enums.cs" />
     <Compile Include="Utils\Networking\ServerNetwork.cs" />
     <Compile Include="Utils\Networking\ServerSentPackets.cs" />
     <Compile Include="Utils\NoRepeat.cs" />
     <Compile Include="PropHuntMod.cs" />
     <Compile Include="Utils\PropMovementControls.cs" />
     <Compile Include="Utils\PropValidation.cs" />
-    <Content Include="icon.png">
+    <!-- <Content Include="Assets\icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </Content> -->
     <Content Include="PropHuntModOld.txt" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="manifest.json">
+    <Content Include="Assets\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>%(Filename)%(Extension)</TargetPath>
+    </Content>
+    <Content Include="README.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>%(Filename)%(Extension)</TargetPath>
+    </Content>
+    <Compile Include="Utils\ExtraProps.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- <ItemGroup>
+    <None Include="Assets\confetti.bundle">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Compile Include="Utils\ExtraProps.cs" />
+    <None Include="Assets\sweepshader.bundle">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="README.md" />
+  </ItemGroup> -->
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
@@ -190,6 +214,7 @@ set PLUGIN_DIR=H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\p
 set RELEASE_DIR=$(ProjectDir)\bin\release
 
 xcopy "$(TargetDir)" "%25PLUGIN_DIR%25" /E /I /Y
-tar -a -c -f "$(ProjectDir)\bin\PropHuntMod.zip" $(ProjectDir)\bin\Debug"</PostBuildEvent>
+cd "$(ProjectDir)\bin\Debug"
+tar -c -a -f "$(ProjectDir)\bin\PropHuntMod.zip" *</PostBuildEvent>
   </PropertyGroup>
 </Project>

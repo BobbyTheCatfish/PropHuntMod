@@ -25,7 +25,7 @@ namespace PropHuntMod
         public override uint ApiVersion => Config.SSMPApiVersion;
         public override bool NeedsNetwork =>  true;
 
-        public static bool roundStarted = false;
+        public static GameState GameState;
         public static bool isSeeker = false;
         public static ushort propSwaps = 0;
         public static ushort maxPropSwaps = 0;

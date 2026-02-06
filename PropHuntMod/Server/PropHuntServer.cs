@@ -1,72 +1,15 @@
-﻿using PropHuntMod.Utils;
+﻿using PropHuntMod.Server;
+using PropHuntMod.Utils;
 using PropHuntMod.Utils.Networking;
 using SSMP.Api.Server;
-using SSMP.Api.Server.Networking;
 using SSMP.Game.Settings;
-using SSMP.Networking.Packet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Timers;
 using UnityEngine;
 
 namespace PropHuntMod
 {
-    internal class ServerPlayer
-    {
-        public ushort id;
-        public bool hidden = false;
-        public bool seeker = false;
-        public string propName;
-        public Vector3 propLocation = Vector3.zero;
-        public float propRotation = 0;
-        public IServerPlayer PlayerAvatar => PropHuntServer._serverApi.ServerManager.GetPlayer(id);
-        public int swapCount = 0;
-        public ServerPlayer(ushort id)
-        {
-            this.id = id;
-        }
-    }
-
-    public class SeekerTimer
-    {
-        int seconds = 5;
-        Timer timer;
-
-        void SetTimer(int seconds, Action cb)
-        {
-            timer = new Timer(seconds * 1000);
-            timer.Elapsed += new ElapsedEventHandler((a, b) => {
-                timer.Stop();
-                timer = null;
-                cb.Invoke();
-            });
-
-            timer.AutoReset = false;
-            timer.Start();
-        }
-
-        void SetSecondsTimer()
-        {
-            if (seconds == 0)
-            {
-                PropHuntServer.instance.Announce("[Seekers]: Ready or not, here we come!");
-                ServerNetwork.BroadcastSeekerStart();
-            }
-            else
-            {
-                PropHuntServer.instance.Announce($"[Seekers]: {seconds}...");
-                SetTimer(1, () => SetSecondsTimer());
-                seconds--;
-            }
-        }
-
-        public SeekerTimer(int seconds)
-        {
-            SetTimer(seconds, SetSecondsTimer);
-        }
-    }
-
     public class PropHuntServer : ServerAddon
     {
         protected override string Name => Config.ModName;
@@ -74,12 +17,10 @@ namespace PropHuntMod
         public override uint ApiVersion => Config.SSMPApiVersion;
         public override bool NeedsNetwork => true;
 
-        internal static bool started = false;
-
         public static PropHuntServer instance;
 
-
-        SeekerTimer seekerTimer;
+        public static GameState GameState;
+        public SeekerTimer SeekerTimer { get; private set; }
 
         readonly static Dictionary<ushort, ServerPlayer> players = new Dictionary<ushort, ServerPlayer>();
 
@@ -101,10 +42,10 @@ namespace PropHuntMod
             serverApi.ServerManager.PlayerConnectEvent += player =>
             {
                 var p = GetPlayer(player.Id);
-                if (started)
+                if (GameState == GameState.SeekerWait)
                 {
                     p.seeker = true;
-                    ServerNetwork.SendRoundStart(player.Id);
+                    ServerNetwork.SendRoundStart(player.Id, GameState == GameState.Playing);
                 }
             };
 
@@ -129,10 +70,12 @@ namespace PropHuntMod
 
         public void Announce(string announcement)
         {
+            Log.LogInfo($"Announcement: {announcement}");
             _serverApi.ServerManager.BroadcastMessage(announcement);
         }
         public void Message(ushort recipientID, string message)
         {
+            Log.LogInfo($"Message to {recipientID}: {message}");
             _serverApi.ServerManager.SendMessage(recipientID, message);
         }
         public string DetermineWinner()
@@ -172,7 +115,7 @@ namespace PropHuntMod
 
                 var seeker = validSeekers.GetRandomElement();
                 seeker.seeker = true;
-                Log.LogDebug($"{seeker} is a seeker");
+                Log.LogDebug($"{seeker.PlayerAvatar.Username} is a seeker");
             }
         }
         void ResetSeekers()
@@ -194,26 +137,33 @@ namespace PropHuntMod
 
             EnsureSettings();
             
-            started = true;
+            GameState = GameState.SeekerWait;
             int seekerCountdown = Config.SeekerCountdown;
             Announce($"The game has begun! Hiders have a {seekerCountdown} second head start. Good luck!");
             
             ServerNetwork.BroadcastRoundStart();
             
-            seekerTimer = new SeekerTimer(seekerCountdown);
+            SeekerTimer = new SeekerTimer(seekerCountdown);
 
         }
         public void CheckGameOver(IServerPlayer playerHit, bool canceled = false)
         {
+            if (GameState == GameState.NotStarted) return;
+
             bool winner = players.Values.All(p => string.IsNullOrEmpty(p.propName));
             if (!winner && !canceled) return;
 
             ServerNetwork.BroadcastGameOver(playerHit, canceled);
-            
-            if (canceled) Announce("The game has been stopped early!");
+
+            if (canceled)
+            {
+                Announce("The game has been stopped early!");
+                SeekerTimer?.CancelTimer();
+            }
             else Announce($"{playerHit.Username} was the last bug standing! Congrats!");
             
-            started = false;
+            GameState = GameState.NotStarted;
+
             ResetSwapCounts();
             ResetSeekers();
         }

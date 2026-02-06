@@ -296,12 +296,11 @@ namespace PropHuntMod.Utils
 
     class DebugViewCollider : MonoBehaviour
     {
-        Color borderColor = Color.cyan;
+        Color borderColor = Color.white;
         readonly float lineWidth = 0.05f;
 
         LineRenderer lineRenderer;
         BoxCollider2D collider;
-
         bool Show => PropHuntMod.showHitboxes;
 
         void Awake()

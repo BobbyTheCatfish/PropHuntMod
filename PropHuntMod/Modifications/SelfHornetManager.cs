@@ -25,7 +25,7 @@ namespace PropHuntMod.Modifications
             ToggleHornet(!shouldBeShown);
         }
 
-        public override bool ToggleHornet(bool show)
+        public bool ToggleHornet(bool show, int ticket = -1)
         {
             if (PropHuntClient.isSeeker && !show)
             {
@@ -35,7 +35,7 @@ namespace PropHuntMod.Modifications
             var success = base.ToggleHornet(show);
             if (success)
             {
-                if (Config.AllowDebugFeatures) ClientNetwork.SendHideStatus(!show);
+                if (Config.AllowDebugFeatures) ClientNetwork.SendHideStatus(!show, ticket);
 
                 hornet.transform.Find("Charm Effects/White Circlet Light").gameObject.SetActive(show);
                 hornet.transform.Find("Charm Effects/Wisp Lantern Light").gameObject.SetActive(show);
@@ -43,6 +43,12 @@ namespace PropHuntMod.Modifications
             }
 
             return success;
+
+        }
+
+        public override bool ToggleHornet(bool show)
+        {
+            return ToggleHornet(show, -1);
         }
 
         public override void SetHornet()

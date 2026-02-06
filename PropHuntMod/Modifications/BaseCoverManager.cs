@@ -6,6 +6,8 @@ using PropHuntMod.Utils;
 //using SilksongMultiplayer.NetworkData;
 using GlobalEnums;
 using System;
+using System.Timers;
+using SSMP.Api.Client;
 
 namespace PropHuntMod.Modifications
 {
@@ -13,6 +15,9 @@ namespace PropHuntMod.Modifications
     internal class BaseCoverManager
     {
         internal GameObject cover;
+
+        internal string prevCover;
+
         //internal string coverOGName = "";
         //public string currentScene;
         public PlayerID playerID;
@@ -79,6 +84,24 @@ namespace PropHuntMod.Modifications
             return true;
         }
 
+        public void FindProp(BaseHornetManager manager)
+        {
+            if (!IsHiding)
+            {
+                Log.LogError("No cover to disable");
+                return;
+            }
+
+            cover.transform.parent = null;
+            manager.ToggleHornet(true);
+
+            var coverCopy = cover.gameObject;
+            cover = null;
+
+            Component.Destroy(coverCopy.GetComponent<TriggerHandler>());
+            EffectsManager.SweepGameObject(coverCopy, () => GameObject.Destroy(coverCopy));
+        }
+
         public virtual bool EnableProp(BaseHornetManager hornet, GameObject cover)
         {
             // Can't do anything
@@ -102,6 +125,16 @@ namespace PropHuntMod.Modifications
             try
             {
                 Log.LogInfo("Creating prop");
+
+                if (this.prevCover != null)
+                {
+                    this.prevCover = this.cover.name;
+                }
+                else
+                {
+                    this.prevCover = cover.name;
+                }
+
                 this.cover = GameObject.Instantiate(cover, hornet.hornet.transform);
                 this.cover.name = cover.name;
 
@@ -208,10 +241,12 @@ namespace PropHuntMod.Modifications
         //    );
         //}
 
-        public virtual void OnHit()
+        public virtual void OnHit(TriggerHandler handler)
         {
             //DisableProp(PlayerManager.GetPlayerManager(playerID).hornetManager);
             Log.LogInfo($"Found {playerID}");
+
+            Component.Destroy(handler);
             ClientNetwork.SendPropFound(playerID);
             return;
         }
@@ -235,10 +270,10 @@ namespace PropHuntMod.Modifications
                 return;
             }
             //Log.LogInfo($"{other.name} - {other.tag}");
-            if (other.tag == "Nail Attack" && (PropHuntClient.roundStarted ? PropHuntClient.isSeeker : !SelfCoverManager.instance.IsHiding))
+            if (other.tag == "Nail Attack" && (PropHuntClient.GameState == Utils.GameState.Playing ? PropHuntClient.isSeeker : !SelfCoverManager.instance.IsHiding))
             {
                 if (!other.GetComponentInParent<HeroController>()) return;
-                PlayerManager.GetPlayerManager(playerID).coverManager.OnHit();
+                PlayerManager.GetPlayerManager(playerID).coverManager.OnHit(this);
             }
         }
     }

@@ -13,13 +13,16 @@ namespace PropHuntMod.Utils.Networking.FromClient
         public bool IsReliable => true;
         public bool DropReliableDataIfNewerExists => true;
         public string propName = "";
+        public int TicketID = -1;
         public virtual void WriteData(IPacket packet)
         {
             packet.Write(propName);
+            packet.Write(TicketID);
         }
         public virtual void ReadData(IPacket packet)
         {
             propName = packet.ReadString();
+            TicketID = packet.ReadInt();
         }
     }
     public class PropLocation : IPacketData
@@ -48,15 +51,17 @@ namespace PropHuntMod.Utils.Networking.FromClient
         public bool IsReliable => true;
         public bool DropReliableDataIfNewerExists => true;
         public bool IsHiding { get; set; }
-
+        public int TicketID = -1;
         public virtual void WriteData(IPacket packet)
         {
             packet.Write(IsHiding);
+            packet.Write(TicketID);
         }
 
         public virtual void ReadData(IPacket packet)
         {
             IsHiding = packet.ReadBool();
+            TicketID = packet.ReadInt();
         }
     }
     public class PropFound : IPacketData

@@ -25,6 +25,7 @@ namespace PropHuntMod.Utils
         static ConfigEntry<KeyCode> _propPositionReset;
 
         public static bool DisableDamage => _disableDamage.Value;
+        public static bool DisableDamage => _disableDamage.Value && PropHuntClient.GameState != GameState.NotStarted;
         //public static float attackCooldown { get { return _attackCooldown.Value; } }
         public static KeyCode SwapPropKey => _swapPropKey.Value;
         public static KeyCode HideHornetKey => _hideHornetKey?.Value ?? KeyCode.H;
