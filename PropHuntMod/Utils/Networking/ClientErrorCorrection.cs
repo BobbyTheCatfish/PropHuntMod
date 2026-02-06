@@ -40,7 +40,7 @@ namespace PropHuntMod.Utils.Networking
                     RestoreTriggerHandler(data);
                     break;
                 case CorrectionActions.BecomeSeeker:
-                    BecomeSeeker(data);
+                    BecomeSeeker();
                     break;
                 default:
                     throw new NotImplementedException(data.FixMethod.ToString());
@@ -123,7 +123,7 @@ namespace PropHuntMod.Utils.Networking
                 Log.LogError($"Player {data.AffectedID}'s prop was already destroyed. Can't restore trigger handler");
             }
         }
-        static void BecomeSeeker(FailedAction data)
+        static void BecomeSeeker()
         {
             PropHuntClient.isSeeker = true;
             if (PropHuntClient.GameState == GameState.SeekerWait)

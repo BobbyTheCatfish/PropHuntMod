@@ -19,7 +19,8 @@ namespace PropHuntMod.Utils.Networking
             Log.LogInfo($"Sending prop swap: {propName}");
             sender.SendSingleData(CustomPackets.PropSwap, new FromClient.PropSwap
             {
-                propName = propName
+                propName = propName,
+                TicketID = ticket,
             });
         }
 

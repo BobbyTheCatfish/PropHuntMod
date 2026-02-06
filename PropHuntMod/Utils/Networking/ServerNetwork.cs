@@ -24,7 +24,7 @@ namespace PropHuntMod.Utils.Networking
     {
         static IServerAddonNetworkSender<CustomPackets> sender;
         static IServerAddonNetworkReceiver<CustomPackets> receiver;
-        static Dictionary<ushort, List<BypassTicket>> tickets = new Dictionary<ushort, List<BypassTicket>>();
+        static readonly Dictionary<ushort, List<BypassTicket>> tickets = new Dictionary<ushort, List<BypassTicket>>();
         static int TicketID = 0;
 
         static BypassTicket GenerateTicket(ushort playerID, CorrectionActions action)
