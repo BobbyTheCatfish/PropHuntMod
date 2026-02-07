@@ -38,4 +38,20 @@ namespace PropHuntMod.Utils
         RestoreTriggerHandler,
         BecomeSeeker,
     }
+
+    public enum MovementState
+    {
+        Normal,
+        Move2D,
+        MoveZ,
+        Rotate
+    }
+
+    public enum MovementMethods
+    {
+        Numpad,
+        KeyboardMovement,
+        ControllerRightStick,
+        ControllerLeftStick,
+    }
 }

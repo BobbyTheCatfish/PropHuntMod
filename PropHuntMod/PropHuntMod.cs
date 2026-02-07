@@ -33,6 +33,7 @@ using UnityEngine.UI;
 namespace PropHuntMod
 {
     using PlayerID = UInt16;
+
     [BepInPlugin("com.bobbythecatfish.prophunt", Utils.Config.ModName, Utils.Config.ModVersion)]
     [BepInDependency("ssmp")]
     [BepInProcess("Hollow Knight Silksong.exe")]
@@ -43,10 +44,10 @@ namespace PropHuntMod
         internal SelfCoverManager cover = new SelfCoverManager();
         //private static AttackCooldownPatches attackPatches = new AttackCooldownPatches(config);
         private static readonly NoDamage noDamage = new NoDamage();
+        private static PropMovementControls movement;
         internal static Dictionary<PlayerID, PlayerManager> playerManager = new Dictionary<PlayerID, PlayerManager>();
         internal static IClientApi client;
         internal static bool modEnabled = false;
-
         internal static bool showHitboxes = false;
 
         internal static string CurrentScene;
@@ -87,7 +88,7 @@ namespace PropHuntMod
         bool IsInputDisabled()
         {
             // pause menu, inventory, etc
-            if (HeroController.instance?.IsInputBlocked() ?? false) return true;
+            if ((HeroController.instance?.IsInputBlocked() ?? false) && PropMovementControls.MovementState == MovementState.Normal) return true;
             //if (client.UiManager.ChatBox.IsOpen) return true;
             if (GameManager.SilentInstance?.GameState == GlobalEnums.GameState.MAIN_MENU) return true;
 
@@ -100,8 +101,7 @@ namespace PropHuntMod
 
             return false;
         }
-        
-
+        int logged = 0;
         private void Update()
         {
             if (!modEnabled) return;
@@ -121,8 +121,21 @@ namespace PropHuntMod
                 hornet.EnsureHornetHidden();
             }
 
+            // Prop movement
+            if (hornet.hornet == null) return;
+            movement?.Update();
+
             // No keybinds if inputs are blocked
-            if (IsInputDisabled()) return;
+            if (IsInputDisabled())
+            {
+                if (logged == 0) Log.LogInfo("Input blocked");
+                logged = 1;
+                return;
+            } else if (logged == 1)
+            {
+                Log.LogInfo("Input restored");
+                logged = 0;
+            }
 
             // Effects testing
             if (Input.GetKeyDown(KeyCode.O))
@@ -170,32 +183,6 @@ namespace PropHuntMod
             {
                 cover.DisableProp(hornet);
             }
-
-            // Prop movement
-            {
-                if (hornet.hornet == null) return;
-
-                cover.MoveProp(Direction.Down, KeyCode.Keypad2);
-                cover.MoveProp(Direction.Left, KeyCode.Keypad4);
-                cover.MoveProp(Direction.Right, KeyCode.Keypad6);
-                cover.MoveProp(Direction.Up, KeyCode.Keypad8);
-                cover.MoveProp(Direction.Front, KeyCode.Keypad7);
-                cover.MoveProp(Direction.Back, KeyCode.Keypad9);
-                cover.MoveProp(Direction.Reset, KeyCode.Keypad5, true);
-
-                cover.MoveProp(Direction.RotateLeft, KeyCode.Keypad1);
-                cover.MoveProp(Direction.RotateRight, KeyCode.Keypad3);
-            }
-
-            if (
-                !Input.GetKey(KeyCode.Keypad2) && !Input.GetKey(KeyCode.Keypad4) &&
-                !Input.GetKey(KeyCode.Keypad6) && !Input.GetKey(KeyCode.Keypad8) &&
-                !Input.GetKey(KeyCode.Keypad7) && !Input.GetKey(KeyCode.Keypad9) &&
-                !Input.GetKey(KeyCode.Keypad1) && !Input.GetKey(KeyCode.Keypad3)
-                )
-            {
-                cover.SendPropPosition();
-            }
         }
         void LateUpdate()
         {
@@ -240,6 +227,7 @@ namespace PropHuntMod
                 //Log.LogInfo("Begin", GameManager.SilentInstance.GameState);
                 return;
             }
+            movement = new PropMovementControls();
             SelfCoverManager.instance.DisableProp(false, true);
             //Log.LogInfo($"Changing scene to {__instance.TargetSceneName}");
             PreviousScene = CurrentScene;
