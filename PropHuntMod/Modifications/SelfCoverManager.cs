@@ -21,19 +21,21 @@ namespace PropHuntMod.Modifications
             isRemote = false;
             instance = this;
         }
-        public void MoveProp(Direction direction, KeyCode key, bool onlyOnce = false)
+        public void MoveProp(Direction direction, KeyCode key, ref bool moved, bool onlyOnce = false)
         {
+            if (!IsHiding) return;
             if (onlyOnce && !Input.GetKeyDown(key)) return;
             else if (!onlyOnce && !Input.GetKey(key)) return;
 
-            MoveProp(direction, onlyOnce);
-        }
-
-        public void MoveProp(Direction direction, bool onlyOnce = false)
-        {
+            moved = true;
             bool slowDown = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
             float distance = slowDown ? 0.01f : 0.1f;
 
+            MoveProp(direction, distance);
+        }
+
+        public void MoveProp(Direction direction, float distance = 0.1f)
+        {
             if (!IsHiding)
             {
                 Log.LogError("No cover, can't move");
@@ -63,8 +65,16 @@ namespace PropHuntMod.Modifications
             else if (direction == Direction.Down) y -= distance;
             else if (direction == Direction.Front) z -= distance;
             else if (direction == Direction.Back) z += distance;
-            else if (direction == Direction.RotateLeft) rotation += distance * 10;
-            else if (direction == Direction.RotateRight) rotation -= distance * 10;
+            else if (direction == Direction.RotateLeft)
+            {
+                if (flipped) rotation -= distance * 10;
+                else rotation += distance * 10;
+            }
+            else if (direction == Direction.RotateRight)
+            {
+                if (flipped) rotation += distance * 10;
+                else rotation -= distance * 10;
+            }
             else if (direction == Direction.Reset)
             {
                 x = 0;

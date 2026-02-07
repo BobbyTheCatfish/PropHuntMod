@@ -175,9 +175,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\*.*">
+    <Content Include="Assets\icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>%(Filename)%(Extension)</TargetPath>
+      <TargetPath>icon.png</TargetPath>
+    </Content>
+    <Content Include="Assets\manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>manifest.json</TargetPath>
+    </Content>
+    <Content Include="Assets\prophunt.bundle">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>prophunt.bundle</TargetPath>
     </Content>
     <Content Include="README.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

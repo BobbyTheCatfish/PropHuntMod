@@ -34,14 +34,6 @@ namespace PropHuntMod
 {
     using PlayerID = UInt16;
 
-    public enum MovementState
-    {
-        Normal,
-        Move2D,
-        MoveZ,
-        Rotate
-    }
-
     [BepInPlugin("com.bobbythecatfish.prophunt", Utils.Config.ModName, Utils.Config.ModVersion)]
     [BepInDependency("ssmp")]
     [BepInProcess("Hollow Knight Silksong.exe")]
@@ -96,7 +88,7 @@ namespace PropHuntMod
         bool IsInputDisabled()
         {
             // pause menu, inventory, etc
-            if ((HeroController.instance?.IsInputBlocked() ?? false) && MovementState == MovementState.Normal) return true;
+            if ((HeroController.instance?.IsInputBlocked() ?? false) && PropMovementControls.MovementState == MovementState.Normal) return true;
             //if (client.UiManager.ChatBox.IsOpen) return true;
             if (GameManager.SilentInstance?.GameState == GlobalEnums.GameState.MAIN_MENU) return true;
 
