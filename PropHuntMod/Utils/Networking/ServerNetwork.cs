@@ -88,13 +88,14 @@ namespace PropHuntMod.Utils.Networking
         /******************
          * PACKET SENDERS *
          ******************/
-        public static void ForwardPropSwap(ushort id, string propName)
+        public static void ForwardPropSwap(ushort id, string propName, string propPath)
         {
             Log.LogInfo($"Broadcasting prop swap from {id}: {propName}");
             Broadcast(id, CustomPackets.PropSwap, new FromServer.PropSwap
             {
                 Id = id,
-                propName = propName
+                propName = propName,
+                propPath = propPath
             });
         }
 
@@ -221,10 +222,20 @@ namespace PropHuntMod.Utils.Networking
                 }
             }
 
-            player.propName = string.IsNullOrEmpty(data.propName) ? null : data.propName;
+            if (string.IsNullOrEmpty(data.propName))
+            {
+                player.propName = null;
+                player.propPath = null;
+            }
+            else
+            {
+                player.propName = data.propName;
+                player.propPath = data.propPath;
+            }
+
             if (!swapCountExempt) player.swapCount++;
 
-            ForwardPropSwap(id, data.propName);
+            ForwardPropSwap(id, data.propName, data.propPath);
         }
 
         static void OnPropLocation(ushort id, FromClient.PropLocation data)
@@ -255,19 +266,21 @@ namespace PropHuntMod.Utils.Networking
             if (player.seeker)
             {
                 player.propName = "";
+                player.propPath = "";
                 player.propRotation = 0;
                 player.propLocation = Vector3.zero;
             }
             else
             {
                 player.propName = data.PropName;
+                player.propPath = data.PropPath;
                 player.propLocation = data.PropLocation;
                 player.propRotation = data.PropRotation;
             }
 
             BaseCoverManager.ConstrainPropLocation(ref player.propLocation, ref player.propRotation);
 
-            ForwardPropSwap(id, player.propName);
+            ForwardPropSwap(id, player.propName, player.propPath);
             ForwardPropLocation(id, player.propLocation, player.propRotation);
 
             PropHuntServer.instance.CheckGameOver(player.PlayerAvatar);

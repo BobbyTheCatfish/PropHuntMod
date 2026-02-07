@@ -127,15 +127,15 @@ namespace PropHuntMod.Modifications
             EnableProp(newCover);
         }
 
-        public bool EnableProp(GameObject cover, int ticket = -1)
+        public bool EnableProp(Prop prop, int ticket = -1)
         {
             if (IsSeeker()) return false;
 
             Log.LogInfo("Enabling prop");
-            var success = base.EnableProp(SelfHornetManager.instance, cover);
+            var success = base.EnableProp(SelfHornetManager.instance, prop);
             if (success)
             {
-                ClientNetwork.SendPropSwap(cover.name, ticket);
+                ClientNetwork.SendPropSwap(prop, ticket);
                 PropHuntClient.propSwaps++;
             }
 
@@ -148,7 +148,7 @@ namespace PropHuntMod.Modifications
             if (success && !isSceneChange)
             {
                 PropMovementControls.Instance.SetMovementState(MovementState.Normal);
-                ClientNetwork.SendPropSwap("", ticket);
+                ClientNetwork.SendPropSwap(null, ticket);
                 PropHuntMod.showHitboxes = false;
             }
 
@@ -171,7 +171,7 @@ namespace PropHuntMod.Modifications
         }
 
         // To hide the original methods
-        public override bool EnableProp(BaseHornetManager hornet, GameObject cover) { return EnableProp(cover); }
+        public override bool EnableProp(BaseHornetManager hornet, Prop prop) { return EnableProp(prop); }
         public override bool DisableProp(BaseHornetManager hornet, bool logOnFail = true) { return DisableProp(logOnFail); }
     }
 }

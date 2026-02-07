@@ -14,6 +14,7 @@ namespace PropHuntMod.Modifications
 
         public IClientPlayer PlayerAvatar => PropHuntMod.client.ClientManager.GetPlayer(playerID);
         public string currentCoverObjName = "";
+        public string currentCoverObjPath = "";
         public Vector3 currentCoverObjLocation = Vector3.zero;
         public float currentCoverObjRotation = 0;
         public bool currentHideState = false;
@@ -76,18 +77,40 @@ namespace PropHuntMod.Modifications
 
             if (IsHostInSameRoom())
             {
-                if (PropValidation.currentSceneObjects == null) PropValidation.GetAllProps();
-                var toClone = PropValidation.currentSceneObjects.GetSpecific(o => o.name == currentCoverObjName);
-                if (toClone == null)
+                var path = currentCoverObjPath;
+                var prop = PropValidation.FindGameObject(path);
+
+                if (prop == null)
                 {
-                    var errorMsg = $"Unable to find GameObject {currentCoverObjName} for player #{playerID} ({PlayerAvatar.Username})";
-                    PropHuntClient.LocalMessage($"ERROR: {errorMsg}");
-                    Log.LogError(errorMsg);
+                    Log.LogError($"Couldn't find prop {currentCoverObjName} for player {playerID}");
                     return;
                 }
 
-                coverManager.EnableProp(hornetManager, toClone);
+                var cover = PropValidation.PrepareProp(prop, false);
+                if (cover == null)
+                {
+                    Log.LogError($"Couldn't prepare prop for player {playerID}");
+                    return;
+                }
+
+                coverManager.EnableProp(hornetManager, cover);
                 coverManager.SetPropLocation(currentCoverObjLocation, currentCoverObjRotation);
+                
+                // destroy since enableprop instantiates it
+                GameObject.Destroy(cover.go);
+
+
+                //if (PropValidation.currentSceneObjects == null) PropValidation.GetAllProps();
+                //var toClone = PropValidation.currentSceneObjects.GetSpecific(o => o.name == currentCoverObjName);
+                //if (toClone == null)
+                //{
+                //    var errorMsg = $"Unable to find GameObject {currentCoverObjName} for player #{playerID} ({PlayerAvatar.Username})";
+                //    PropHuntClient.LocalMessage($"ERROR: {errorMsg}");
+                //    Log.LogError(errorMsg);
+                //    return;
+                //}
+
+                //coverManager.EnableProp(hornetManager, toClone);
             }
             else
             {
@@ -95,11 +118,17 @@ namespace PropHuntMod.Modifications
             }
         }
 
-        public void SetProp(string name)
+        public void SetProp(string name, string path)
         {
-            if (string.IsNullOrEmpty(name)) name = "";
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(path))
+            {
+                name = "";
+                path = "";
+            }
 
             currentCoverObjName = name;
+            currentCoverObjPath = path;
+
             ResetCoverPosition();
             EnsurePropCover();
         }

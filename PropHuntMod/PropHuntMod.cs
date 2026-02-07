@@ -17,16 +17,13 @@ using UnityEngine.UI;
  * FEATURE LIST
  * Hide/Show Hornet
  * Spawn and attach a game object (prop) to hornet
- * Move the prop in x/y/z
+ * Move the prop in x/y/z, 2d rotate as well
  * Dynamically get game objects in current scene
- * Add more props other than breakable ones (corpses, enemies?, etc)
  * Slow down attacks (Currently disabled)
- *
+ * 
  * 
  * TODO:
- * Integrate with multiplayer mod
- *  - Find out which player is whichz
- *  - Send prop information packets
+ * Add more props other than breakable ones (corpses, enemies?, etc)
  * 
  */
 

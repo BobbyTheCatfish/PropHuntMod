@@ -14,12 +14,13 @@ namespace PropHuntMod.Utils.Networking
         /******************
          * PACKET SENDERS *
          ******************/
-        public static void SendPropSwap(string propName, int ticket = -1)
+        public static void SendPropSwap(Prop prop, int ticket = -1)
         {
-            Log.LogInfo($"Sending prop swap: {propName}");
+            Log.LogInfo($"Sending prop swap: {prop?.name}");
             sender.SendSingleData(CustomPackets.PropSwap, new FromClient.PropSwap
             {
-                propName = propName,
+                propName = prop?.name ?? "",
+                propPath = prop?.path ?? "",
                 TicketID = ticket,
             });
         }
@@ -53,12 +54,13 @@ namespace PropHuntMod.Utils.Networking
             });
         }
 
-        public static void SendSync(string propName, Vector3 propPosition, float propRotation)
+        public static void SendSync(string propName, string propPath, Vector3 propPosition, float propRotation)
         {
             Log.LogInfo($"Sending sync data: {propName}, {propPosition}, {propRotation}");
             sender.SendSingleData(CustomPackets.Sync, new FromClient.Sync
             {
                 PropName = propName,
+                PropPath = propPath,
                 PropLocation = propPosition,
                 PropRotation = propRotation
             });
@@ -86,7 +88,7 @@ namespace PropHuntMod.Utils.Networking
         static void OnPropSwap(FromServer.PropSwap data)
         {
             PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
-            player.SetProp(data.propName);
+            player.SetProp(data.propName, data.propPath);
 
             Log.LogInfo($"{data.Id} prop set to {data.propName}");
         }
@@ -157,7 +159,7 @@ namespace PropHuntMod.Utils.Networking
             {
                 var player = PlayerManager.GetPlayerManager(data.PropOwnerID);
                 player.coverManager.FindProp(player.hornetManager);
-                player.SetProp("");
+                player.SetProp("", "");
                 Log.LogInfo($"{player.PlayerAvatar.Username} has been found");
             }
             EffectsManager.PlayFoundSound(data.IsClientFound);

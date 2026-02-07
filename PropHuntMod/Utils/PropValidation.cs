@@ -12,12 +12,19 @@ using UnityEngine.SceneManagement;
 
 namespace PropHuntMod.Utils
 {
+    public class Prop
+    {
+        public string name;
+        public string path;
+        public GameObject go;
+    }
 
     internal static class PropValidation
     {
         static readonly string[] extraNames = { "corpse", "quest_board" };
         static readonly PhysLayers[] invalidLayers = { PhysLayers.ENEMIES, PhysLayers.HERO_ATTACK };
-        public static NoRepeat<GameObject> currentSceneObjects;
+        public static NoRepeat<Prop> currentSceneObjects;
+        static GameObject PropParent;
 
         static readonly Type[] allowedTypes =
         {
@@ -166,7 +173,7 @@ namespace PropHuntMod.Utils
             PrepareAllProps(props);
             //AddPropsToOutput(scene, props);
         }
-        static void AddPropsToOutput(string scene, List<GameObject> props)
+        static void AddPropsToOutput(string scene, List<Prop> props)
         {
             string row = $"{scene},{props.Count},\"{string.Join("\n", props.Select(x => x.name))}\"";
 
@@ -174,6 +181,16 @@ namespace PropHuntMod.Utils
             var file = File.AppendText(filepath);
             file.WriteLine(row);
             file.Close();
+        }
+
+        static void RemoveComponents<T>(GameObject gameObject, bool keepOnParent = false) where T : Component
+        {
+            var components = gameObject.GetComponentsInChildren<T>();
+            foreach (var component in components)
+            {
+                //Log.LogInfo(component + " removed");
+                if (!keepOnParent || component.gameObject != gameObject.gameObject) Component.Destroy(component);
+            }
         }
         static void StripProp(GameObject gameObject)
         {
@@ -188,19 +205,8 @@ namespace PropHuntMod.Utils
                 }
             }
 
-            // Remove physics objects
-            void RemoveComponents<T>(bool keepOnParent = false) where T : Component
-            {
-                var components = gameObject.GetComponentsInChildren<T>();
-                foreach (var component in components)
-                {
-                    //Log.LogInfo(component + " removed");
-                    if (!keepOnParent || component.gameObject != gameObject.gameObject) Component.Destroy(component);
-                }
-            }
-
-            RemoveComponents<Collider2D>();
-            RemoveComponents<Rigidbody2D>(true);
+            RemoveComponents<Collider2D>(gameObject);
+            RemoveComponents<Rigidbody2D>(gameObject, true);
 
             // Remove empty children such as detectors
             var children = gameObject.GetComponentsInChildren<Transform>();
@@ -212,97 +218,163 @@ namespace PropHuntMod.Utils
                 }
             }
         }
+
+        static string GeneratePropPath(GameObject prop)
+        {
+            string path = $"/{prop.name}";
+            
+            var parent = prop.transform.parent;
+            while (prop.transform.parent != null)
+            {
+                prop = prop.transform.parent.gameObject;
+                path = $"/{prop.name}{path}";
+            }    
+
+            return path;
+        }
+        public static Prop PrepareProp(GameObject prop, bool assignParent = true)
+        {
+            if (prop == null) return null;
+
+            GameObject cover;
+            try
+            {
+                if (assignParent) cover = GameObject.Instantiate(prop, PropParent.transform);
+                else
+                {
+                    cover = GameObject.Instantiate(prop);
+                    cover.SetActive(false);
+                }
+                cover.layer = (int)PhysLayers.HERO_BOX;
+                cover.name = prop.name;
+            }
+            catch (Exception e)
+            {
+                Log.LogError($"Ran into an error instantiating cover {prop?.name}.");
+                Log.LogError(e);
+                return null;
+            }
+
+            StripProp(cover);
+
+            if (!AddPropHitbox(cover))
+            {
+                GameObject.Destroy(cover);
+                return null;
+            }
+
+
+            return new Prop
+            {
+                name = cover.name,
+                go = cover,
+                path = GeneratePropPath(prop)
+            };
+        }
+
+        static bool AddPropHitbox(GameObject prop)
+        {
+            Renderer[] renderers = prop.GetComponentsInChildren<Renderer>(false).Where(r => !(r is LineRenderer) && !(r is ParticleSystemRenderer)).ToArray();
+
+            if (renderers.Length == 0)
+            {
+                Log.LogError("No renderers found");
+                return false;
+            }
+
+            Bounds combinedBounds = renderers[0].bounds;
+
+            foreach (var r in renderers)
+            {
+                var name = r.name.ToLower();
+                if (name.StartsWith("haze") || name.StartsWith("light") || name == "lit") continue;
+                //Log.LogInfo(r, r.name, r.bounds);
+                combinedBounds.Encapsulate(r.bounds);
+            }
+            //Log.LogInfo(renderers[0].bounds);
+
+            var collider = prop.AddComponent<BoxCollider2D>();
+            collider.isTrigger = true;
+            collider.offset = Vector2.zero;//cover.transform.InverseTransformPoint(combinedBounds.center);
+            collider.size = combinedBounds.size;
+
+            var body = prop.AddComponentIfNotPresent<Rigidbody2D>();
+            body.bodyType = RigidbodyType2D.Kinematic;
+
+            prop.AddComponent<LineRenderer>();
+            prop.AddComponent<DebugViewCollider>();
+
+            prop.AddComponent<TriggerHandler>();
+
+            //foreach (Renderer renderer in renderers)
+            //{
+            //    renderer.gameObject.AddComponentIfNotPresent<LineRenderer>();
+            //    renderer.gameObject.AddComponent<DebugViewBounds>();
+            //}
+
+            return true;
+        }
+
         static void PrepareAllProps(List<GameObject> props)
         {
-            var parent = new GameObject("PROP PARENT");
+            PropParent = new GameObject("PROP PARENT");
+            PropParent.SetActive(false);
 
             if (!SelfHornetManager.instance.HornetExists()) return;
 
             //var hornetTransform = SelfHornetManager.instance.hornet.transform;
             //parent.transform.SetParentReset(hornetTransform);
-            //parent.transform.SetPosition2D(hornetTransform.position);
-            //parent.transform.SetParent(hornetTransform);
 
-            List<GameObject> allProps = new List<GameObject>();
+            List<Prop> allProps = new List<Prop>();
 
             foreach (var prop in props)
             {
-                GameObject cover = null;
-                try
+                var preppedProp = PrepareProp(prop);
+                if (preppedProp != null)
                 {
-                    cover = GameObject.Instantiate(prop, parent.transform);
-                    cover.layer = (int)PhysLayers.HERO_BOX;
+                    allProps.Add(preppedProp);
                 }
-                catch (Exception e)
-                {
-                    Log.LogError("Ran into an error instantiating cover.");
-                    Log.LogError(e);
-                }
-
-                if (cover == null) continue;
-                //Log.LogInfo(cover.name);
-
-                try
-                {
-                    StripProp(cover);
-                }
-                catch (Exception e)
-                {
-                    Log.LogError($"Ran into an error stripping prop {cover.name} of components.");
-                    Log.LogError(e);
-                    continue;
-                }
-
-                // Add hit detection
-                Renderer[] renderers = cover.GetComponentsInChildren<Renderer>(false).Where(r => !(r is LineRenderer) && !(r is ParticleSystemRenderer)).ToArray();
-
-                if (renderers.Length == 0)
-                {
-                    Log.LogError("No renderers found");
-                }
-                else
-                {
-                    Bounds combinedBounds = renderers[0]?.bounds ?? new Bounds();
-
-                    foreach (var r in renderers)
-                    {
-                        var name = r.name.ToLower();
-                        if (name.StartsWith("haze") || name.StartsWith("light") || name == "lit") continue;
-                        //Log.LogInfo(r, r.name, r.bounds);
-                        combinedBounds.Encapsulate(r.bounds);
-                    }
-                    //Log.LogInfo(renderers[0].bounds);
-
-                    var collider = cover.AddComponent<BoxCollider2D>();
-                    collider.isTrigger = true;
-                    collider.offset = Vector2.zero;//cover.transform.InverseTransformPoint(combinedBounds.center);
-                    collider.size = combinedBounds.size;
-
-                    var body = cover.AddComponentIfNotPresent<Rigidbody2D>();
-                    body.bodyType = RigidbodyType2D.Kinematic;
-
-                    cover.AddComponent<LineRenderer>();
-                    cover.AddComponent<DebugViewCollider>();
-
-                    cover.AddComponent<TriggerHandler>();
-
-                    //foreach (Renderer renderer in renderers)
-                    //{
-                    //    renderer.gameObject.AddComponentIfNotPresent<LineRenderer>();
-                    //    renderer.gameObject.AddComponent<DebugViewBounds>();
-                    //}
-                }
-
-                allProps.Add(cover);
             }
 
-            parent.SetActive(false);
-            currentSceneObjects = new NoRepeat<GameObject>(allProps);
+            //PropParent.SetActive(false);
+            currentSceneObjects = new NoRepeat<Prop>(allProps);
         }
         public static void ResetProps()
         {
             Log.LogInfo("Resetting props");
             currentSceneObjects = null;
+        }
+
+        public static GameObject FindGameObject(string path)
+        {
+            string[] names = path.Split('/');
+
+            var parent = SceneManager.GetActiveScene().GetRootGameObjects().FirstOrDefault(go => go.name == names[0]);
+            if (parent == null) return null;
+
+            for (int i = 1; i < names.Length; i++)
+            {
+                var name = names[i];
+                
+                var nextObject = FindGameObjectLayer(name, parent);
+                if (nextObject == null) return null;
+                
+                parent = nextObject;
+            }
+
+            return parent;
+        }
+
+        static GameObject FindGameObjectLayer(string name, GameObject parent)
+        {
+            var childCount = parent.transform.childCount;
+            for (int i = 0; i < childCount; i++)
+            {
+                var child = parent.transform.GetChild(i);
+                if (child.name == name) return child.gameObject;
+            }
+
+            return null;
         }
     }
 

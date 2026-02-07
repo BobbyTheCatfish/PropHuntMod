@@ -15,8 +15,8 @@ namespace PropHuntMod.Modifications
     internal class BaseCoverManager
     {
         internal GameObject cover;
-
-        internal string prevCover;
+        internal string CoverPath;
+        internal string PrevCoverPath;
 
         //internal string coverOGName = "";
         //public string currentScene;
@@ -103,24 +103,25 @@ namespace PropHuntMod.Modifications
             EffectsManager.SweepGameObject(coverCopy, () => GameObject.Destroy(coverCopy));
         }
 
-        public virtual bool EnableProp(BaseHornetManager hornet, GameObject cover)
+        public virtual bool EnableProp(BaseHornetManager hornet, Prop prop)
         {
             // Can't do anything
-            if (cover == null)
+            if (prop == null)
             {
                 PropHuntClient.LocalMessage("There isn't any valid cover here. Try another room.");
                 Log.LogError("No valid cover found");
                 return false;
             }
             
+            // Destroy old prop
             if (IsHiding)
             {
                 Log.LogWarning("Destroying cover...");
 
-                prevCover = this.cover.name;
+                PrevCoverPath = CoverPath;
 
-                GameObject.Destroy(this.cover);
-                this.cover = null;
+                GameObject.Destroy(cover);
+                cover = null;
             }
 
             // Create prop, parent to hornet, and hide hornet
@@ -130,20 +131,20 @@ namespace PropHuntMod.Modifications
             {
                 Log.LogInfo("Creating prop");
 
-                if (this.prevCover == null)
+                if (PrevCoverPath == null)
                 {
-                    this.prevCover = cover.name;
+                    PrevCoverPath = prop.path;
                 }
 
-                this.cover = GameObject.Instantiate(cover, hornet.hornet.transform);
-                this.cover.name = cover.name;
+                cover = GameObject.Instantiate(prop.go, hornet.hornet.transform);
+                cover.name = prop.name;
+                CoverPath = prop.path;
 
                 SetPropLocation(Vector3.zero, 0);
 
                 cover.SetActive(true);
-                //coverOGName = cover.name;
 
-                this.cover.layer = (int)PhysLayers.HERO_BOX;
+                cover.layer = (int)PhysLayers.HERO_BOX;
                 hornet.ToggleHornet(false);
 
                 var handler = this.cover.GetComponent<TriggerHandler>();

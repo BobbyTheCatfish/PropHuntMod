@@ -13,15 +13,18 @@ namespace PropHuntMod.Utils.Networking.FromClient
         public bool IsReliable => true;
         public bool DropReliableDataIfNewerExists => true;
         public string propName = "";
+        public string propPath = "";
         public int TicketID = -1;
         public virtual void WriteData(IPacket packet)
         {
             packet.Write(propName);
+            packet.Write(propPath);
             packet.Write(TicketID);
         }
         public virtual void ReadData(IPacket packet)
         {
             propName = packet.ReadString();
+            propPath = packet.ReadString();
             TicketID = packet.ReadInt();
         }
     }
@@ -84,12 +87,14 @@ namespace PropHuntMod.Utils.Networking.FromClient
         public bool IsReliable => true;
         public bool DropReliableDataIfNewerExists => true;
         public string PropName { get; set; }
+        public string PropPath { get; set; }
         public Vector3 PropLocation { get; set; }
         public float PropRotation { get; set; }
 
         public virtual void WriteData(IPacket packet)
         {
             packet.Write(PropName);
+            packet.Write(PropPath);
 
             packet.Write(PropLocation.x);
             packet.Write(PropLocation.y);
@@ -101,6 +106,7 @@ namespace PropHuntMod.Utils.Networking.FromClient
         public virtual void ReadData(IPacket packet)
         {
             PropName = packet.ReadString();
+            PropPath = packet.ReadString();
 
             PropLocation = new Vector3(packet.ReadFloat(), packet.ReadFloat(), packet.ReadFloat());
             PropRotation = packet.ReadFloat();

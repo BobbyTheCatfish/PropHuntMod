@@ -50,7 +50,7 @@ namespace PropHuntMod.Utils.Networking
         static void DisablePlayerProp(FailedAction data)
         {
             var player = PlayerManager.GetPlayerManager(data.AffectedID);
-            player.SetProp("");
+            player.SetProp("", "");
         }
 
         static IEnumerator PreviousScene(FailedAction data)
@@ -88,11 +88,13 @@ namespace PropHuntMod.Utils.Networking
         public static void RestoreLastProp(FailedAction data)
         {
             var cm = SelfCoverManager.instance;
-            var prop = PropValidation.currentSceneObjects.GetSpecific(go => go.name == cm.prevCover);
+            var propObj = PropValidation.FindGameObject(cm.PrevCoverPath);
             
-            if (prop == null)
+            var prop = PropValidation.PrepareProp(propObj);
+            
+            if (propObj == null || prop == null)
             {
-                Log.LogFatal($"Couldn't restore previous prop {cm.prevCover}");
+                Log.LogFatal($"Couldn't restore previous prop {cm.PrevCoverPath}");
                 return;
             }
 
