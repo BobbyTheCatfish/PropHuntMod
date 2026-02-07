@@ -147,6 +147,7 @@ namespace PropHuntMod.Modifications
             var success = base.DisableProp(SelfHornetManager.instance, logOnFail);
             if (success && !isSceneChange)
             {
+                PropMovementControls.Instance.SetMovementState(MovementState.Normal);
                 ClientNetwork.SendPropSwap("", ticket);
                 PropHuntMod.showHitboxes = false;
             }
