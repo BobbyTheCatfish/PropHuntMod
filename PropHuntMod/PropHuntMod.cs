@@ -164,7 +164,7 @@ namespace PropHuntMod
             // SET PROP
             if (Input.GetKeyDown(Utils.Config.SwapPropKey))
             {
-                cover.EnableProp();
+                cover.EnableRandomProp();
             }
             if (Input.GetKeyDown(Utils.Config.ResetKey))
             {
@@ -280,7 +280,7 @@ namespace PropHuntMod
                 }
                 else
                 {
-                    SelfCoverManager.instance.EnableProp();
+                    SelfCoverManager.instance.EnableRandomProp();
                 }
             }
 

@@ -76,6 +76,7 @@ namespace PropHuntMod.Modifications
                 return false;
             }
 
+            Log.LogInfo($"Destroying prop {cover}");
             GameObject.Destroy(cover);
             cover = null;
             //coverOGName = "";
@@ -115,6 +116,9 @@ namespace PropHuntMod.Modifications
             if (IsHiding)
             {
                 Log.LogWarning("Destroying cover...");
+
+                prevCover = this.cover.name;
+
                 GameObject.Destroy(this.cover);
                 this.cover = null;
             }
@@ -126,11 +130,7 @@ namespace PropHuntMod.Modifications
             {
                 Log.LogInfo("Creating prop");
 
-                if (this.prevCover != null)
-                {
-                    this.prevCover = this.cover.name;
-                }
-                else
+                if (this.prevCover == null)
                 {
                     this.prevCover = cover.name;
                 }

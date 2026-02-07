@@ -19,7 +19,7 @@ namespace PropHuntMod
 
         public static PropHuntServer instance;
 
-        public static GameState GameState;
+        public static GameState GameState = GameState.NotStarted;
         public SeekerTimer SeekerTimer { get; private set; }
 
         readonly static Dictionary<ushort, ServerPlayer> players = new Dictionary<ushort, ServerPlayer>();
@@ -92,16 +92,8 @@ namespace PropHuntMod
 
             return winnerName;
         }
-        public void ResetSwapCounts()
-        {
-            foreach (var player in players.Values)
-            {
-                player.swapCount = 0;
-            }
-        }
         void PickSeekers(int count = 1)
         {
-            ResetSeekers();
             count = Mathf.Clamp(count, 1, players.Count - 1);
             Log.LogInfo($"Choosing {count} seekers");
             for (int i = 0; i < count; i++)
@@ -118,11 +110,16 @@ namespace PropHuntMod
                 Log.LogDebug($"{seeker.PlayerAvatar.Username} is a seeker");
             }
         }
-        void ResetSeekers()
+        void ResetPlayers()
         {
             foreach (var player in players.Values)
             {
                 player.seeker = false;
+                player.swapCount = 0;
+                player.propName = "";
+                player.propRotation = 0;
+                player.propLocation = Vector3.zero;
+                player.hidden = false;
             }
         }
         public void GameStart()
@@ -132,7 +129,7 @@ namespace PropHuntMod
                 Announce("...Well that's awkward. I can't start a game without two people!");
                 return;
             }
-            ResetSwapCounts();
+            ResetPlayers();
             PickSeekers();
 
             EnsureSettings();
@@ -141,9 +138,9 @@ namespace PropHuntMod
             int seekerCountdown = Config.SeekerCountdown;
             Announce($"The game has begun! Hiders have a {seekerCountdown} second head start. Good luck!");
             
+            SeekerTimer = new SeekerTimer(seekerCountdown);
             ServerNetwork.BroadcastRoundStart();
             
-            SeekerTimer = new SeekerTimer(seekerCountdown);
 
         }
         public void CheckGameOver(IServerPlayer playerHit, bool canceled = false)
@@ -164,8 +161,7 @@ namespace PropHuntMod
             
             GameState = GameState.NotStarted;
 
-            ResetSwapCounts();
-            ResetSeekers();
+            ResetPlayers();
         }
 
         void EnsureSettings()

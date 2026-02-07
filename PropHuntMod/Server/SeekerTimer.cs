@@ -17,7 +17,7 @@ namespace PropHuntMod.Server
         void SetTimer(int seconds)
         {
             this.seconds = seconds;
-            timer = new Timer(seconds * 1000);
+            timer = new Timer(1000);
             timer.Elapsed += new ElapsedEventHandler((a, b) => {
                 OnSecond();
             });

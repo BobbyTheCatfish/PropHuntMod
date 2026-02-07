@@ -93,7 +93,7 @@ namespace PropHuntMod.Modifications
             ClientNetwork.SendPropLocation(Position, Rotation);
         }
 
-        public void EnableProp()
+        public void EnableRandomProp()
         {
             if (PropValidation.currentSceneObjects == null)
             {
@@ -115,6 +115,8 @@ namespace PropHuntMod.Modifications
         public bool EnableProp(GameObject cover, int ticket = -1)
         {
             if (IsSeeker()) return false;
+
+            Log.LogInfo("Enabling prop");
             var success = base.EnableProp(SelfHornetManager.instance, cover);
             if (success)
             {

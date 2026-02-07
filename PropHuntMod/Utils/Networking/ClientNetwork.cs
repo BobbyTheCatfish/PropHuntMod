@@ -122,7 +122,7 @@ namespace PropHuntMod.Utils.Networking
             else
             {
                 EffectsManager.SetTitle("HIDER", "", "YOUR ROLE:");
-                SelfCoverManager.instance.EnableProp();
+                SelfCoverManager.instance.EnableRandomProp();
                 PropHuntClient.LocalMessage("You're hiding this round!");
             }
 
@@ -176,6 +176,7 @@ namespace PropHuntMod.Utils.Networking
             var mainText = data.WasCanceled ? "Round Canceled" : data.IsWinner ? "You Won!" : "Round Complete";
             var subText = data.IsWinner || data.WasCanceled ? "" : $"{data.WinnerUsername} won!";
             EffectsManager.SetTitle(mainText, subText);
+
             if (data.IsWinner) EffectsManager.PlayConfetti();
             GameManager.instance.FreezeMoment(GlobalEnums.FreezeMomentTypes.BossDeathSlow);
         }
