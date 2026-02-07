@@ -47,17 +47,17 @@ namespace PropHuntMod.Utils
         }
         static bool IsExtraProp(string scene, GameObject gameObject)
         {
-                if (string.IsNullOrEmpty(scene)) return false;
-                if (ExtraProps.props == null) ExtraProps.Init();
-                var props = ExtraProps.props.FirstOrDefault(k => scene.StartsWith(k.Key)).Value;
+            if (string.IsNullOrEmpty(scene)) return false;
+            if (ExtraProps.props == null) ExtraProps.Init();
+            var props = ExtraProps.props.FirstOrDefault(k => scene.StartsWith(k.Key)).Value;
 
-                if (props == null) return false;
-                //Log.LogError("success");
-                var renderer = gameObject.GetComponent<SpriteRenderer>();
-                if (renderer == null || renderer.sprite == null) return false;
-                if (renderer.color != Color.white) return false;
+            if (props == null) return false;
+            //Log.LogError("success");
+            var renderer = gameObject.GetComponent<SpriteRenderer>();
+            if (renderer == null || renderer.sprite == null) return false;
+            if (renderer.color != Color.white) return false;
 
-                return props.Any(p => gameObject.name.StartsWith(p) || renderer.sprite.name.StartsWith(p));
+            return props.Any(p => gameObject.name.StartsWith(p) || renderer.sprite.name.StartsWith(p));
         }
         static void LogSpecificObj(string objectName, string condition)
         {
@@ -144,6 +144,8 @@ namespace PropHuntMod.Utils
         {
             string scene = SceneManager.GetActiveScene().name;
 
+            Log.LogInfo($"Preparing all props for scene {scene}");
+
             GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
             List<GameObject> props = new List<GameObject>();
 
@@ -216,8 +218,8 @@ namespace PropHuntMod.Utils
 
             if (!SelfHornetManager.instance.HornetExists()) return;
 
-            var hornetTransform = SelfHornetManager.instance.hornet.transform;
-            GameObject.Instantiate(parent, hornetTransform);
+            //var hornetTransform = SelfHornetManager.instance.hornet.transform;
+            //parent.transform.SetParentReset(hornetTransform);
             //parent.transform.SetPosition2D(hornetTransform.position);
             //parent.transform.SetParent(hornetTransform);
 
@@ -240,7 +242,16 @@ namespace PropHuntMod.Utils
                 if (cover == null) continue;
                 //Log.LogInfo(cover.name);
 
-                StripProp(cover);
+                try
+                {
+                    StripProp(cover);
+                }
+                catch (Exception e)
+                {
+                    Log.LogError($"Ran into an error stripping prop {cover.name} of components.");
+                    Log.LogError(e);
+                    continue;
+                }
 
                 // Add hit detection
                 Renderer[] renderers = cover.GetComponentsInChildren<Renderer>(false).Where(r => !(r is LineRenderer) && !(r is ParticleSystemRenderer)).ToArray();
@@ -290,6 +301,7 @@ namespace PropHuntMod.Utils
         }
         public static void ResetProps()
         {
+            Log.LogInfo("Resetting props");
             currentSceneObjects = null;
         }
     }

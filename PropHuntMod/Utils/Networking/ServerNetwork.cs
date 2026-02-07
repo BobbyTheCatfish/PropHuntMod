@@ -114,7 +114,7 @@ namespace PropHuntMod.Utils.Networking
             {
                 IsSeeker = player.seeker,
                 PropSwapLimit = Config.MaxSwapCount,
-                SeekerWaitTime = started ? 0 : Config.SeekerCountdown - PropHuntServer.instance.SeekerTimer.seconds
+                SeekerWaitTime = started ? 0 : PropHuntServer.instance.SeekerTimer.seconds
             };
 
             sender.SendSingleData(CustomPackets.RoundStart, data, id);
@@ -307,12 +307,14 @@ namespace PropHuntMod.Utils.Networking
                 if (owner.seeker)
                 {
                     PropHuntServer.instance.Message(id, "That player is a seeker!");
-                    FailedAction(id, data.PropOwnerID, CustomPackets.PropFound, CorrectionActions.None);
+                    FailedAction(id, data.PropOwnerID, CustomPackets.PropFound, CorrectionActions.DisablePlayerProp);
+                    return;
                 }
                 else if (!finder.seeker)
                 {
                     PropHuntServer.instance.Message(id, "You're not a seeker! You can't find people this round.");
                     FailedAction(id, data.PropOwnerID, CustomPackets.PropFound, CorrectionActions.RestoreTriggerHandler);
+                    return;
                 }
                 else owner.seeker = true;
             }
