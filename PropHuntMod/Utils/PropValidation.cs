@@ -221,13 +221,13 @@ namespace PropHuntMod.Utils
 
         static string GeneratePropPath(GameObject prop)
         {
-            string path = $"/{prop.name}";
+            string path = prop.name;
             
             var parent = prop.transform.parent;
             while (prop.transform.parent != null)
             {
                 prop = prop.transform.parent.gameObject;
-                path = $"/{prop.name}{path}";
+                path = $"{prop.name}/{path}";
             }    
 
             return path;

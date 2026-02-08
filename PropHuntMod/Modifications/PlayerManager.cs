@@ -77,8 +77,7 @@ namespace PropHuntMod.Modifications
 
             if (IsHostInSameRoom())
             {
-                var path = currentCoverObjPath;
-                var prop = PropValidation.FindGameObject(path);
+                var prop = PropValidation.FindGameObject(currentCoverObjPath);
 
                 if (prop == null)
                 {

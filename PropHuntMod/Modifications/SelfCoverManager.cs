@@ -125,6 +125,9 @@ namespace PropHuntMod.Modifications
 
             var newCover = PropValidation.currentSceneObjects.GetRandom();
             EnableProp(newCover);
+
+            Log.LogInfo(newCover.path);
+            Log.LogInfo(PropValidation.FindGameObject(newCover.path));
         }
 
         public bool EnableProp(Prop prop, int ticket = -1)
