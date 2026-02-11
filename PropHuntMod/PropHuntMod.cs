@@ -272,17 +272,22 @@ namespace PropHuntMod
             //PlayerManager.EnsureAllPropCovers();
         }
 
-        //[HarmonyPrefix]
-        //[HarmonyPatch(typeof (Breakable), "Break")]
-        //public static void OnBreak(Breakable __instance)
-        //{
-        //    if (!modEnabled) return;
-        //
-        //    if (hornet == null) return;
-        //    if (__instance.transform.parent.gameObject.name != hornet.hornet.name && !cover.IsCovered())
-        //    {
-        //        hornet.hornet.GetComponent<HeroController>().DamageSelf(1);
-        //    }
-        //}
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Breakable), "Break")]
+        public static void OnBreak(Breakable __instance)
+        {
+            //if (!modEnabled) return;
+
+            //var newObj = GameObject.Instantiate(__instance.gameObject, __instance.transform.parent);
+            //newObj.name = __instance.name;
+
+            //newObj.SetActive(false);
+
+            //if (hornet == null) return;
+            //if (__instance.transform.parent.gameObject.name != hornet.hornet.name && !cover.IsCovered())
+            //{
+            //    hornet.hornet.GetComponent<HeroController>().DamageSelf(1);
+            //}
+        }
     }
 }

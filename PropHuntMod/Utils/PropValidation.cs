@@ -247,6 +247,13 @@ namespace PropHuntMod.Utils
                 }
                 cover.layer = (int)PhysLayers.HERO_BOX;
                 cover.name = prop.name;
+
+                var breakable = cover.GetComponent<Breakable>();
+                if (breakable != null && breakable.IsBroken)
+                {
+                    var renderer = cover.GetComponent<SpriteRenderer>();
+                    if (renderer != null) renderer.enabled = true;
+                }
             }
             catch (Exception e)
             {
