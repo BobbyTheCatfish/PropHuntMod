@@ -52,20 +52,6 @@ namespace PropHuntMod.Utils
                 //|| obj.GetComponent<GrassCut>()
             );
         }
-        static bool IsExtraProp(string scene, GameObject gameObject)
-        {
-            if (string.IsNullOrEmpty(scene)) return false;
-            if (ExtraProps.props == null) ExtraProps.Init();
-            var props = ExtraProps.props.FirstOrDefault(k => scene.StartsWith(k.Key)).Value;
-
-            if (props == null) return false;
-            //Log.LogError("success");
-            var renderer = gameObject.GetComponent<SpriteRenderer>();
-            if (renderer == null || renderer.sprite == null) return false;
-            if (renderer.color != Color.white) return false;
-
-            return props.Any(p => gameObject.name.StartsWith(p) || renderer.sprite.name.StartsWith(p));
-        }
         static void LogSpecificObj(string objectName, string condition)
         {
             if (objectName == "Bonechurch_shop") Log.LogInfo(condition);
@@ -101,6 +87,12 @@ namespace PropHuntMod.Utils
                 return false;
             }
 
+            if (renderer?.sprite.name == "black_fader_moon")
+            {
+                LogSpecificObj(gameObject.name, "black fader");
+                return false;
+            }
+
             LogSpecificObj(gameObject.name, "passed negative");
 
             //if (gameObject.name.StartsWith("CC_metal__"))
@@ -115,7 +107,7 @@ namespace PropHuntMod.Utils
             string name = gameObject.name.ToLower();
             if (extraNames.Any(n => name.Contains(n))) return true;
 
-            if (IsExtraProp(scene, gameObject)) return true;
+            if (ExtraProps.IsExtraProp(scene, gameObject)) return true;
 
             return false;
         }
@@ -171,10 +163,11 @@ namespace PropHuntMod.Utils
             }
 
             PrepareAllProps(props);
-            //AddPropsToOutput(scene, props);
+            //AddPropsToOutput(scene);
         }
-        static void AddPropsToOutput(string scene, List<Prop> props)
+        static void AddPropsToOutput(string scene)
         {
+            var props = currentSceneObjects.inputValues;
             string row = $"{scene},{props.Count},\"{string.Join("\n", props.Select(x => x.name))}\"";
 
             var filepath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "PropReport.csv");

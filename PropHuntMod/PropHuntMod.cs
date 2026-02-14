@@ -6,6 +6,7 @@ using PropHuntMod.Utils;
 using PropHuntMod.Utils.Networking;
 using SSMP.Api.Client;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization.Formatters;
@@ -55,6 +56,8 @@ namespace PropHuntMod
         internal static List<Action> nextFrameActions = new List<Action>();
         static List<Action> _nextFrames = new List<Action>();
 
+
+        static IEnumerator propEnum;
         void Awake()
         {
             Instance = this;
@@ -137,6 +140,7 @@ namespace PropHuntMod
             // Effects testing
             if (Input.GetKeyDown(KeyCode.O))
             {
+                propEnum.MoveNext();
                 //Utils.Networking.ClientNetwork.OnPropFound(new Utils.Networking.FromServer.PropFound
                 //{
                 //    IsClientFound = true,
@@ -180,6 +184,18 @@ namespace PropHuntMod
             {
                 cover.DisableProp(hornet);
             }
+        }
+
+        static IEnumerator EnableNextProp()
+        {
+            foreach (var prop in PropValidation.currentSceneObjects.inputValues)
+            {
+                Log.LogInfo($"Enabling {prop.name}");
+                SelfCoverManager.instance.EnableProp(prop);
+                yield return null;
+            }
+
+            Log.LogError("Ran out of props");
         }
         void LateUpdate()
         {
@@ -249,6 +265,7 @@ namespace PropHuntMod
             }
 
             PropValidation.GetAllProps();
+            propEnum = EnableNextProp();
 
             if (PropHuntClient.GameState != GameState.NotStarted && !PropHuntClient.isSeeker)
             {

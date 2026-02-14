@@ -140,6 +140,12 @@ namespace PropHuntMod.Modifications
                 cover.name = prop.name;
                 CoverPath = prop.path;
 
+                var sprite = cover.GetComponent<SpriteRenderer>();
+                if (sprite != null)
+                {
+                    sprite.enabled = true;
+                }
+
                 SetPropLocation(Vector3.zero, 0);
 
                 cover.SetActive(true);

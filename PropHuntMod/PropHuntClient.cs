@@ -51,6 +51,15 @@ namespace PropHuntMod
                     LocalMessage(command);
             };
 
+            clientApi.ClientManager.DisconnectEvent += () =>
+            {
+                GameState = GameState.NotStarted;
+                isSeeker = false;
+                propSwaps = 0;
+                maxPropSwaps = 0;
+                PropHuntMod.playerManager.Clear();
+            };
+
             // Handle connects and disconnects
             clientApi.ClientManager.PlayerConnectEvent += player =>
             {

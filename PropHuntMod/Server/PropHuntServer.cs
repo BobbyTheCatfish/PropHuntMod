@@ -33,6 +33,8 @@ namespace PropHuntMod
             _serverApi = serverApi;
             this.Logger.Info("Prop Hunt Loaded.");
 
+            GameState = GameState.NotStarted;
+            players.Clear();
 
             ServerNetwork.Init(serverApi, this);
 

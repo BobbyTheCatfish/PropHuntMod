@@ -46,7 +46,7 @@ namespace PropHuntMod.Commands
         public string[] Aliases => new string[] { };
         public void Execute(string[] args)
         {
-            if (!PropHuntClient.isSeeker && !PropHuntMod.showHitboxes)
+            if (PropHuntClient.isSeeker && !PropHuntMod.showHitboxes)
             {
                 PropHuntClient.LocalMessage("Cannot enable hitboxes when seeking.");
                 return;

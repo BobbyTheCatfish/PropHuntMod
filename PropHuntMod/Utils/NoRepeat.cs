@@ -7,8 +7,8 @@ namespace NoRepeat
 {
     public class NoRepeat<T>
     {
-        private List<T> used;
-        private readonly List<T> inputValues;
+        public List<T> used { get; private set; }
+        public List<T> inputValues { get; private set; }
         private readonly Random random = new Random();
         public NoRepeat(List<T> values)
         {
