@@ -125,7 +125,7 @@ namespace PropHuntMod.Utils
 
             cover.MoveProp(Direction.RotateLeft, KeyCode.Keypad1, ref moved);
             cover.MoveProp(Direction.RotateRight, KeyCode.Keypad3, ref moved);
-            cover.MoveProp(Direction.Reset, KeyCode.Keypad4, ref moved, true);
+            cover.MoveProp(Direction.Reset, KeyCode.Keypad5, ref moved, true);
         }
 
         void KeyboardUpdate()
