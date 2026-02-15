@@ -87,7 +87,7 @@ namespace PropHuntMod.Utils
                 return false;
             }
 
-            if (renderer?.sprite.name == "black_fader_moon")
+            if (renderer?.sprite?.name == "black_fader_moon")
             {
                 LogSpecificObj(gameObject.name, "black fader");
                 return false;
@@ -102,7 +102,7 @@ namespace PropHuntMod.Utils
 
             // Then filter positives
             if (HasScript(gameObject)) return true;
-            if (gameObject.tag == "RespawnPoint") return true;
+            //if (gameObject.tag == "RespawnPoint") return true; // some benches have null sprites, leave off until thats fixed
 
             string name = gameObject.name.ToLower();
             if (extraNames.Any(n => name.Contains(n))) return true;
@@ -148,6 +148,8 @@ namespace PropHuntMod.Utils
             GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
             List<GameObject> props = new List<GameObject>();
 
+            ExtraProps.Init();
+
             foreach (var gameObject in allGameObjects)
             {
                 if (!IsValidProp(scene, gameObject)) continue;
@@ -188,7 +190,7 @@ namespace PropHuntMod.Utils
         static void StripProp(GameObject gameObject)
         {
             // Remove scripts
-            var scripts = gameObject.GetComponentsInChildren<MonoBehaviour>();
+            var scripts = gameObject.GetComponentsInChildren<MonoBehaviour>(true);
             foreach (var component in scripts)
             {
                 Type type = component.GetType();
@@ -238,6 +240,7 @@ namespace PropHuntMod.Utils
                     cover = GameObject.Instantiate(prop);
                     cover.SetActive(false);
                 }
+
                 cover.layer = (int)PhysLayers.HERO_BOX;
                 cover.name = prop.name;
 
@@ -257,12 +260,18 @@ namespace PropHuntMod.Utils
 
             StripProp(cover);
 
+            // reset rotation before determining collider bounds
+            var rot = cover.transform.rotation;
+            cover.transform.rotation = Quaternion.identity;
+
             if (!AddPropHitbox(cover))
             {
                 GameObject.Destroy(cover);
                 return null;
             }
 
+            // restore rotation
+            cover.transform.rotation = rot;
 
             return new Prop
             {
@@ -293,10 +302,15 @@ namespace PropHuntMod.Utils
             }
             //Log.LogInfo(renderers[0].bounds);
 
+            var size = prop.transform.InverseTransformVector(combinedBounds.size);
+
             var collider = prop.AddComponent<BoxCollider2D>();
             collider.isTrigger = true;
-            collider.offset = Vector2.zero;//cover.transform.InverseTransformPoint(combinedBounds.center);
-            collider.size = combinedBounds.size;
+            collider.offset = prop.transform.InverseTransformPoint(combinedBounds.center);
+            collider.size = new Vector2(
+                Mathf.Abs(size.x),
+                Mathf.Abs(size.y)
+            );
 
             var body = prop.AddComponentIfNotPresent<Rigidbody2D>();
             body.bodyType = RigidbodyType2D.Kinematic;

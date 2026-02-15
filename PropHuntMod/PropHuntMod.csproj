@@ -207,6 +207,10 @@
     </None>
     <None Include="README.md" />
   </ItemGroup> -->
+    <Content Include="Assets\ExtraProps.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>ExtraProps.json</TargetPath>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
