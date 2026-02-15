@@ -4,7 +4,7 @@
   "version_number": "1.0.0",
   "dependencies": [
     "BepInEx-BepInExPack_Silksong-5.4.2304",
-    "SSMP-SSMP-0.0.6"
+    "SSMP-SSMP-0.1.0"
   ],
   "website_url": "https://github.com/BobbyTheCatfish/PropHuntMod"
 }
