@@ -194,7 +194,6 @@
     "Clover_Silk_Pod_Wide"
   ],
   "Cog": [
-    "CC_metal__0001_28",
     "CC_metal__0005_24",
     "CC_metal__0010_19",
     "CC_metal__0012_17",
@@ -207,16 +206,18 @@
     "Cog_Choir__0002_tall_front",
     "Cog_Choir__0004_short_front",
     "Cog_Choir__0006_right_short",
-    "cog_plat_spin_0008",
-    "cog_plat_spin_0014",
-    "cog_plat_spin_0015",
+    "cog_plat_spin__0008",
+    "cog_plat_spin__0014",
+    "cog_plat_spin__0015",
     "cog__0002_1",
     "automaton_corpses_basic",
     "cradle_floor__0002_1",
     "cog_core_automaton_shelves_0002_1",
     "cog_rest_set_0002_1",
     "cog_rest_set_0003_1",
-    "sc_junk_piles_small_0001_1"
+    "sc_junk_piles_small_0001_1",
+    "cog_pillar_medal",
+    "cog_lever_wind_up_0003_1"
   ],
   "Coral": [
     "conch_walls_0004_1",

@@ -93,6 +93,12 @@ namespace PropHuntMod.Utils
                 return false;
             }
 
+            if ((renderer?.color.grayscale ?? 1) < 0.75f)
+            {
+                LogSpecificObj(gameObject.name, "too dark");
+                return false;
+            }
+
             LogSpecificObj(gameObject.name, "passed negative");
 
             //if (gameObject.name.StartsWith("CC_metal__"))
