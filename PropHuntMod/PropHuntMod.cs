@@ -34,6 +34,7 @@ namespace PropHuntMod
 
     [BepInPlugin("com.bobbythecatfish.prophunt", Utils.Config.ModName, Utils.Config.ModVersion)]
     [BepInDependency("ssmp")]
+    [BepInDependency("io.github.flibber-hk.filteredlogs", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInProcess("Hollow Knight Silksong.exe")]
     public class PropHuntMod : BaseUnityPlugin
     {
@@ -56,8 +57,6 @@ namespace PropHuntMod
         internal static List<Action> nextFrameActions = new List<Action>();
         static List<Action> _nextFrames = new List<Action>();
 
-
-        static IEnumerator propEnum;
         void Awake()
         {
             Instance = this;
@@ -65,6 +64,8 @@ namespace PropHuntMod
             Log.SetLogger(base.Logger);
             SSMP.Api.Client.ClientAddon.RegisterAddon(new PropHuntClient());
             SSMP.Api.Server.ServerAddon.RegisterAddon(new PropHuntServer());
+
+            FilteredLogs.API.ApplyFilter("Prop Hunt");
         }
         public static void Initialize(IClientApi clientApi)
         {
@@ -140,7 +141,7 @@ namespace PropHuntMod
             // Effects testing
             if (Input.GetKeyDown(KeyCode.O))
             {
-                propEnum.MoveNext();
+                PropTesting.PropNext();
                 //Utils.Networking.ClientNetwork.OnPropFound(new Utils.Networking.FromServer.PropFound
                 //{
                 //    IsClientFound = true,
@@ -166,6 +167,11 @@ namespace PropHuntMod
                 //}
             }
 
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                PropTesting.PropPrevious();
+            }
+
             /**************
              *  KEYBINDS  *
              **************/
@@ -186,17 +192,6 @@ namespace PropHuntMod
             }
         }
 
-        static IEnumerator EnableNextProp()
-        {
-            foreach (var prop in PropValidation.currentSceneObjects.inputValues)
-            {
-                Log.LogInfo($"Enabling {prop.name}");
-                SelfCoverManager.instance.EnableProp(prop);
-                yield return null;
-            }
-
-            Log.LogError("Ran out of props");
-        }
         void LateUpdate()
         {
             if (nextFrameActions.Count > 0)
@@ -240,7 +235,7 @@ namespace PropHuntMod
                 //Log.LogInfo("Begin", GameManager.SilentInstance.GameState);
                 return;
             }
-            movement = new PropMovementControls();
+            if (movement == null) movement = new PropMovementControls();
             SelfCoverManager.instance.DisableProp(false, true);
             //Log.LogInfo($"Changing scene to {__instance.TargetSceneName}");
             PreviousScene = CurrentScene;
@@ -265,7 +260,7 @@ namespace PropHuntMod
             }
 
             PropValidation.GetAllProps();
-            propEnum = EnableNextProp();
+            PropTesting.OnSceneChange();
 
             if (PropHuntClient.GameState != GameState.NotStarted && !PropHuntClient.isSeeker)
             {

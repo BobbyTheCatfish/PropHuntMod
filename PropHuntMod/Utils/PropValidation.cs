@@ -23,7 +23,7 @@ namespace PropHuntMod.Utils
     {
         static readonly string[] extraNames = { "corpse", "quest_board" };
         static readonly PhysLayers[] invalidLayers = { PhysLayers.ENEMIES, PhysLayers.HERO_ATTACK };
-        public static NoRepeat<Prop> currentSceneObjects;
+        public static NoRepeat<Prop> currentSceneObjects { get; private set; }
         static GameObject PropParent;
 
         static readonly Type[] allowedTypes =
@@ -117,10 +117,24 @@ namespace PropHuntMod.Utils
             {
                 var oldObjRenderer = GetRenderer(existingGameObject);
                 //Log.LogInfo(oldObjRenderer.sprite);
-                
-                if (oldObjRenderer?.sprite == null || newObjRenderer?.sprite == null) return false;
 
-                return oldObjRenderer.sprite.name == newObjRenderer.sprite.name;
+                if (oldObjRenderer?.sprite == null || newObjRenderer?.sprite == null)
+                {
+                    Log.LogInfo($"{newObjRenderer.name} not duplicate, a sprite was null");
+                    return false;
+                }
+
+                bool result = oldObjRenderer.sprite.name == newObjRenderer.sprite.name;
+                //if (result)
+                //{
+                //    Log.LogInfo(
+                //        $"{newObjRenderer.gameObject.name} is duplicate of {existingGameObject.name}",
+                //        $"Old Sprite: {oldObjRenderer.sprite.name}",
+                //        $"New Sprite: {newObjRenderer.sprite.name}"
+                //    );
+                //}
+
+                return result;
             }
             catch (Exception e)
             {
@@ -133,7 +147,7 @@ namespace PropHuntMod.Utils
         static SpriteRenderer GetRenderer(GameObject gameObject)
         {
             var renderer = gameObject.GetComponent<SpriteRenderer>();
-            if (renderer == null || renderer.sprite == null)
+            if (renderer?.sprite == null)
             {
                 renderer = gameObject.GetComponentsInChildren<SpriteRenderer>().FirstOrDefault(s => s.sprite != null);
             }
@@ -157,9 +171,17 @@ namespace PropHuntMod.Utils
 
                 LogSpecificObj(gameObject.name, "valid prop");
                 var renderer = GetRenderer(gameObject);
-                if (renderer == null) continue;
+                if (renderer == null)
+                {
+                    LogSpecificObj(gameObject.name, "no renderer");
+                    continue;
+                }
 
-                if (props.Any(o => IsGameObjectDuplicate(renderer, o))) continue;
+                if (props.Any(o => IsGameObjectDuplicate(renderer, o)))
+                {
+                    LogSpecificObj(gameObject.name, "duplicate object");
+                    continue;
+                }
                 //Log.LogInfo($"{gameObject.name} - {gameObject.layer} YES");
                 props.Add(gameObject);
             }
@@ -229,7 +251,11 @@ namespace PropHuntMod.Utils
         }
         public static Prop PrepareProp(GameObject prop, bool assignParent = true)
         {
-            if (prop == null) return null;
+            if (prop == null)
+            {
+                Log.LogError("Unknown prop to prepare");
+                return null;
+            }
 
             GameObject cover;
             try
@@ -253,7 +279,7 @@ namespace PropHuntMod.Utils
             }
             catch (Exception e)
             {
-                Log.LogError($"Ran into an error instantiating cover {prop?.name}.");
+                Log.LogError($"Ran into an error instantiating cover {prop.name}.");
                 Log.LogError(e);
                 return null;
             }
@@ -266,6 +292,7 @@ namespace PropHuntMod.Utils
 
             if (!AddPropHitbox(cover))
             {
+                Log.LogInfo($"Couldn't add hitbox for {prop.name}");
                 GameObject.Destroy(cover);
                 return null;
             }
@@ -273,6 +300,8 @@ namespace PropHuntMod.Utils
             // restore rotation
             cover.transform.rotation = rot;
 
+
+            //Log.LogInfo(cover.name);
             return new Prop
             {
                 name = cover.name,
@@ -296,7 +325,12 @@ namespace PropHuntMod.Utils
             foreach (var r in renderers)
             {
                 var name = r.name.ToLower();
-                if (name.StartsWith("haze") || name.StartsWith("light") || name == "lit") continue;
+                if (prop.name == "Active") Log.LogInfo(name, r.bounds.size);
+                if (
+                    name.StartsWith("haze") || name.StartsWith("light") || name.StartsWith("vignette") ||
+                    name.EndsWith("fader") || name.EndsWith("glow") || name.EndsWith("cutout") ||
+                    name == "lit"
+                ) continue;
                 //Log.LogInfo(r, r.name, r.bounds);
                 combinedBounds.Encapsulate(r.bounds);
             }
@@ -320,17 +354,20 @@ namespace PropHuntMod.Utils
 
             prop.AddComponent<TriggerHandler>();
 
-            //foreach (Renderer renderer in renderers)
-            //{
-            //    renderer.gameObject.AddComponentIfNotPresent<LineRenderer>();
-            //    renderer.gameObject.AddComponent<DebugViewBounds>();
-            //}
+            foreach (Renderer renderer in renderers)
+            {
+                if (renderer.gameObject == prop) continue;
+                renderer.gameObject.AddComponentIfNotPresent<LineRenderer>();
+                renderer.gameObject.AddComponent<DebugViewBounds>();
+            }
 
             return true;
         }
 
         static void PrepareAllProps(List<GameObject> props)
         {
+            if (PropParent != null) GameObject.Destroy(PropParent);
+
             PropParent = new GameObject("PROP PARENT");
             PropParent.SetActive(false);
 
@@ -453,6 +490,7 @@ namespace PropHuntMod.Utils
         Renderer[] renderers;
         Color borderColor = Color.red;
         readonly float lineWidth = 0.05f;
+        bool Show => PropHuntMod.showHitboxes;
 
         void Awake()
         {
@@ -471,6 +509,8 @@ namespace PropHuntMod.Utils
 
         void LateUpdate()
         {
+            if (!Show) return;
+
             foreach (Renderer renderer in renderers)
             {
                 DrawBox(renderer);
