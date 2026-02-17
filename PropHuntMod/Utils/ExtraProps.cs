@@ -86,7 +86,7 @@ namespace PropHuntMod.Utils
 
             var renderer = gameObject.GetComponent<SpriteRenderer>();
             if (renderer?.sprite == null) return false;
-            if (renderer.color != Color.white) return false;
+            if (renderer.color.grayscale < 0.75f) return false;
 
             bool result = sceneProps.Any(p => renderer.sprite.name.StartsWith(p));
             //bool result = sceneProps.Any(p => gameObject.name.StartsWith(p) || renderer.sprite.name.StartsWith(p));
