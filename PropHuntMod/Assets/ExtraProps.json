@@ -3,16 +3,35 @@
     "ant_camp_0004_camp",
     "black_fader_moon",
     "Ant_opera_0014_curtain_01",
-    "Weaver Corpse Glow",
+    "weaver_corpse_01_glow",
+    "weaver_corpse_02_glow",
     "Bell Hermit",
-    "abyss_egg_large_bg"
+    "abyss_egg_large_bg",
+    "char_grass_03_cut",
+    "Bone_house_pieces_0006_4_tie",
+    "dock_pipe__0026_1_shad",
+    "dock_pipe__0026_1_shad",
+    "_0031_grey_clean_rope",
+    "_0031_grey_gate_chapel",
+    "sc_extras_detail_pieces_0001_Layer-28",
+    "dust_swamp_huts_corpse_sack_02_group_fader",
+    "mapper_master_front_corpse_hair",
+    "sc_extras_detail_pieces_0001_Layer-28_angled"
   ],
   "GLOBAL": [
     "Silkcatcher_plant_0003_3",
     "Silkcatcher_plant_0004_2",
     "Silkcatcher_plant_0005_1",
     "Thread_Spool_spinner000",
-    "Thread_Spool_spinner_cradle_webbed"
+    "Thread_Spool_spinner_cradle_webbed",
+    "break_thread_spools_0004_1",
+    "break_thread_spools_0001_4",
+    "corpses_pilgrim",
+    "Silk_Grub_small_cocoon",
+    "sc_bell_piles_0003_5",
+    "sc_bell_piles_0002_6",
+    "sc_bell_piles_0001_7",
+    "junk_piles_understore_000"
   ],
   "Abandoned_town": [
     "abandoned_town_shellhomes_0002_1",
@@ -31,7 +50,7 @@
     "loom_jars_pile"
   ],
   "Ant": [
-    "corpses_pilgrim",
+    "wilds_big_bush",
     "ant_big_bone_circlet",
     "Ant_Bone_block",
     "Ant_Bone_Extras_0009_barrel_lower_02",
@@ -41,7 +60,6 @@
     "Ant_Bone_Extras_0022_heretic_spike_01",
     "ant_break_branches_0001_1",
     "ant_bridge_pieces_0007_Layer-31",
-    "ant_bridge_pieces_0012_Layer-35",
     "ant_bridge_pieces_0012_Layer-35_trapdoor",
     "ant_cage_trap_base",
     "ant_camp_0000_camp",
@@ -53,10 +71,10 @@
     "ant_extras_branch_0000_3_long",
     "ant_extras_branch_0002_1_full",
     "ant_theatre_extra_spires_0002_1",
-    "Thread_Spool_spinner_ant"
+    "Thread_Spool_spinner_ant",
+    "ant_grave_markers_0003_1"
   ],
   "Arborium": [
-    "wilds_big_bush",
     "scorch_bone_0014_4",
     "shell_bush_vine_clump",
     "wilds_extras_0009_1",
@@ -90,7 +108,6 @@
   ],
   "Belltown": [
     "bell_old__0000_wall_large",
-    "sc_bell_piles_0001_7",
     "bell_old__0005_wall_mid",
     "belltown_arch_set__0001_2",
     "belltown_arch_set__0000_2",
@@ -105,7 +122,9 @@
     "bone_relic_room_0006_1",
     "bone_relic_room_0008_1",
     "bone_relic_room_0003_1",
-    "pinhome_0012_1"
+    //"pinhome_0012_1",
+    "doctor_bell_0002_1",
+    "room_halfway_house_interior_grey_0022_2"
   ],
   "Bell": [
     "Hornet_Core__0092",
@@ -116,12 +135,11 @@
     "Hornet_Core__0097",
     "Hornet_Core__0099",
     "sc_bell_piles_0000_8",
-    "sc_bell_piles_0001_7",
-    "sc_bell_piles_0002_6",
     "sc_bell_piles_0004_4",
     "sc_bell_piles_0005_3",
     "sc_bell_piles_0007_1",
-    "sc_bell_piles_base"
+    "sc_bell_piles_base",
+    "conch_walls_0000_1"
   ],
   "Bone_East": [
     "wilds_big_bush",
@@ -135,13 +153,10 @@
     "ant_camp_0000_camp",
     "break_statues_0003_s_stone_floor",
     "scorch_bone_0012_6",
-    "_0001_umb_inflate_small",
-    "_0009_umb_small",
     "ant_camp_0001_camp",
     "barrel_stacks_tall",
     "spool_base_up",
     "barrel_stacks_squat",
-    "corpses_pilgrim",
     "Room_Umbrella_0015_9",
     "Room_Umbrella_0016_8",
     "Room_Umbrella_0017_7",
@@ -176,11 +191,9 @@
     "Thread_Spool_spinner",
     "Bone_rubble_short",
     "Belltown_0030_statue",
-    "Bone_house_pieces_0006_4",
     "cage_hang_standard",
     "sc_junk_piles_small_0",
     "bone_hut_sack_0004",
-    "corpses_pilgrim",
     "Jar_break_extra",
     "weaver_heat_lamp"
   ],
@@ -229,15 +242,33 @@
     "Coral_Crust_Tree_lore",
     "corla_vine_short",
     "Coral_0038_Layer-102",
-    "Hornet_cage_rect_0000_cage"
+    "Hornet_cage_rect_0000_cage",
+    "conch_walls_0000_1"
+  ],
+  "Cradle": [
+    "Bonechurch_middle_bits_0012_cage_clean",
+    "Bonechurch_middle_bits_0010_cage_break",
+    "Bonechurch_middle_bits_0012_cage_webbed",
+    "jail_extra_0002_mid_size_cage",
+    "Cradle__0008_moving_plat_crank_heavy_web",
+    "Thread_Spool_spinner_cradle_webbed",
+    "Hornet_Core__0081_bell_room",
+    "Hornet_Core__0082_bell_room",
+    "Hornet_Core__0083_bell_room",
+    "map_machine_extra_0002_1",
+    "cradle_lore_sign_seal"
   ],
   "Crawl": [
     "song_gate_0001_1_short",
     "collector_eggs_0005_1",
     "bellway_tent_0002_1",
-    "greymoor_cage_bits_0001_2"
+    "greymoor_cage_bits_0001_2",
+    "kingdom_gate_0001_sand_dune_ground_short_mound",
+    "kingdom_gate_0002_1",
+    "kingdom_gate_0003_1",
+    "kingdom_gate_0003_1_top"
   ],
-  "Docks": [
+  "Dock": [
     "DW_death0004",
     "wilds_big_bush",
     "dock_pipe__0026_1",
@@ -254,16 +285,179 @@
     "chef_room_0009_meat",
     "chef_room_0019_ladel",
     "kitchen_cauldrons_0001_1",
-    "spool_base_up",
-    "spool_base_side",
+    "break_thread_spools_0004_1",
+    "break_thread_spools_0001_4",
     "greymoor_sack",
     "greymoor_junk_small",
     "trader_extras_0000_1",
-    "greymoor_cage_bits_0000_1"
+    "greymoor_cage_bits_0000_1",
+    "dust_pen_poles_0000_1",
+    "_0031_grey_"
   ],
   "Greymoor_17": [
     "_0039_grey_lumpy",
     "grey_0000_stone_mid_size_0001_1",
     "_0027_grey_"
+  ],
+  "Hang": [
+    "sc_junk_piles_small_0002_1",
+    "sc_junk_piles_small_0001_1",
+    "Thread_Spool_spinner000",
+    "sc_lift_back_0005_top",
+    "sc_lift_back_0004_top",
+    "sc_lift_back_0003_top",
+    "sc_lift_back_0002_top",
+    "death0005_in_water",
+    "death0005",
+    "hanging_garden__0022_floor_fg",
+    "hanging_garden__0022_floor",
+    "hanging_garden_bell_bush_0001_1_pile",
+    "hanging_garden__0000_plat_large_core2",
+    "hanging_garden__0001_plat_large_core1",
+    "hanging_garden_waterwheel_0000_1",
+    "hanging_garden_waterwheel_0001_1_ring_support",
+    "song_pilgrims_sleeping",
+    "wp_cloth_02",
+    "junk_piles_understore_0025",
+    "junk_piles_understore_0026",
+    "junk_piles_understore_0027"
+  ],
+  "Library": [
+    "Library_theatre_costumes_0000_1",
+    "Library_theatre_costumes_0001_1",
+    "Library_theatre_costumes_0002_1",
+    "sc_junk_piles_small_0000_1",
+    "sc_storage_song__0000_Layer-1",
+    "sc_extras_detail_pieces_0007_Layer-34",
+    "sc_extras_detail_pieces_0008_Layer-25",
+    "dead_scholar__0000_scholar_shell",
+    "dead_scholar__0001_scholar_shell",
+    "song_library__0012_1_pile_small",
+    "song_scholar_school"
+  ],
+  "Memory": [
+    "ant_theatre_extra",
+    "Boneforest_breakables_0011_8",
+    "bone_deep_0139_p",
+    "bone_mid_simple",
+    "song_gate_0001_1",
+    "weaver_heat_lamp_0005_1_plinth",
+    "cradle_husk"
+  ],
+  "Organ": [
+    "organ_extra_floor_bits_0001_1",
+    "vent_base_outer_pipe"
+  ],
+  "Peak": [
+    "loom_jars_pile",
+    "large_servitor_heat_lamp_old",
+    "weaver_thread_spool_spinner",
+    "peak__0067_1",
+    "peak__0029_Layer-31",
+    "snowflake_0004_1_chunk_basic",
+    "snowflake_0004_1_chunk_full",
+    "snowflake_chimney_0000_1_wide",
+    "Peak_soft_mounds_",
+    "junk__0014_weave",
+    "weaver_scroll_walls_0000_1"
+  ],
+  "Room_Caravan": [
+    "Caravan_inside_0012",
+    "Caravan_inside_0010",
+    "Caravan_inside_0009",
+    "Caravan_inside_0007",
+    "Caravan_spa_interior_0003_4",
+    "Caravan_spa_interior_0001_2_railing",
+    "Caravan_spa_interior_0002_3"
+  ],
+  "Room_": [
+    "crawcourt_rags_0003_3",
+    "diving_bell_interior_shielded_0003_1",
+    "diving_bell_interior_shielded_0002_1",
+    "diving_bell_interior__0006_1_type_02",
+    "kitchen_cauldrons_0001_1_flat",
+    "dust_swamp__0003_lichen_hang",
+    "Room_Pinstress_0007_1",
+    "witch-hut-furrniture_0000_1",
+    "witch_hut_extras_0000_1",
+    "witch_hut_extras_0002_1",
+    "witches-hut_0004_1",
+    "witches-hut_0003_1"
+  ],
+  "Shadow": [
+    "bone_deep_0121_b_full",
+    "shell_shard_fossil_0008"
+  ],
+  "Shellwood": [
+    "flower_queen_leaves_0004_1",
+    "flower_queen_leaves_0007_1",
+    "witches-hut_0002_1",
+    "witches-hut_0000_1",
+    "witches-hut_0003_1",
+    "shellwood_lumps_0000_3_mid"
+  ],
+  "Slab": [
+    "first_weaver_fossil_0001_1",
+    "first_weaver_coffin_outer",
+    "first_weaver_ground_spike",
+    "slab_hatchery__0002_1",
+    "slab_weaver_chain_door_ring_0000_1",
+    "cast_blade_projectile0021",
+    "first_weaver_cage_inner_door",
+    "death0006",
+    "Coral_0033_Layer-97",
+    "slab_dishes",
+    "wp_cloth_02",
+    "Slab__0030_screw",
+    "slab_armour_0000_1",
+    "slab_armour_0003_1",
+    "Jail__0000_3",
+    "slab_prisoner_cage",
+    "jail_extra_0002_mid_size_cage",
+    "jail_extra_0001_table",
+    "slab_props__0000_cage"
+  ],
+  "Song": [
+    "song_pilgrims_sleeping",
+    "song_city_pipes_0017",
+    "music_box_0000_1",
+    "music_box_0002_1",
+    "bell_bench_cog_01_small",
+    "CC_metal__0025_4",
+    "flower_field__0001_l3_mid_03"
+  ],
+  "Sprint": [
+    "_0000_caravan_bench_sprintmaster_0000_1",
+    "crawl_creature_corridor_0001_1_edge_teeth",
+    "Sprintmaster_scenery__0011_pole"
+  ],
+  "Tube": [
+    "barrel_stacks_0001_2_thin",
+    "sc_junk_piles_small_0002_1",
+    "spool_weaver_small"
+  ],
+  "Under": [
+    "song_shrine_small_0002_1",
+    "dock_b__0042_shelf_hang",
+    "sc_junk_piles_small_0002_1",
+    "bellway_sacks",
+    "Bonechurch_middle_bits_0001_sack",
+    "Bonechurch_middle_bits_0002_sack",
+    "weaver_heat_lamp_0005_1_plinth_under"
+  ],
+  "Ward": [
+    "barrel_stacks_0001_2",
+    "sc_storage_ward_0002_1",
+    "junk__0006_ward",
+    "junk__0007_ward",
+    "junk__0008_ward",
+    "junk__0009_ward",
+    "catacomb_shelfs_0001_2"
+  ],
+  "Weave": [
+    "weaver_heat_lamp",
+    "spool_weaver_small",
+    "weaver_thread_spool_spinner",
+    "junk__0014_weave"
   ]
 }
