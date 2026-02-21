@@ -58,6 +58,7 @@ namespace PropHuntMod
                 propSwaps = 0;
                 maxPropSwaps = 0;
                 PropHuntMod.playerManager.Clear();
+                PropHuntServer.instance.Reset(true);
             };
 
             // Handle connects and disconnects

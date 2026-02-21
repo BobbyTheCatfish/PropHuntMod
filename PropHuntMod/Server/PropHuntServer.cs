@@ -33,8 +33,7 @@ namespace PropHuntMod
             _serverApi = serverApi;
             this.Logger.Info("Prop Hunt Loaded.");
 
-            GameState = GameState.NotStarted;
-            players.Clear();
+            Reset();
 
             ServerNetwork.Init(serverApi, this);
 
@@ -53,9 +52,29 @@ namespace PropHuntMod
 
             serverApi.ServerManager.PlayerDisconnectEvent += player =>
             {
+                Log.LogInfo($"Player {player} disconnected");
                 players.Remove(player.Id);
+
                 CheckGameOver(player);
             };
+        }
+
+        public void Reset(bool disconnect = false)
+        {
+            Log.LogInfo("Resetting server");
+            GameState = GameState.NotStarted;
+            SeekerTimer?.CancelTimer();
+            SeekerTimer = null;
+
+            if (disconnect)
+            {
+                foreach (var player in _serverApi.ServerManager.Players)
+                {
+                    _serverApi.ServerManager.DisconnectPlayer(player.Id, SSMP.Networking.Packet.Data.DisconnectReason.Shutdown);
+                }
+            }
+
+            players.Clear();
         }
 
         internal static ServerPlayer GetPlayer(ushort playerID)
