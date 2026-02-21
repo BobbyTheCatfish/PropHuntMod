@@ -201,8 +201,10 @@ namespace PropHuntMod.Utils.Networking
         {
             var player = PropHuntServer.GetPlayer(id);
 
+            var disabling = string.IsNullOrEmpty(data.propPath);
+
             // Seekers can't hide
-            if (player.seeker && PropHuntServer.GameState != GameState.NotStarted)
+            if (player.seeker && PropHuntServer.GameState != GameState.NotStarted && !disabling)
             {
                 PropHuntServer.instance.Message(id, "You're a seeker! You can't hide this round.");
                 FailedAction(id, id, CustomPackets.PropSwap, CorrectionActions.DisableClientProp);
@@ -222,7 +224,7 @@ namespace PropHuntMod.Utils.Networking
                 }
             }
 
-            if (string.IsNullOrEmpty(data.propName))
+            if (disabling)
             {
                 player.propName = null;
                 player.propPath = null;
@@ -235,7 +237,7 @@ namespace PropHuntMod.Utils.Networking
 
             if (!swapCountExempt) player.swapCount++;
 
-            ForwardPropSwap(id, data.propName, data.propPath);
+            ForwardPropSwap(id, player.propName, player.propPath);
         }
 
         static void OnPropLocation(ushort id, FromClient.PropLocation data)
@@ -334,7 +336,7 @@ namespace PropHuntMod.Utils.Networking
 
             if (string.IsNullOrEmpty(owner.propName))
             {
-                PropHuntServer.instance.Message(id, "That player has already been found. They might be out of sync.");
+                PropHuntServer.instance.Message(id, "That player has already been found. You might be out of sync.");
                 FailedAction(id, data.PropOwnerID, CustomPackets.PropFound, CorrectionActions.DisablePlayerProp);
                 return;
             }

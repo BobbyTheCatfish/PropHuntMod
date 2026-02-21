@@ -60,6 +60,9 @@ namespace PropHuntMod.Modifications
                 return;
             }
             render = hornet.GetComponent<MeshRenderer>();
+
+            HeroController.instance.OnDeath -= OnDeath;
+            HeroController.instance.OnDeath += OnDeath;
         }
 
         public void SetSeekerObscure(bool enabled)
@@ -93,6 +96,12 @@ namespace PropHuntMod.Modifications
             //    Vector3 rotation = GameCameras.instance.transform.rotation.eulerAngles;
             //rotation.y = enabled ? 180 : 0;
             //GameCameras.instance.transform.rotation = Quaternion.Euler(rotation);
+        }
+
+        public void OnDeath()
+        {
+            SelfCoverManager.instance.DisableProp(false, false);
+            Log.LogDebug("I ded");
         }
     }
 }
