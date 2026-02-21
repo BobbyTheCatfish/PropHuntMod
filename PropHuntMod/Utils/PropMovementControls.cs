@@ -82,15 +82,15 @@ namespace PropHuntMod.Utils
             stick.Up.Enabled = true;
             stick.Down.Enabled = true;
 
-            var stickButton = rightStick ? InputManager.ActiveDevice.RightStickButton : InputManager.ActiveDevice.LeftStickButton;
-            stickButton.Enabled = true;
+            var modeButton = rightStick ? InputManager.ActiveDevice.RightStickButton : InputManager.ActiveDevice.LeftStickButton;
+            modeButton.Enabled = true;
 
-            if (stickButton.IsPressed && !ModeSwitchPressed)
+            if (modeButton.IsPressed && !ModeSwitchPressed)
             {
                 ChangeModes();
                 ModeSwitchPressed = true;
             }
-            else if (!stickButton.IsPressed)
+            else if (!modeButton.IsPressed)
             {
                 ModeSwitchPressed = false;
             }
@@ -128,7 +128,7 @@ namespace PropHuntMod.Utils
 
             cover.MoveProp(Direction.RotateLeft, KeyCode.Keypad1, ref moved);
             cover.MoveProp(Direction.RotateRight, KeyCode.Keypad3, ref moved);
-            cover.MoveProp(Direction.Reset, KeyCode.Keypad5, ref moved, true);
+            //cover.MoveProp(Direction.Reset, KeyCode.Keypad5, ref moved, true); // Probably handled by ResetPosition()
         }
 
         void KeyboardUpdate()
@@ -200,15 +200,17 @@ namespace PropHuntMod.Utils
 
         public void SetMovementState(MovementState newState)
         {
+            Log.LogDebug($"Movement State: {MovementState} -> {newState}");
             MovementState = newState;
 
-            Log.LogInfo(newState);
+            // Block or unblock inputs
             if (newState == MovementState.Move2D)
             {
                 HeroController.instance.AddInputBlocker(blockingMechanism);
             }
             else if (newState == MovementState.Normal)
             {
+                // Unblock on the next frame to prevent accidental taunt inputs
                 PropHuntMod.nextFrameActions.Add(() =>
                 {
                     HeroController.instance.RemoveInputBlocker(blockingMechanism);
