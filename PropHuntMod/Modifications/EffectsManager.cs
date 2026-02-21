@@ -87,6 +87,32 @@ namespace PropHuntMod.Modifications
             sweep.onComplete = onFinish;
         }
 
+        // Not tested or implemented yet
+        static void ActionOnBundle(string bundleName, string bundleFile, Action<AssetBundle> action)
+        {
+            var loadedBundles = AssetBundle.GetAllLoadedAssetBundles();
+            var bundle = loadedBundles.FirstOrDefault(b => b.name == bundleName);
+
+            bool unload = false;
+            if (bundle == null)
+            {
+                Log.LogInfo("Bundle not loaded. Loading now.");
+                var bundlePath = Path.Combine(bundleFile);
+                bundle = AssetBundle.LoadFromFile(bundlePath);
+                unload = true;
+            }
+
+            if (bundle == null)
+            {
+                Log.LogError($"Unable to load bundle {bundleName}");
+                return;
+            }
+
+            action.Invoke(bundle);
+
+            if (unload) bundle.Unload(false);
+        }
+
         static void Init()
         {
             /****************
@@ -127,10 +153,10 @@ namespace PropHuntMod.Modifications
             bundle = AssetBundle.LoadFromFile(Path.Combine(dir, "prophunt.bundle"));
             var assets = bundle.LoadAllAssets();
 
-            foreach (var  asset in assets)
-            {
-                Log.LogInfo(asset.name, asset);
-            }
+            //foreach (var  asset in assets)
+            //{
+            //    Log.LogInfo(asset.name, asset);
+            //}
 
             /******************************
              *  LOAD SWEEP EFFECT SHADER  *
@@ -151,6 +177,9 @@ namespace PropHuntMod.Modifications
              **************************/
 
             GameObject confettiGO = assets.First(a => a is GameObject && a.name == "Confetti") as GameObject;
+            var main = confettiGO.GetComponent<ParticleSystem>().main;
+            main.playOnAwake = false;
+
             confettiGO = GameObject.Instantiate(confettiGO, GameCameras.instance.tk2dCam.transform);
             confettiGO.transform.localPosition = new Vector3(0, -7.5f, 25);
 
