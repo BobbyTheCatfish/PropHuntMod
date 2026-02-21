@@ -62,7 +62,10 @@ namespace PropHuntMod.Utils
         {
             if (input.IsPressed && input.Value > StickThreshold)
             {
-                MoveProp(direction, useValue ? input.Value / 5 : 0.1f);
+                var magnitude = 0.1f;
+                if (useValue) magnitude = input.Value / 5;
+                if (InputHandler.Instance.inputActions.Dash.IsPressed) magnitude /= 2;
+                MoveProp(direction, magnitude);
                 return true;
             }
 
@@ -137,6 +140,7 @@ namespace PropHuntMod.Utils
             actions.Up.Enabled = true;
             actions.Down.Enabled = true;
             actions.Taunt.Enabled = true;
+            actions.Dash.Enabled = true;
 
             if (actions.Taunt.IsPressed && !ModeSwitchPressed)
             {
