@@ -5,11 +5,6 @@ Prop Hunt is very similar to hide and seek.
 You hide as objects (props) around the map while seekers try to find and you.
 Once you've been found, you become a seeker. The last person standing wins! Look at the [Gameplay](#gameplay) section for more details.
 
-```
-Note: As part of this mod, enemies can't attack or target you by default. This is to make hiding easier.
-If you want to disable this, you can change it within the BepInEx Config Manager
-```
-
 ## Installation
 This mod requires [SSMP](https://thunderstore.io/c/hollow-knight-silksong/p/SSMP/SSMP/) for multiplayer.
 
@@ -27,7 +22,7 @@ Before and between rounds (see [commands](#commands) section), players are free 
 > A list of each room's props can be found [here](https://docs.google.com/spreadsheets/d/1pxumrYVEBxFdBz4NKolcoCLyxjkwwWMmx7_CYVWZ0Qc).
 You can use a mod like [QuickWarp](https://thunderstore.io/c/hollow-knight-silksong/p/hk_speedrunning/QuickWarp/) to go to specific rooms easily.
 
-> It's worth noting that some rooms may not have any props, or may have very few.
+> It's worth noting that some rooms (especially memories) may not have any props, or may have very few.
 If you encounter any, please create an issue on the mod's [GitHub](https://github.com/BobbyTheCatfish/PropHuntMod/issues).
 
 Take this time before starting to establish a few rules:
@@ -60,32 +55,39 @@ There are a few keybinds for this mod, which can be changed within BepInEx Confi
 
 `R` -> `Reset` (Reveal yourself and remove your prop)
 
+`Numpad 5` -> `Reset Prop Position`
 
-The numpad can be used to move and rotate your prop within certain limits.
-Unfortunately these aren't configurable yet, but will be in a future update.
+While hiding, you can move your prop in a few ways, within a few limits. There are a few methods to move your prop, and you can change the one you use in the configuration.
+#### Numpad
 ```
 7 8 9      forward         up          back
 4 5 6       left      center/reset     right
 1 2 3     rot. left       down      rot. right
 ```
 
+#### Controller Left/Right Stick
+Press in the selected stick to change modes (Move in 2d space, move forward/back, rotate, stop movement), and move the stick to
+move the prop. An indicator will appear near your healthbar to indicate which movement mode you're in.
+
+#### Keyboard Movement
+Similar to the controller stick method, this uses your movement keys to move the prop. You can switch between modes by pressing
+the `taunt` button.
+
+
 ### Commands
 These commands can be used by pressing `Y` to open the SSMP chat
 - `/hunt` (starts a round of prop hunt)
 - `/stop` (stops the current round of prop hunt)
-- `/hitboxes` (enables viewing prop hitboxes, hiders only and meant for debug)
 - `/sync` (syncs the states of other players props)
 
 
 
 ## Roadmap
 These are just some things that I'd like to add in the future
-- Use a mode toggle system for prop movement
 - Add game configuration
 	- select number of seekers
 	- seeker wait time
 	- limit the number of prop swaps per player per round
-- Add more props
 
 ## Reporting Issues
 This is still a little beta at the moment. I haven't had many chances to test the multiplayer features, so please check your logs often.
