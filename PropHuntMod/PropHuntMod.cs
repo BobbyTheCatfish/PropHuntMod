@@ -265,7 +265,9 @@ namespace PropHuntMod
             }
 
             PropValidation.GetAllProps();
+#if DEBUG
             PropTesting.OnSceneChange();
+#endif
 
             if (PropHuntClient.GameState != GameState.NotStarted && !PropHuntClient.isSeeker)
             {
