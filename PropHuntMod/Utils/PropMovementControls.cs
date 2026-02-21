@@ -230,17 +230,8 @@ namespace PropHuntMod.Utils
             }
         }
 
-        Sprite CreateSubSprite(Texture2D src, int index)
-        {
-            Rect rect = new Rect(index * 500, 0, 500, 500);
-            return Sprite.Create(src, rect, new Vector2(0.5f, 0.5f), 50);
-        }
-
         void CreateMovementIndicator()
         {
-            var iconPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "movement-icons.png");
-            byte[] iconData = File.ReadAllBytes(iconPath);
-
             var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             var bundle = AssetBundle.LoadFromFile(Path.Combine(dir, "prophunt.bundle"));

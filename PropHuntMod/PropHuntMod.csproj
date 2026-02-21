@@ -175,7 +175,7 @@
     <Compile Include="Utils\NoRepeat.cs" />
     <Compile Include="PropHuntMod.cs" />
     <Compile Include="Utils\PropMovementControls.cs" />
-    <Compile Include="Utils\PropTesting.cs" Condition="'$(Configuration)' == 'Debug'"/>
+    <Compile Include="Utils\PropTesting.cs" Condition="'$(Configuration)' == 'Debug'" />
     <Compile Include="Utils\PropValidation.cs" />
     <!-- <Content Include="Assets\icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -235,7 +235,7 @@ set PLUGIN_DIR=H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\p
 set RELEASE_DIR=$(ProjectDir)\bin\release
 
 xcopy "$(TargetDir)" "%25PLUGIN_DIR%25" /E /I /Y
-cd "$(ProjectDir)\bin\Debug"
+cd "$(TargetDir)"
 tar -c -a -f "$(ProjectDir)\bin\PropHuntMod.zip" *</PostBuildEvent>
   </PropertyGroup>
 </Project>
