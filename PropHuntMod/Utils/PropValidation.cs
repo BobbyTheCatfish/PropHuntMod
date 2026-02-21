@@ -39,7 +39,8 @@ namespace PropHuntMod.Utils
             typeof(tk2dSpriteAnimationClip),
             typeof(tk2dSpriteAnimationFrame),
             typeof(tk2dLookAnimNPC),
-            typeof(CurveRotationAnimation)
+            typeof(CurveRotationAnimation),
+            typeof(JitterSelf),
         };
         static bool HasScript(GameObject obj)
         {
@@ -65,7 +66,7 @@ namespace PropHuntMod.Utils
                 return false;
             }
 
-            if (Regex.IsMatch(gameObject.name, "^pebble$|^junk_push|^Small_bell_push|^weaver_corpse_shrine", RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(gameObject.name, "^pebble$|^junk_push|^Small_bell_push|^weaver_corpse_shrine|^Weaver Corpse Glow", RegexOptions.IgnoreCase))
             {
                 //Log.LogInfo($"{gameObject.name} - banned");
                 return false;
@@ -87,7 +88,7 @@ namespace PropHuntMod.Utils
                 return false;
             }
 
-            if (renderer?.sprite?.name == "black_fader_moon")
+            if (renderer?.sprite?.name != null && ExtraProps.banned.Any(p => p == renderer.sprite.name))
             {
                 LogSpecificObj(gameObject.name, "black fader");
                 return false;
@@ -193,7 +194,7 @@ namespace PropHuntMod.Utils
             }
 
             PrepareAllProps(props);
-            //AddPropsToOutput(scene);
+            AddPropsToOutput(scene);
         }
         static void AddPropsToOutput(string scene)
         {
@@ -351,6 +352,12 @@ namespace PropHuntMod.Utils
                 Mathf.Abs(size.x),
                 Mathf.Abs(size.y)
             );
+
+            if ((collider.size.x > 20 && collider.size.y > 20) || collider.size.x >= 30 || collider.size.y >= 30)
+            {
+                Log.LogError($"Prop {prop.name} was too frickin big (${collider.size})");
+                return false;
+            }
 
             var body = prop.AddComponentIfNotPresent<Rigidbody2D>();
             body.bodyType = RigidbodyType2D.Kinematic;

@@ -85,6 +85,10 @@ namespace PropHuntMod
             clientApi.CommandManager.RegisterCommand(new Commands.ShowHitboxes());
             clientApi.CommandManager.RegisterCommand(new Commands.Sync());
 
+#if DEBUG
+            clientApi.CommandManager.RegisterCommand(new Commands.ToScene());
+#endif
+
             //clientApi.CommandManager.RegisterCommand(new Commands.ClientStartCommand());
             //clientApi.CommandManager.RegisterCommand(new Commands.ClientStopCommand());
         }

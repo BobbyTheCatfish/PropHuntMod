@@ -16,6 +16,8 @@ namespace PropHuntMod.Utils
         static string[] sceneProps;
         static string[] scenePrefixes;
         static string scenePrefix;
+        public static string[] global = { };
+        public static string[] banned = { };
 
         public static void Init()
         {
@@ -55,6 +57,8 @@ namespace PropHuntMod.Utils
             var key = json.Keys.FirstOrDefault(s => scene.StartsWith(s));
             Log.LogInfo("Key: " + key);
 
+            global = json["GLOBAL"];
+
             if (string.IsNullOrEmpty(key))
             {
                 Log.LogError("EPI: key not found");
@@ -67,6 +71,7 @@ namespace PropHuntMod.Utils
             Log.LogInfo("Props:", string.Join(", ", sceneProps));
             scenePrefix = key;
 
+            banned = json["BANNED"];
         }
 
         public static bool IsExtraProp(string scene, GameObject gameObject)
@@ -88,7 +93,8 @@ namespace PropHuntMod.Utils
             if (renderer?.sprite == null) return false;
             if (renderer.color.grayscale < 0.75f) return false;
 
-            bool result = sceneProps.Any(p => renderer.sprite.name.StartsWith(p));
+            bool result = global.Any(p => renderer.sprite.name.StartsWith(p)) || sceneProps.Any(p => renderer.sprite.name.StartsWith(p));
+            if (result && banned.Any(p => renderer.sprite.name == p)) result = false;
             //bool result = sceneProps.Any(p => gameObject.name.StartsWith(p) || renderer.sprite.name.StartsWith(p));
             return result;
         }

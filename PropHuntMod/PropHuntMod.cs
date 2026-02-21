@@ -64,8 +64,6 @@ namespace PropHuntMod
             Log.SetLogger(base.Logger);
             SSMP.Api.Client.ClientAddon.RegisterAddon(new PropHuntClient());
             SSMP.Api.Server.ServerAddon.RegisterAddon(new PropHuntServer());
-
-            FilteredLogs.API.ApplyFilter("Prop Hunt");
         }
         public static void Initialize(IClientApi clientApi)
         {
@@ -78,6 +76,10 @@ namespace PropHuntMod
             Harmony.CreateAndPatchAll(typeof(BaseCoverManager), "prophunt");
             modEnabled = true;
             //Harmony.CreateAndPatchAll(typeof(AttackCooldownPatches), "prophunt");
+
+#if DEBUG
+            showHitboxes = true;
+#endif
         }
 
         public static void Unload()
@@ -132,12 +134,14 @@ namespace PropHuntMod
                 if (logged == 0) Log.LogInfo("Input blocked");
                 logged = 1;
                 return;
-            } else if (logged == 1)
+            }
+            else if (logged == 1)
             {
                 Log.LogInfo("Input restored");
                 logged = 0;
             }
 
+#if DEBUG
             // Effects testing
             if (Input.GetKeyDown(KeyCode.O))
             {
@@ -171,6 +175,7 @@ namespace PropHuntMod
             {
                 PropTesting.PropPrevious();
             }
+#endif
 
             /**************
              *  KEYBINDS  *

@@ -13,6 +13,10 @@ namespace PropHuntMod.Utils
         public static void SetLogger(ManualLogSource log)
         {
             logger = log;
+
+#if DEBUG
+            FilteredLogs.API.ApplyFilter("Prop Hunt");
+#endif
         }
 
         public static void LogInfo(params object[] data)

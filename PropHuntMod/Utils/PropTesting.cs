@@ -130,7 +130,6 @@ namespace PropHuntMod.Utils
                 return;
             }
 
-            propIndex = 0;
             sceneIndex = index;
             var transition = transitions[index];
 
@@ -138,6 +137,19 @@ namespace PropHuntMod.Utils
             Warp.TryWarp(transition.scene, transition.transition);
         }
 
+        public static bool GoToScene(string sceneName)
+        {
+            var scene = transitions.FirstOrDefault(t => t.scene == sceneName);
+            if (scene == null)
+            {
+                scene = transitions.FirstOrDefault(t => t.scene.StartsWith(sceneName));
+            }
+
+            if (scene == null) return false;
+
+            Warp.TryWarp(scene.scene, scene.transition);
+            return true;
+        }
         public static void OnSceneChange()
         {
             if (transitions.Count == 0)
@@ -155,6 +167,7 @@ namespace PropHuntMod.Utils
                 return;
             }
 
+            propIndex = -1;
             sceneIndex = index;
         }
     }

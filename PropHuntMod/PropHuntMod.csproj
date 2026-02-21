@@ -48,7 +48,7 @@
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\core\BepInEx.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="FilteredLogs">
+    <Reference Include="FilteredLogs" Condition="'$(Configuration)' == 'Debug'">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\flibber-FilteredLogs-1.0.0\FilteredLogs.dll</HintPath>
       <Private>False</Private>
     </Reference>
@@ -62,7 +62,7 @@
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\Hollow Knight Silksong_Data\Managed\PlayMaker.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="QuickWarp">
+    <Reference Include="QuickWarp" Condition="'$(Configuration)' == 'Debug'">
       <HintPath>H:\SteamLibrary\steamapps\common\Hollow Knight Silksong\BepInEx\plugins\QuickWarp\QuickWarp.dll</HintPath>
       <Private>False</Private>
     </Reference>
@@ -175,7 +175,7 @@
     <Compile Include="Utils\NoRepeat.cs" />
     <Compile Include="PropHuntMod.cs" />
     <Compile Include="Utils\PropMovementControls.cs" />
-    <Compile Include="Utils\PropTesting.cs" />
+    <Compile Include="Utils\PropTesting.cs" Condition="'$(Configuration)' == 'Debug'"/>
     <Compile Include="Utils\PropValidation.cs" />
     <!-- <Content Include="Assets\icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
