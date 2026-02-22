@@ -17,6 +17,8 @@ You should be able to install this with any compatible installer/mod manager.
 3) Copy the extracted mod folder to the plugins folder (Example: `Plugins/PropHunt/PropHuntMod.dll`)
 
 
+> For mod support, you can find me (BobbyTheCatfish) in the [HK Modding](https://discord.gg/hollow-knight-modding-879125729936298015) and [HKMP](https://discord.gg/6nzXWhPpEf) Discord servers, as well as my [personal one](https://discord.gg/drv64CKZh4).
+
 ## Gameplay
 Before and between rounds (see [commands](#commands) section), players are free to switch between props and destroy other players' props. Each room has a different set of props you can hide as.
 > A list of each room's props can be found [here](https://docs.google.com/spreadsheets/d/1pxumrYVEBxFdBz4NKolcoCLyxjkwwWMmx7_CYVWZ0Qc).
@@ -48,6 +50,11 @@ Once a hider is found, they become a seeker.
 ## Usage
 > See the [SSMP usage documentation](https://thunderstore.io/c/hollow-knight-silksong/p/SSMP/SSMP/) for details on setting up or joining a server
 
+### FAQ
+- Does it matter which save file I use?
+	- Nope! You can be on any act, have whatever progress you want, and other people *should* be able to see your props just fine
+	- That being said, it'd probably be a good idea to be in a mostly completed act 2 file.
+
 ### Keybinds
 There are a few keybinds for this mod, which can be changed within BepInEx Configuration Manager.
 
@@ -70,8 +77,8 @@ Press in the selected stick to change modes (Move in 2d space, move forward/back
 move the prop. An indicator will appear near your healthbar to indicate which movement mode you're in.
 
 #### Keyboard Movement
-Similar to the controller stick method, this uses your movement keys to move the prop. You can switch between modes by pressing
-the `taunt` button.
+Similar to the controller stick method, this uses your movement keys to move the prop.
+You can switch between modes by pressing the `taunt` button.
 
 
 ### Commands
