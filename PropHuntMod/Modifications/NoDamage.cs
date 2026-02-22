@@ -57,5 +57,16 @@ namespace PropHuntMod.Modifications
         {
             return DisableAlertRange(__instance);
         }
+
+        // Prevent damage from props hiting cogs
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(CogMultiHitter), "OnTriggerEnter2D")]
+        public static bool CogDamage(CogMultiHitter __instance, Collider2D other)
+        {
+            Log.LogInfo("Cog doing damage");
+            if (other.GetComponent<TriggerHandler>()) return false;
+
+            return true;
+        }
     }
 }
