@@ -113,9 +113,9 @@ namespace PropHuntMod
 
             return winnerName;
         }
-        void PickSeekers(int count = 1)
+        void PickSeekers()
         {
-            count = Mathf.Clamp(count, 1, players.Count - 1);
+            var count = Mathf.Clamp(Config.SeekerCount, 1, players.Count - 1);
             Log.LogInfo($"Choosing {count} seekers");
             for (int i = 0; i < count; i++)
             {

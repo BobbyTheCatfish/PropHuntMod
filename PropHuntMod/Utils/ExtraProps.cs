@@ -30,7 +30,7 @@ namespace PropHuntMod.Utils
                 if (string.IsNullOrEmpty(prefix))
                 {
                     Log.LogDebug("EPI: Scene not in extra props list");
-                    Log.LogDebug(sceneProps?.Length);
+                    //Log.LogDebug(sceneProps?.Length);
                     sceneProps = null;
                     scenePrefix = null;
                     return;
@@ -39,7 +39,7 @@ namespace PropHuntMod.Utils
                 if (prefix == scenePrefix)
                 {
                     Log.LogDebug("EPI: Scene is same.");
-                    Log.LogDebug(sceneProps.Length);
+                    //Log.LogDebug(sceneProps.Length);
                     return;
                 }
             }
@@ -78,13 +78,13 @@ namespace PropHuntMod.Utils
         {
             if (string.IsNullOrEmpty(scene))
             {
-                Log.LogDebug("IEP: No scene name");
+                //Log.LogDebug("IEP: No scene name");
                 return false;
             }
 
             if (sceneProps == null)
             {
-                Log.LogDebug("IEP: No scene props");
+                //Log.LogDebug("IEP: No scene props");
                 return false;
             }
             //Log.LogError("success");

@@ -11,7 +11,6 @@ namespace PropHuntMod.Utils
         public const string ModVersion = "1.0.1";
         public const int SSMPApiVersion = 1;
         public const int MaxSwapCount = 0;
-        public const int SeekerCountdown = 30;
 
         public readonly static bool AllowDebugFeatures = false;
 
@@ -24,6 +23,9 @@ namespace PropHuntMod.Utils
         static ConfigEntry<KeyCode> _propPositionReset;
         static ConfigEntry<MovementMethods> _movementMethod;
 
+        static ConfigEntry<int> _seekerWaitTime;
+        static ConfigEntry<int> _seekerCount;
+
         public static bool DisableDamage => _disableDamage.Value && PropHuntClient.GameState != GameState.NotStarted;
         //public static float attackCooldown { get { return _attackCooldown.Value; } }
         public static KeyCode SwapPropKey => _swapPropKey.Value;
@@ -32,6 +34,9 @@ namespace PropHuntMod.Utils
 
         public static KeyCode PropPositionReset => _propPositionReset.Value;
         public static MovementMethods MovementMethod => _movementMethod.Value;
+
+        public static int SeekerCountdown => _seekerWaitTime.Value;
+        public static int SeekerCount => _seekerCount.Value;
 
         public static void LoadConfig(ConfigFile Config)
         {
@@ -45,6 +50,8 @@ namespace PropHuntMod.Utils
 
             _propPositionReset = Config.Bind("Prop Movement", "Reset Position", KeyCode.Keypad5, "Resets the prop position");
 
+            _seekerWaitTime = Config.Bind("Server Settings", "Seeker Wait Time", 30, "How long the seekers have to wait for before they can start seeking");
+            _seekerCount = Config.Bind("Server Settings", "Seeker Count", 1, "How many seekers per round?");
 
             if (AllowDebugFeatures)
             {
