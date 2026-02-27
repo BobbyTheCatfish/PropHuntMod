@@ -68,7 +68,7 @@ namespace PropHuntMod.Commands
             PlayerManager.EnsureAllPropCovers();
 
             var cover = SelfCoverManager.instance;
-            ClientNetwork.SendSync(cover.cover?.name ?? "", cover.CoverPath ?? "", cover.Position, cover.Rotation);
+            ClientNetwork.SendSync(cover.cover?.name ?? "", cover.CoverPath ?? "", cover.Position, cover.Rotation, cover.Scale);
         }
     }
 

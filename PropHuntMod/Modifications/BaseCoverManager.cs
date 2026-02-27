@@ -24,6 +24,8 @@ namespace PropHuntMod.Modifications
         internal bool isRemote = true;
         internal Vector3 Position => cover?.transform.localPosition ?? Vector3.zero;
         internal float Rotation => cover?.transform.GetLocalRotation2D() ?? 0;
+        internal float Scale { get; private set; } = 1;
+        internal Vector2 OriginalScale { get; private set; } = Vector3.one;
         public bool IsHiding => cover != null;
         public void SetPropLocation(Vector3 location)
         {
@@ -47,25 +49,40 @@ namespace PropHuntMod.Modifications
             cover.transform.SetLocalRotation2D(rotation);
         }
 
-        public void SetPropLocation(Vector3 location, float rotation)
+        public void SetPropScale(float scale)
+        {
+            Scale = scale;
+            if (!IsHiding)
+            {
+                Log.LogError("No cover, can't set prop scale");
+                return;
+            }
+
+            cover.transform.SetScale2D(OriginalScale * scale);
+        }
+
+        public void SetPropLocation(Vector3 location, float rotation, float scale)
         {
             if (!IsHiding)
             {
-                Log.LogError("No cover, can't set prop rotation");
+                Log.LogError("No cover, can't set any prop location");
                 return;
             }
-            ConstrainPropLocation(ref location, ref rotation);
+            ConstrainPropLocation(ref location, ref rotation, ref scale);
 
             SetPropLocation(location);
             SetPropLocation(rotation);
+            SetPropScale(scale);
         }
-        public static void ConstrainPropLocation(ref Vector3 location, ref float rotation)
+        public static void ConstrainPropLocation(ref Vector3 location, ref float rotation, ref float scale)
         {
-            location.x = Mathf.Clamp(location.x, -2, 2);
-            location.y = Mathf.Clamp(location.y, -4, 4);
-            location.z = Mathf.Clamp(location.z, -8, 8);
+            location.x = Mathf.Clamp(location.x, Consts.MIN_X, Consts.MAX_X);
+            location.y = Mathf.Clamp(location.y, Consts.MIN_Y, Consts.MAX_Y);
+            location.z = Mathf.Clamp(location.z, Consts.MIN_Z, Consts.MAX_Z);
 
             rotation %= 360;
+
+            scale = Mathf.Clamp(scale, Consts.MIN_S, Consts.MAX_S);
         }
 
         public virtual bool DisableProp(BaseHornetManager manager, bool logOnFail = true)
@@ -144,9 +161,11 @@ namespace PropHuntMod.Modifications
                 if (sprite != null)
                 {
                     sprite.enabled = true;
+                    sprite.maskInteraction = SpriteMaskInteraction.None;
                 }
 
-                SetPropLocation(Vector3.zero, 0);
+                OriginalScale = (Vector2)cover.transform.lossyScale;
+                SetPropLocation(Vector3.zero, 0, 1);
 
                 cover.SetActive(true);
 

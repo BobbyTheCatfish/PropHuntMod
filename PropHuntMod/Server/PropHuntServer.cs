@@ -139,6 +139,7 @@ namespace PropHuntMod
                 player.swapCount = 0;
                 player.propName = "";
                 player.propRotation = 0;
+                player.propScale = 1;
                 player.propLocation = Vector3.zero;
                 player.hidden = false;
             }

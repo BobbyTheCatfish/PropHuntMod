@@ -34,6 +34,7 @@ namespace PropHuntMod.Utils.Networking.FromClient
         public bool DropReliableDataIfNewerExists => true;
         public Vector3 PropPosition { get; set; }
         public float PropRotation { get; set; }
+        public float PropScale { get; set; }
         public virtual void WriteData(IPacket packet)
         {
             packet.Write(PropPosition.x);
@@ -41,12 +42,14 @@ namespace PropHuntMod.Utils.Networking.FromClient
             packet.Write(PropPosition.z);
 
             packet.Write(PropRotation);
+            packet.Write(PropScale);
         }
 
         public virtual void ReadData(IPacket packet)
         {
             PropPosition = new Vector3(packet.ReadFloat(), packet.ReadFloat(), packet.ReadFloat());
             PropRotation = packet.ReadFloat();
+            PropScale = packet.ReadFloat();
         }
     }
     public class HideStatus : IPacketData
@@ -90,6 +93,7 @@ namespace PropHuntMod.Utils.Networking.FromClient
         public string PropPath { get; set; }
         public Vector3 PropLocation { get; set; }
         public float PropRotation { get; set; }
+        public float PropScale { get; set; }
 
         public virtual void WriteData(IPacket packet)
         {
@@ -101,6 +105,7 @@ namespace PropHuntMod.Utils.Networking.FromClient
             packet.Write(PropLocation.z);
             
             packet.Write(PropRotation);
+            packet.Write(PropScale);
         }
 
         public virtual void ReadData(IPacket packet)
@@ -110,6 +115,7 @@ namespace PropHuntMod.Utils.Networking.FromClient
 
             PropLocation = new Vector3(packet.ReadFloat(), packet.ReadFloat(), packet.ReadFloat());
             PropRotation = packet.ReadFloat();
+            PropScale = packet.ReadFloat();
         }
     }
 

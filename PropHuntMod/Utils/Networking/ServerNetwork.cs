@@ -122,16 +122,17 @@ namespace PropHuntMod.Utils.Networking
         }
 
 
-        public static void ForwardPropLocation(ushort id, Vector3 propPosition, float propRotation)
+        public static void ForwardPropLocation(ushort id, Vector3 propPosition, float propRotation, float propScale)
         {
-            Log.LogInfo($"Broadcasting prop location from {id}: {propPosition}, {propRotation}");
+            Log.LogInfo($"Broadcasting prop location from {id}: {propPosition}, {propRotation}, {propScale}");
 
-            BaseCoverManager.ConstrainPropLocation(ref propPosition, ref propRotation);
+            BaseCoverManager.ConstrainPropLocation(ref propPosition, ref propRotation, ref propScale);
             Broadcast(id, CustomPackets.PropLocation, new FromServer.PropLocation
             {
                 Id= id,
                 PropPosition = propPosition,
-                PropRotation = propRotation
+                PropRotation = propRotation,
+                PropScale = propScale
             });
         }
 
@@ -254,11 +255,12 @@ namespace PropHuntMod.Utils.Networking
 
             player.propLocation = data.PropPosition;
             player.propRotation = data.PropRotation;
+            player.propScale = data.PropScale;
 
             // Constrain location
-            BaseCoverManager.ConstrainPropLocation(ref player.propLocation, ref player.propRotation);
+            BaseCoverManager.ConstrainPropLocation(ref player.propLocation, ref player.propRotation, ref player.propScale);
 
-            ForwardPropLocation(id, player.propLocation, player.propRotation);
+            ForwardPropLocation(id, player.propLocation, player.propRotation, player.propScale);
         }
         
         static void OnSync(ushort id, FromClient.Sync data)
@@ -269,8 +271,9 @@ namespace PropHuntMod.Utils.Networking
             {
                 player.propName = "";
                 player.propPath = "";
-                player.propRotation = 0;
                 player.propLocation = Vector3.zero;
+                player.propRotation = 0;
+                player.propScale = 1;
             }
             else
             {
@@ -278,12 +281,13 @@ namespace PropHuntMod.Utils.Networking
                 player.propPath = data.PropPath;
                 player.propLocation = data.PropLocation;
                 player.propRotation = data.PropRotation;
+                player.propScale = data.PropRotation;
             }
 
-            BaseCoverManager.ConstrainPropLocation(ref player.propLocation, ref player.propRotation);
+            BaseCoverManager.ConstrainPropLocation(ref player.propLocation, ref player.propRotation, ref player.propScale);
 
             ForwardPropSwap(id, player.propName, player.propPath);
-            ForwardPropLocation(id, player.propLocation, player.propRotation);
+            ForwardPropLocation(id, player.propLocation, player.propRotation, player.propScale);
 
             PropHuntServer.instance.CheckGameOver(player.PlayerAvatar);
         }
@@ -344,6 +348,7 @@ namespace PropHuntMod.Utils.Networking
             owner.propName = null;
             owner.propLocation = Vector3.zero;
             owner.propRotation = 0;
+            owner.propScale = 1;
 
             ForwardPropFound(id, data.PropOwnerID);
 

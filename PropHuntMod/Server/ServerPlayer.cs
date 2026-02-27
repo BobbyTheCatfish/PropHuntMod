@@ -17,6 +17,7 @@ namespace PropHuntMod.Server
         public string propPath;
         public Vector3 propLocation = Vector3.zero;
         public float propRotation = 0;
+        public float propScale = 1;
         public IServerPlayer PlayerAvatar => PropHuntServer._serverApi.ServerManager.GetPlayer(id);
         public int swapCount = 0;
         public ServerPlayer(ushort id)

@@ -25,13 +25,14 @@ namespace PropHuntMod.Utils.Networking
             });
         }
 
-        public static void SendPropLocation(Vector3 propPosition, float propRotation)
+        public static void SendPropLocation(Vector3 propPosition, float propRotation, float propScale)
         {
-            Log.LogInfo($"Sending prop location: {propPosition}, {propRotation}");
+            Log.LogInfo($"Sending prop location: {propPosition}, {propRotation}, {propScale}");
             sender.SendSingleData(CustomPackets.PropLocation, new FromClient.PropLocation
             {
                 PropPosition = propPosition,
-                PropRotation = propRotation
+                PropRotation = propRotation,
+                PropScale = propScale
             });
         }
 
@@ -54,15 +55,16 @@ namespace PropHuntMod.Utils.Networking
             });
         }
 
-        public static void SendSync(string propName, string propPath, Vector3 propPosition, float propRotation)
+        public static void SendSync(string propName, string propPath, Vector3 propPosition, float propRotation, float propScale)
         {
-            Log.LogInfo($"Sending sync data: {propName}, {propPosition}, {propRotation}");
+            Log.LogInfo($"Sending sync data: {propName}, {propPosition}, {propRotation}, {propScale}");
             sender.SendSingleData(CustomPackets.Sync, new FromClient.Sync
             {
                 PropName = propName,
                 PropPath = propPath,
                 PropLocation = propPosition,
-                PropRotation = propRotation
+                PropRotation = propRotation,
+                PropScale = propScale
             });
         }
 
@@ -133,9 +135,9 @@ namespace PropHuntMod.Utils.Networking
         static void OnPropLocation(FromServer.PropLocation data)
         {
             PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
-            player.SetPropLocation(data.PropPosition, data.PropRotation);
+            player.SetPropLocation(data.PropPosition, data.PropRotation, data.PropScale);
 
-            Log.LogInfo($"{data.Id} prop moved to {data.PropPosition}, {data.PropRotation}");
+            Log.LogInfo($"{data.Id} prop moved to {data.PropPosition}, {data.PropRotation}, {data.PropScale}");
         }
 
         static void OnHideStatus(FromServer.HideStatus data)

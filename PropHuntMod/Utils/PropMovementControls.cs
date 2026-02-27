@@ -1,4 +1,5 @@
-﻿using InControl;
+﻿using HutongGames.PlayMaker;
+using InControl;
 using PropHuntMod.Modifications;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace PropHuntMod.Utils
         static Sprite MoveXY;
         static Sprite MoveZ;
         static Sprite Rotate;
+        static Sprite Scale;
 
         bool moved = false;
 
@@ -36,9 +38,16 @@ namespace PropHuntMod.Utils
 
         void ChangeModes()
         {
+            if (!SelfCoverManager.instance.IsHiding)
+            {
+                SetMovementState(MovementState.Normal);
+                return;
+            }
+
             if (MovementState == MovementState.Normal) SetMovementState(MovementState.Move2D);
             else if (MovementState == MovementState.Move2D) SetMovementState(MovementState.MoveZ);
-            else if (MovementState == MovementState.MoveZ) SetMovementState(MovementState.Rotate);
+            else if (MovementState == MovementState.MoveZ) SetMovementState(MovementState.Scale);
+            else if (MovementState == MovementState.Scale) SetMovementState(MovementState.Rotate);
             else SetMovementState(MovementState.Normal);
 
             return;
@@ -72,25 +81,21 @@ namespace PropHuntMod.Utils
             return false;
         }
 
-        void ControllerUpdate(bool rightStick = true)
+        void NonKeypadUpdate(OneAxisInputControl switchModeButton, OneAxisInputControl left, OneAxisInputControl right, OneAxisInputControl up, OneAxisInputControl down, bool useValue)
         {
-            var stick = rightStick ? InputManager.ActiveDevice.RightStick : InputManager.ActiveDevice.LeftStick;
-            if (stick == null) return;
+            left.Enabled = true;
+            right.Enabled = true;
+            up.Enabled = true;
+            down.Enabled = true;
+            switchModeButton.Enabled = true;
+            InputHandler.Instance.inputActions.Dash.Enabled = true;
 
-            stick.Left.Enabled = true;
-            stick.Right.Enabled = true;
-            stick.Up.Enabled = true;
-            stick.Down.Enabled = true;
-
-            var modeButton = rightStick ? InputManager.ActiveDevice.RightStickButton : InputManager.ActiveDevice.LeftStickButton;
-            modeButton.Enabled = true;
-
-            if (modeButton.IsPressed && !ModeSwitchPressed)
+            if (switchModeButton.IsPressed && !ModeSwitchPressed)
             {
                 ChangeModes();
                 ModeSwitchPressed = true;
             }
-            else if (!modeButton.IsPressed)
+            else if (!switchModeButton.IsPressed)
             {
                 ModeSwitchPressed = false;
             }
@@ -99,20 +104,36 @@ namespace PropHuntMod.Utils
             if (MovementState == MovementState.Move2D)
             {
                 // move left or right, not both
-                if (!CheckStick(stick.Left, Direction.Left)) CheckStick(stick.Right, Direction.Right);
+                if (!CheckStick(left, Direction.Left, useValue)) CheckStick(right, Direction.Right, useValue);
                 // move up or down, not both
-                if (!CheckStick(stick.Up, Direction.Up)) CheckStick(stick.Down, Direction.Down);
+                if (!CheckStick(up, Direction.Up, useValue)) CheckStick(down, Direction.Down, useValue);
             }
             else if (MovementState == MovementState.MoveZ)
             {
-                if (!CheckStick(stick.Left, Direction.Back)) CheckStick(stick.Right, Direction.Front);
-                if (!CheckStick(stick.Up, Direction.Back)) CheckStick(stick.Down, Direction.Front);
+                if (!CheckStick(left, Direction.Back, useValue)) CheckStick(right, Direction.Front, useValue);
+                if (!CheckStick(up, Direction.Back, useValue)) CheckStick(down, Direction.Front, useValue);
+            }
+            else if (MovementState == MovementState.Scale)
+            {
+                if (!CheckStick(left, Direction.ScaleUp, useValue)) CheckStick(right, Direction.ScaleDown, useValue);
+                if (!CheckStick(up, Direction.ScaleUp, useValue)) CheckStick(down, Direction.ScaleDown, useValue);
             }
             else if (MovementState == MovementState.Rotate)
             {
                 // rotate left or right, not both
-                if (!CheckStick(stick.Left, Direction.RotateLeft)) CheckStick(stick.Right, Direction.RotateRight);
+                if (!CheckStick(left, Direction.RotateLeft, useValue)) CheckStick(right, Direction.RotateRight, useValue);
             }
+        }
+
+        void ControllerUpdate(bool rightStick = true)
+        {
+            var stick = rightStick ? InputManager.ActiveDevice.RightStick : InputManager.ActiveDevice.LeftStick;
+            if (stick == null) return;
+
+            var modeButton = rightStick ? InputManager.ActiveDevice.RightStickButton : InputManager.ActiveDevice.LeftStickButton;
+            if (modeButton == null) return;
+
+            NonKeypadUpdate(modeButton, stick.Left, stick.Right, stick.Up, stick.Down, true);
         }
 
         void NumpadUpdate()
@@ -128,44 +149,16 @@ namespace PropHuntMod.Utils
 
             cover.MoveProp(Direction.RotateLeft, KeyCode.Keypad1, ref moved);
             cover.MoveProp(Direction.RotateRight, KeyCode.Keypad3, ref moved);
+
+            cover.MoveProp(Direction.ScaleUp, KeyCode.KeypadPlus, ref moved);
+            cover.MoveProp(Direction.ScaleDown, KeyCode.KeypadMinus, ref moved);
             //cover.MoveProp(Direction.Reset, KeyCode.Keypad5, ref moved, true); // Probably handled by ResetPosition()
         }
 
         void KeyboardUpdate()
         {
             var actions = InputHandler.Instance.inputActions;
-
-            actions.Left.Enabled = true;
-            actions.Right.Enabled = true;
-            actions.Up.Enabled = true;
-            actions.Down.Enabled = true;
-            actions.Taunt.Enabled = true;
-            actions.Dash.Enabled = true;
-
-            if (actions.Taunt.IsPressed && !ModeSwitchPressed)
-            {
-                ChangeModes();
-                ModeSwitchPressed = true;
-            }
-            else if (!actions.Taunt.IsPressed)
-            {
-                ModeSwitchPressed = false;
-            }
-
-            if (MovementState == MovementState.Move2D)
-            {
-                if (!CheckStick(actions.Left, Direction.Up, false)) CheckStick(actions.Right, Direction.Right, false);
-                if (!CheckStick(actions.Up, Direction.Up, false)) CheckStick(actions.Down, Direction.Down, false);
-            }
-            else if (MovementState == MovementState.MoveZ)
-            {
-                if (!CheckStick(actions.Left, Direction.Back, false)) CheckStick(actions.Right, Direction.Front, false);
-                if (!CheckStick(actions.Up, Direction.Back, false)) CheckStick(actions.Down, Direction.Front, false);
-            }
-            else if (MovementState == MovementState.Rotate)
-            {
-                if (!CheckStick(actions.Left, Direction.RotateLeft, false)) CheckStick(actions.Right, Direction.RotateRight, false);
-            }
+            NonKeypadUpdate(actions.Taunt, actions.Left, actions.Right, actions.Up, actions.Down, false);
         }
 
         public void Update()
@@ -230,6 +223,9 @@ namespace PropHuntMod.Utils
                 case MovementState.MoveZ:
                     StateIndicator.sprite = MoveZ;
                     break;
+                case MovementState.Scale:
+                    StateIndicator.sprite = Scale;
+                    break;
                 case MovementState.Rotate:
                     StateIndicator.sprite = Rotate;
                     break;
@@ -252,6 +248,7 @@ namespace PropHuntMod.Utils
             MoveXY = assets.First(a => a.name == "MoveXY");
             MoveZ = assets.First(a => a.name == "MoveZ");
             Rotate = assets.First(a => a.name == "Rotate");
+            Scale = assets.First(a => a.name == "Scale");
 
             bundle.Unload(false);
 

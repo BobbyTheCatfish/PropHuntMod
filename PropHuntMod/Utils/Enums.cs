@@ -44,6 +44,7 @@ namespace PropHuntMod.Utils
         Normal,
         Move2D,
         MoveZ,
+        Scale,
         Rotate
     }
 
@@ -53,5 +54,20 @@ namespace PropHuntMod.Utils
         KeyboardMovement,
         ControllerRightStick,
         ControllerLeftStick,
+    }
+
+    internal static class Consts
+    {
+        public const int MIN_X = -2;
+        public const int MAX_X = 2;
+
+        public const int MIN_Y = -4;
+        public const int MAX_Y = 4;
+
+        public const int MIN_Z = -8;
+        public const int MAX_Z = 8;
+
+        public const float MIN_S = 0.5f;
+        public const float MAX_S = 2f;
     }
 }

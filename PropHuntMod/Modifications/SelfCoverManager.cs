@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace PropHuntMod.Modifications
 {
-    enum Direction { Left, Right, Up, Down, Front, Back, Reset, RotateLeft, RotateRight };
+    enum Direction { Left, Right, Up, Down, Front, Back, Reset, RotateLeft, RotateRight, ScaleUp, ScaleDown };
     internal class SelfCoverManager : BaseCoverManager
     {
         public static SelfCoverManager instance;
@@ -45,7 +45,8 @@ namespace PropHuntMod.Modifications
             var x = Position.x;
             var y = Position.y;
             var z = Position.z;
-            var rotation = this.Rotation;
+            var rotation = Rotation;
+            var scale = Scale;
 
             SelfHornetManager hornet = SelfHornetManager.instance;
             if (!hornet.HornetExists()) return;
@@ -65,6 +66,8 @@ namespace PropHuntMod.Modifications
             else if (direction == Direction.Down) y -= distance;
             else if (direction == Direction.Front) z -= distance;
             else if (direction == Direction.Back) z += distance;
+            else if (direction == Direction.ScaleUp) scale *= (1 + distance / 5);
+            else if (direction == Direction.ScaleDown) scale /= (1 + distance / 5);
             else if (direction == Direction.RotateLeft)
             {
                 if (flipped) rotation -= distance * 10;
@@ -81,6 +84,7 @@ namespace PropHuntMod.Modifications
                 y = 0;
                 z = 0;
                 rotation = 0;
+                scale = 1;
             }
             else
             {
@@ -91,7 +95,7 @@ namespace PropHuntMod.Modifications
 
             //Log.LogInfo($"Hornet position: {hornet.hornet.transform.position}");
             Vector3 newLocation = new Vector3(x, y, z);
-            SetPropLocation(newLocation, rotation);
+            SetPropLocation(newLocation, rotation, scale);
             movedRecently = true;
         }
 
@@ -105,7 +109,7 @@ namespace PropHuntMod.Modifications
             }
 
             movedRecently = false;
-            ClientNetwork.SendPropLocation(Position, Rotation);
+            ClientNetwork.SendPropLocation(Position, Rotation, Scale);
         }
 
         public void EnableRandomProp()

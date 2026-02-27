@@ -17,6 +17,7 @@ namespace PropHuntMod.Modifications
         public string currentCoverObjPath = "";
         public Vector3 currentCoverObjLocation = Vector3.zero;
         public float currentCoverObjRotation = 0;
+        public float currentCoverObjScale = 1;
         public bool currentHideState = false;
         public PlayerID playerID;
 
@@ -93,7 +94,7 @@ namespace PropHuntMod.Modifications
                 }
 
                 coverManager.EnableProp(hornetManager, cover);
-                coverManager.SetPropLocation(currentCoverObjLocation, currentCoverObjRotation);
+                coverManager.SetPropLocation(currentCoverObjLocation, currentCoverObjRotation, currentCoverObjScale);
                 
                 // destroy since enableprop instantiates it
                 GameObject.Destroy(cover.go);
@@ -132,14 +133,15 @@ namespace PropHuntMod.Modifications
             EnsurePropCover();
         }
 
-        public void SetPropLocation(Vector3 location, float rotation)
+        public void SetPropLocation(Vector3 location, float rotation, float scale)
         {
             currentCoverObjLocation = location;
             currentCoverObjRotation = rotation;
+            currentCoverObjScale = scale;
 
             if (IsHostInSameRoom())
             {
-                coverManager.SetPropLocation(location, rotation);
+                coverManager.SetPropLocation(location, rotation, scale);
             }
         }
 
@@ -154,7 +156,7 @@ namespace PropHuntMod.Modifications
 
         public void ResetCoverPosition()
         {
-            SetPropLocation(Vector3.zero, 0);
+            SetPropLocation(Vector3.zero, 0, 1);
         }
 
         public static void EnsureAllPropCovers()
