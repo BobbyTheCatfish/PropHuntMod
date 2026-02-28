@@ -1,6 +1,5 @@
-﻿using PropHuntMod.Server;
-using PropHuntMod.Utils;
-using PropHuntMod.Utils.Networking;
+﻿using PropHuntMod.Utils;
+using PropHuntMod.Networking;
 using SSMP.Api.Server;
 using SSMP.Game.Settings;
 using System;
@@ -8,16 +7,16 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace PropHuntMod
+namespace PropHuntMod.Networking.Server
 {
-    public class PropHuntServer : ServerAddon
+    internal class Server : ServerAddon
     {
         protected override string Name => Config.ModName;
         protected override string Version => Config.ModVersion;
         public override uint ApiVersion => Config.SSMPApiVersion;
         public override bool NeedsNetwork => true;
 
-        public static PropHuntServer instance;
+        public static Server instance;
 
         public static GameState GameState = GameState.NotStarted;
         public SeekerTimer SeekerTimer { get; private set; }
@@ -25,12 +24,12 @@ namespace PropHuntMod
         readonly static Dictionary<ushort, ServerPlayer> players = new Dictionary<ushort, ServerPlayer>();
 
 
-        internal static IServerApi _serverApi = null;
+        internal static IServerApi api = null;
 
         public override void Initialize(IServerApi serverApi)
         {
             instance = this;
-            _serverApi = serverApi;
+            api = serverApi;
             this.Logger.Info("Prop Hunt Loaded.");
 
             Reset();
@@ -68,9 +67,9 @@ namespace PropHuntMod
 
             if (disconnect)
             {
-                foreach (var player in _serverApi.ServerManager.Players)
+                foreach (var player in api.ServerManager.Players)
                 {
-                    _serverApi.ServerManager.DisconnectPlayer(player.Id, SSMP.Networking.Packet.Data.DisconnectReason.Shutdown);
+                    api.ServerManager.DisconnectPlayer(player.Id, SSMP.Networking.Packet.Data.DisconnectReason.Shutdown);
                 }
             }
 
@@ -92,12 +91,12 @@ namespace PropHuntMod
         public void Announce(string announcement)
         {
             Log.LogInfo($"Announcement: {announcement}");
-            _serverApi.ServerManager.BroadcastMessage(announcement);
+            api.ServerManager.BroadcastMessage(announcement);
         }
         public void Message(ushort recipientID, string message)
         {
             Log.LogInfo($"Message to {recipientID}: {message}");
-            _serverApi.ServerManager.SendMessage(recipientID, message);
+            api.ServerManager.SendMessage(recipientID, message);
         }
         public string DetermineWinner()
         {

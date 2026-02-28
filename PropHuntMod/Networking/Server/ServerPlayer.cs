@@ -1,12 +1,7 @@
 ﻿using SSMP.Api.Server;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PropHuntMod.Server
+namespace PropHuntMod.Networking.Server
 {
     internal class ServerPlayer
     {
@@ -18,7 +13,7 @@ namespace PropHuntMod.Server
         public Vector3 propLocation = Vector3.zero;
         public float propRotation = 0;
         public float propScale = 1;
-        public IServerPlayer PlayerAvatar => PropHuntServer._serverApi.ServerManager.GetPlayer(id);
+        public IServerPlayer PlayerAvatar => Server.api.ServerManager.GetPlayer(id);
         public int swapCount = 0;
         public ServerPlayer(ushort id)
         {

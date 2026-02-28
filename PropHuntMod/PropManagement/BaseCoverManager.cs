@@ -1,15 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using PropHuntMod.Utils.Networking;
+﻿using UnityEngine;
+using PropHuntMod.Networking.Client;
 using PropHuntMod.Utils;
-//using SilksongMultiplayer.NetworkData;
 using GlobalEnums;
 using System;
-using System.Timers;
-using SSMP.Api.Client;
+using PropHuntMod.Players;
 
-namespace PropHuntMod.Modifications
+namespace PropHuntMod.Props
 {
     using PlayerID = UInt16;
     internal class BaseCoverManager
@@ -38,7 +34,7 @@ namespace PropHuntMod.Modifications
             cover.transform.localPosition = location;
         }
 
-        public void SetPropLocation(float rotation)
+        public void SetPropRotation(float rotation)
         {
             if (!IsHiding)
             {
@@ -71,7 +67,7 @@ namespace PropHuntMod.Modifications
             ConstrainPropLocation(ref location, ref rotation, ref scale);
 
             SetPropLocation(location);
-            SetPropLocation(rotation);
+            SetPropRotation(rotation);
             SetPropScale(scale);
         }
         public static void ConstrainPropLocation(ref Vector3 location, ref float rotation, ref float scale)
@@ -125,7 +121,7 @@ namespace PropHuntMod.Modifications
             // Can't do anything
             if (prop == null)
             {
-                PropHuntClient.LocalMessage("There isn't any valid cover here. Try another room.");
+                Client.LocalMessage("There isn't any valid cover here. Try another room.");
                 Log.LogError("No valid cover found");
                 return false;
             }
@@ -186,87 +182,6 @@ namespace PropHuntMod.Modifications
             return true;
         }
 
-        //private int[] invalidLayers = { 11, 17 };
-        //private List<GameObject> GetAllProps()
-        //{
-        //    GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
-        //    List<GameObject> props = new List<GameObject>();
-        //    foreach (GameObject gameObject in allGameObjects)
-        //    {
-        //        if (
-        //            HasScript(gameObject)
-        //            //|| (gameObject.name.ToLower().Contains("pilgrim"))
-        //            || (gameObject.name.ToLower().Contains("corpse"))
-        //            // || gameObject.layer == 19
-        //            || gameObject.tag == "RespawnPoint"
-        //        )
-        //        {
-        //            SpriteRenderer GetRenderer(GameObject go)
-        //            {
-        //                var ren = go.GetComponent<SpriteRenderer>();
-        //                if (ren != null && ren.sprite == null)
-        //                {
-        //                    ren = go.GetComponentsInChildren<SpriteRenderer>().Where(s => s.sprite != null).FirstOrDefault();
-        //                }
-        //                return ren;
-        //            }
-        //            //Log.LogInfo($"{gameObject.name} - {gameObject.layer} MAYBE");
-                    
-        //            var renderer = GetRenderer(gameObject);
-        //            if (
-        //                ((renderer && renderer.enabled) || gameObject.GetComponent<tk2dSprite>())
-        //                && !invalidLayers.Contains(gameObject.layer)
-        //                && gameObject.activeInHierarchy
-        //                && !Regex.IsMatch(gameObject.name, "\\(\\d+\\)? ?(\\(Clone\\))?$")
-        //                && !Regex.IsMatch(gameObject.name, "pebble|junk_push|Small_bell_push|weaver_corpse_shrine", RegexOptions.IgnoreCase)
-        //            )
-        //            {
-        //                if (props.Any(o => {
-        //                    Log.LogInfo("Getting sprite renderer");
-        //                    try
-        //                    {
-        //                        //Log.LogInfo(renderer);
-        //                        Log.LogInfo(renderer.sprite);
-        //                        //Log.LogInfo(renderer.sprite.texture);
-        //                        //Log.LogInfo(renderer.sprite.texture.name);
-        //                        var ren = GetRenderer(o);
-        //                        Log.LogInfo(ren.sprite);
-        //                        if (ren == null || ren.sprite == null || renderer == null) return false;
-        //                        return ren.sprite.name == renderer.sprite.name;
-        //                    }
-        //                    catch (Exception e)
-        //                    {
-        //                        Log.LogError($"{gameObject.name} failed, not a real object?");
-        //                        Log.LogError(e);
-        //                        return true;
-        //                    }
-        //                }))
-        //                {
-        //                    continue;
-        //                }
-
-        //                Log.LogInfo($"{gameObject.name} - {gameObject.layer} YES");
-        //                props.Add(gameObject);
-        //            }
-        //        }
-        //    }
-
-        //    AddPropsToOutput(props);
-        //    return props;
-        //}
-
-        //private bool HasScript(GameObject obj)
-        //{
-        //    return (
-        //        obj.GetComponent<Breakable>()
-        //        || obj.GetComponent<PlayMakerNPC>()
-        //        || obj.GetComponent<BasicNPC>()
-        //        || obj.GetComponent<QuestBoardInteractable>()
-        //        || obj.GetComponent<PushableRubble>()
-        //        || obj.GetComponent<GrassCut>()
-        //    );
-        //}
-
         public virtual void OnHit(TriggerHandler handler)
         {
             //DisableProp(PlayerManager.GetPlayerManager(playerID).hornetManager);
@@ -296,7 +211,7 @@ namespace PropHuntMod.Modifications
                 return;
             }
             //Log.LogInfo($"{other.name} - {other.tag}");
-            if (other.tag == "Nail Attack" && (PropHuntClient.GameState == Utils.GameState.Playing ? PropHuntClient.isSeeker : !SelfCoverManager.instance.IsHiding))
+            if (other.tag == "Nail Attack" && (Client.GameState == Utils.GameState.Playing ? Client.isSeeker : !SelfCoverManager.instance.IsHiding))
             {
                 if (!other.GetComponentInParent<HeroController>()) return;
                 PlayerManager.GetPlayerManager(playerID).coverManager.OnHit(this);

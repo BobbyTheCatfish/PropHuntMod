@@ -1,10 +1,11 @@
-﻿using PropHuntMod.Utils;
+﻿using PropHuntMod.Props;
+using PropHuntMod.Utils;
 using SSMP.Api.Client;
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace PropHuntMod.Modifications
+namespace PropHuntMod.Players
 {
     using PlayerID = UInt16;
     internal class PlayerManager

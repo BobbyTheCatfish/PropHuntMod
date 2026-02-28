@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace PropHuntMod.Modifications
+namespace PropHuntMod.Utils
 {
     internal class EffectVerticalSweep : MonoBehaviour
     {

@@ -2,8 +2,9 @@
 using HarmonyLib;
 using UnityEngine;
 using PropHuntMod.Utils;
+using PropHuntMod.Props;
 
-namespace PropHuntMod.Modifications
+namespace PropHuntMod.Patches
 {
     internal class NoDamage
     {

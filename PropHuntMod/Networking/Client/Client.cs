@@ -1,24 +1,17 @@
-﻿using BepInEx;
-using HarmonyLib;
-using UnityEngine;
-using System.Collections.Generic;
-using PropHuntMod.Utils;
+﻿using PropHuntMod.Utils;
 using SSMP.Api.Client;
 using SSMP.Game;
-using System.Linq;
-using PropHuntMod.Utils.Networking;
-using PropHuntMod.Modifications;
-using UnityEngine.SceneManagement;
+using PropHuntMod.Players;
 
-namespace PropHuntMod
+namespace PropHuntMod.Networking.Client
 {
-    public enum Teams
+    internal enum Teams
     {
-        Hunter = SSMP.Game.Team.Lifeblood,
-        Seeker = SSMP.Game.Team.Grimm
+        Hunter = Team.Lifeblood,
+        Seeker = Team.Grimm
     }
 
-    public class PropHuntClient : ClientAddon
+    internal class Client : ClientAddon
     {
         protected override string Name => Config.ModName;
         protected override string Version => Config.ModVersion;
@@ -58,7 +51,7 @@ namespace PropHuntMod
                 propSwaps = 0;
                 maxPropSwaps = 0;
                 PropHuntMod.playerManager.Clear();
-                PropHuntServer.instance.Reset(true);
+                Server.Server.instance.Reset(true);
             };
 
             // Handle connects and disconnects

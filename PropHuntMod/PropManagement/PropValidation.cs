@@ -1,6 +1,7 @@
 ﻿using GlobalEnums;
 using NoRepeat;
-using PropHuntMod.Modifications;
+using PropHuntMod.Players;
+using PropHuntMod.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +11,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace PropHuntMod.Utils
+namespace PropHuntMod.Props
 {
     public class Prop
     {

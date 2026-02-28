@@ -1,13 +1,7 @@
 ﻿using PropHuntMod.Utils;
-using PropHuntMod.Utils.Networking;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
 
-namespace PropHuntMod.Server
+namespace PropHuntMod.Networking.Server
 {
     public class SeekerTimer
     {
@@ -37,14 +31,14 @@ namespace PropHuntMod.Server
                 timer = null;
 
                 // send data
-                PropHuntServer.instance.Announce("[Seekers]: Ready or not, here we come!");
-                PropHuntServer.GameState = GameState.Playing;
+                Server.instance.Announce("[Seekers]: Ready or not, here we come!");
+                Server.GameState = GameState.Playing;
                 ServerNetwork.BroadcastSeekerStart();
 
             }
             else if (seconds <= 5)
             {
-                PropHuntServer.instance.Announce($"[Seekers]: {seconds}...");
+                Server.instance.Announce($"[Seekers]: {seconds}...");
             }
         }
 

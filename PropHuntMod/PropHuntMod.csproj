@@ -144,43 +144,42 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands.cs" />
-    <Compile Include="Modifications\AttackCooldown.cs" />
-    <Compile Include="Modifications\EffectVerticalSweep.cs" />
-    <Compile Include="Modifications\NoDamage.cs" />
-    <Compile Include="Modifications\PlayerManager.cs" />
-    <Compile Include="Modifications\SelfCoverManager.cs" />
-    <Compile Include="Modifications\SelfHornetManager.cs" />
-    <Compile Include="Modifications\EffectsManager.cs" />
+    <Compile Include="Networking\Commands.cs" />
+    <Compile Include="Patches\AttackCooldown.cs" />
+    <Compile Include="Patches\ScenePatches.cs" />
+    <Compile Include="Utils\Effects\EffectVerticalSweep.cs" />
+    <Compile Include="Patches\NoDamage.cs" />
+    <Compile Include="PlayerManagement\PlayerManager.cs" />
+    <Compile Include="PropManagement\SelfCoverManager.cs" />
+    <Compile Include="PlayerManagement\SelfHornetManager.cs" />
+    <Compile Include="Utils\Effects\EffectsManager.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="PropHuntClient.cs" />
-    <Compile Include="Server\PropHuntServer.cs" />
-    <Compile Include="Server\SeekerTimer.cs" />
-    <Compile Include="Server\ServerPlayer.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="Networking\Client\Client.cs" />
+    <Compile Include="Networking\Server\Server.cs" />
+    <Compile Include="Networking\Server\SeekerTimer.cs" />
+    <Compile Include="Networking\Server\ServerPlayer.cs" />
     <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\ModConfiguration.cs" />
-    <Compile Include="Modifications\BaseHornetManager.cs" />
-    <Compile Include="Modifications\BaseCoverManager.cs" />
-    <Compile Include="Utils\Networking\ClientErrorCorrection.cs" />
-    <Compile Include="Utils\Networking\ClientNetwork.cs" />
-    <Compile Include="Utils\Networking\ClientSentPackets.cs" />
+    <Compile Include="PlayerManagement\BaseHornetManager.cs" />
+    <Compile Include="PropManagement\BaseCoverManager.cs" />
+    <Compile Include="Networking\Client\ClientErrorCorrection.cs" />
+    <Compile Include="Networking\Client\ClientNetwork.cs" />
+    <Compile Include="Networking\Client\ClientSentPackets.cs" />
     <Compile Include="Utils\Enums.cs" />
-    <Compile Include="Utils\Networking\ServerNetwork.cs" />
-    <Compile Include="Utils\Networking\ServerSentPackets.cs" />
+    <Compile Include="Networking\Server\ServerNetwork.cs" />
+    <Compile Include="Networking\Server\ServerSentPackets.cs" />
     <Compile Include="Utils\NoRepeat.cs" />
     <Compile Include="PropHuntMod.cs" />
-    <Compile Include="Utils\PropMovementControls.cs" />
-    <Compile Include="Utils\PropTesting.cs" Condition="'$(Configuration)' == 'Debug'" />
-    <Compile Include="Utils\PropValidation.cs" />
+    <Compile Include="PropManagement\PropMovementControls.cs" />
+    <Compile Include="PropManagement\PropTesting.cs" Condition="'$(Configuration)' == 'Debug'" />
+    <Compile Include="PropManagement\PropValidation.cs" />
     <!-- <Content Include="Assets\icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content> -->
-    <Content Include="PropHuntModOld.txt" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -200,7 +199,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>%(Filename)%(Extension)</TargetPath>
     </Content>
-    <Compile Include="Utils\ExtraProps.cs" />
+    <Compile Include="PropManagement\ExtraProps.cs" />
   </ItemGroup>
   <ItemGroup>
     <!-- <ItemGroup>
@@ -228,6 +227,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>@echo off

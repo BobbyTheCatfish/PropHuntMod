@@ -1,18 +1,19 @@
 ﻿using BepInEx;
 using HarmonyLib;
-using PropHuntMod.Modifications;
-//using PropHuntMod.Utils.Networking;
+using PropHuntMod.Patches;
 using PropHuntMod.Utils;
-using PropHuntMod.Utils.Networking;
+using PropHuntMod.Networking.Client;
+using PropHuntMod.Networking.Server;
 using SSMP.Api.Client;
+using SSMP.Api.Server;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization.Formatters;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using PropHuntMod.Props;
+using PropHuntMod.Players;
 
 /**
  * FEATURE LIST
@@ -42,17 +43,12 @@ namespace PropHuntMod
         internal SelfHornetManager hornet = new SelfHornetManager();
         internal SelfCoverManager cover = new SelfCoverManager();
         //private static AttackCooldownPatches attackPatches = new AttackCooldownPatches(config);
-        private static readonly NoDamage noDamage = new NoDamage();
+        //private static readonly NoDamage noDamage = new NoDamage();
         private static PropMovementControls movement;
         internal static Dictionary<PlayerID, PlayerManager> playerManager = new Dictionary<PlayerID, PlayerManager>();
         internal static IClientApi client;
         internal static bool modEnabled = false;
         internal static bool showHitboxes = false;
-
-        internal static string CurrentScene;
-        internal static string PreviousScene;
-        internal static int SceneTransitionTicket = -1;
-        //internal static string PreviousGate;
 
         internal static List<Action> nextFrameActions = new List<Action>();
         static List<Action> _nextFrames = new List<Action>();
@@ -62,8 +58,9 @@ namespace PropHuntMod
             Instance = this;
             Utils.Config.LoadConfig(Config);
             Log.SetLogger(base.Logger);
-            SSMP.Api.Client.ClientAddon.RegisterAddon(new PropHuntClient());
-            SSMP.Api.Server.ServerAddon.RegisterAddon(new PropHuntServer());
+
+            ClientAddon.RegisterAddon(new Client());
+            ServerAddon.RegisterAddon(new Server());
         }
         public static void Initialize(IClientApi clientApi)
         {
@@ -74,8 +71,9 @@ namespace PropHuntMod
             Harmony.CreateAndPatchAll(typeof(PropHuntMod), "prophunt");
             Harmony.CreateAndPatchAll(typeof(NoDamage), "prophunt");
             Harmony.CreateAndPatchAll(typeof(BaseCoverManager), "prophunt");
+            Harmony.CreateAndPatchAll(typeof(ScenePatches), "prophunt");
             modEnabled = true;
-            //Harmony.CreateAndPatchAll(typeof(AttackCooldownPatches), "prophunt");
+            movement = new PropMovementControls();
 
 #if DEBUG
             showHitboxes = true;
@@ -205,108 +203,6 @@ namespace PropHuntMod
                 _nextFrames = nextFrameActions.ToList();
                 nextFrameActions.Clear();
             }
-        }
-
-        // Store previous scene while in transition
-        //[HarmonyPrefix]
-        //[HarmonyPatch(typeof (TransitionPoint), "TryDoTransition")]
-        //internal static void OnDoSceneTransition(TransitionPoint __instance)
-        //{
-        //    var gm = GameManager.instance;
-        //    if (!gm || TransitionPoint.IsTransitionBlocked)
-        //    {
-        //        return;
-        //    }
-
-        //    var hc = HeroController.instance;
-        //    if (gm.GameState == GlobalEnums.GameState.ENTERING_LEVEL)
-        //    {
-        //        if (__instance.GetGatePosition() != GlobalEnums.GatePosition.bottom || !hc.isHeroInPosition || hc.Body.linearVelocity.y >= 0f)
-        //        {
-        //            PreviousScene = __instance.targetScene;
-        //            //PreviousGate = __instance.entryPoint;
-        //        }
-        //    }
-        //}
-
-        // Disable prop on scene change
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(SceneLoad), "Begin")]
-        internal static void OnSceneChange(SceneLoad __instance)
-        {
-            if (!modEnabled) return;
-            if (GameManager.SilentInstance.GameState == GlobalEnums.GameState.MAIN_MENU)
-            {
-                //Log.LogInfo("Begin", GameManager.SilentInstance.GameState);
-                return;
-            }
-            if (movement == null) movement = new PropMovementControls();
-            SelfCoverManager.instance.DisableProp(false, true);
-            //Log.LogInfo($"Changing scene to {__instance.TargetSceneName}");
-            PreviousScene = CurrentScene;
-            CurrentScene = __instance.TargetSceneName;
-            PropValidation.ResetProps();
-
-            //foreach (var player in playerManager.Values)
-            //{
-            //    player.EnsurePropCover();
-            //}
-        }
-
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(GameManager), "OnNextLevelReady")]
-        internal static void OnNextLevelReady()
-        {
-            if (!modEnabled) return;
-            if (GameManager.SilentInstance.GameState == GlobalEnums.GameState.MAIN_MENU)
-            {
-                //Log.LogInfo(GameManager.SilentInstance.GameState);
-                return;
-            }
-
-            PropValidation.GetAllProps();
-#if DEBUG
-            PropTesting.OnSceneChange();
-#endif
-
-            if (PropHuntClient.GameState != GameState.NotStarted && !PropHuntClient.isSeeker)
-            {
-                if (SceneTransitionTicket != -1)
-                {
-                    ClientErrorCorrection.RestoreLastProp(new Utils.Networking.FromServer.FailedAction
-                    {
-                        AffectedID = 0,
-                        BypassTicketID = SceneTransitionTicket,
-                        FailedPacket = CustomPackets.PropSwap,
-                        FixMethod = CorrectionActions.PreviousScene
-                    });
-                    SceneTransitionTicket = -1;
-                }
-                else
-                {
-                    SelfCoverManager.instance.EnableRandomProp();
-                }
-            }
-
-            //PlayerManager.EnsureAllPropCovers();
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(Breakable), "Break")]
-        public static void OnBreak(Breakable __instance)
-        {
-            //if (!modEnabled) return;
-
-            //var newObj = GameObject.Instantiate(__instance.gameObject, __instance.transform.parent);
-            //newObj.name = __instance.name;
-
-            //newObj.SetActive(false);
-
-            //if (hornet == null) return;
-            //if (__instance.transform.parent.gameObject.name != hornet.hornet.name && !cover.IsCovered())
-            //{
-            //    hornet.hornet.GetComponent<HeroController>().DamageSelf(1);
-            //}
         }
     }
 }

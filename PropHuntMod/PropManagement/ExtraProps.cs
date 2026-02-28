@@ -1,6 +1,7 @@
 
 
 using Newtonsoft.Json;
+using PropHuntMod.Utils;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace PropHuntMod.Utils
+namespace PropHuntMod.Props
 {
     internal static class ExtraProps
     {

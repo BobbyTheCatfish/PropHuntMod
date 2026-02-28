@@ -1,13 +1,9 @@
 ﻿using PropHuntMod.Utils;
-using PropHuntMod.Utils.Networking;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PropHuntMod.Networking.Client;
 using UnityEngine;
+using PropHuntMod.Props;
 
-namespace PropHuntMod.Modifications
+namespace PropHuntMod.Players
 {
     internal class SelfHornetManager : BaseHornetManager
     {
@@ -27,9 +23,9 @@ namespace PropHuntMod.Modifications
 
         public bool ToggleHornet(bool show, int ticket = -1)
         {
-            if (PropHuntClient.isSeeker && !show)
+            if (Client.isSeeker && !show)
             {
-                PropHuntClient.LocalMessage("You're a seeker, you can't hide yourself!");
+                Client.LocalMessage("You're a seeker, you can't hide yourself!");
                 return false;
             }
             var success = base.ToggleHornet(show);

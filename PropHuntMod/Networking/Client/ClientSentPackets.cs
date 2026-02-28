@@ -1,4 +1,5 @@
-﻿using SSMP.Networking.Packet;
+﻿using PropHuntMod.Utils;
+using SSMP.Networking.Packet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PropHuntMod.Utils.Networking.FromClient
+namespace PropHuntMod.Networking.Client
 {
     public class PropSwap : IPacketData
     {

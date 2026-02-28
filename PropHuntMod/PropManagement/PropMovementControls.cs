@@ -1,18 +1,11 @@
-﻿using HutongGames.PlayMaker;
-using InControl;
-using PropHuntMod.Modifications;
-using System;
-using System.Collections.Generic;
+﻿using InControl;
+using PropHuntMod.Utils;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using static HutongGames.PlayMaker.Actions.GamepadStickEvents;
 
-namespace PropHuntMod.Utils
+namespace PropHuntMod.Props
 {
     internal class PropMovementControls
     {
@@ -29,7 +22,7 @@ namespace PropHuntMod.Utils
         public static PropMovementControls Instance;
         internal static MovementState MovementState = MovementState.Normal;
 
-        InputBlockingMechanism blockingMechanism = new InputBlockingMechanism();
+        InputBlockingMechanism blocker = new InputBlockingMechanism();
 
         public PropMovementControls()
         {
@@ -199,14 +192,14 @@ namespace PropHuntMod.Utils
             // Block or unblock inputs
             if (newState == MovementState.Move2D)
             {
-                HeroController.instance.AddInputBlocker(blockingMechanism);
+                HeroController.instance.AddInputBlocker(blocker);
             }
             else if (newState == MovementState.Normal)
             {
                 // Unblock on the next frame to prevent accidental taunt inputs
                 PropHuntMod.nextFrameActions.Add(() =>
                 {
-                    HeroController.instance.RemoveInputBlocker(blockingMechanism);
+                    HeroController.instance.RemoveInputBlocker(blocker);
                 });
             }
 

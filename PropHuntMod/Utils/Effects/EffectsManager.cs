@@ -8,7 +8,7 @@ using System.Reflection;
 using TeamCherry.Localization;
 using UnityEngine;
 
-namespace PropHuntMod.Modifications
+namespace PropHuntMod.Utils
 {
     internal static class EffectsManager
     {

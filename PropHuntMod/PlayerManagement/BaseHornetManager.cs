@@ -1,9 +1,8 @@
 ﻿using PropHuntMod.Utils;
-using PropHuntMod.Utils.Networking;
 using System;
 using UnityEngine;
 
-namespace PropHuntMod.Modifications
+namespace PropHuntMod.Players
 {
     using PlayerID = UInt16;
     public class BaseHornetManager

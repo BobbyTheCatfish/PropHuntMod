@@ -1,14 +1,12 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PropHuntMod.Modifications;
+using PropHuntMod.Utils;
 using QuickWarp;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace PropHuntMod.Utils
+namespace PropHuntMod.Props
 {
     class WarpPoint
     {

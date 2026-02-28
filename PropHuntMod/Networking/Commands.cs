@@ -1,8 +1,10 @@
-﻿using PropHuntMod.Modifications;
-using PropHuntMod.Utils;
-using PropHuntMod.Utils.Networking;
+﻿using PropHuntMod.Utils;
+using PropHuntMod.Networking.Server;
+using PropHuntMod.Networking.Client;
 using SSMP.Api.Command.Client;
 using SSMP.Api.Command.Server;
+using PropHuntMod.Players;
+using PropHuntMod.Props;
 
 namespace PropHuntMod.Commands
 {
@@ -13,13 +15,13 @@ namespace PropHuntMod.Commands
         public string[] Aliases => new string[] { };
         public void Execute(ICommandSender sender, string[] args)
         {
-            if (PropHuntServer.GameState != Utils.GameState.NotStarted)
+            if (Server.GameState != Utils.GameState.NotStarted)
             {
                 sender.SendMessage("The game has already started!");
                 return;
             }
 
-            PropHuntServer.instance.GameStart();
+            Server.instance.GameStart();
         }
     }
 
@@ -30,13 +32,13 @@ namespace PropHuntMod.Commands
         public string[] Aliases => new string[] { };
         public void Execute(ICommandSender sender, string[] args)
         {
-            if (PropHuntServer.GameState == Utils.GameState.NotStarted)
+            if (Server.GameState == Utils.GameState.NotStarted)
             {
                 sender.SendMessage("The game hasn't started yet!");
                 return;
             }
 
-            PropHuntServer.instance.CheckGameOver(null, true);
+            Server.instance.CheckGameOver(null, true);
         }
     }
 
@@ -47,12 +49,12 @@ namespace PropHuntMod.Commands
         public string[] Aliases => new string[] { };
         public void Execute(string[] args)
         {
-            if (PropHuntClient.isSeeker && !PropHuntMod.showHitboxes)
+            if (Client.isSeeker && !PropHuntMod.showHitboxes)
             {
-                PropHuntClient.LocalMessage("Cannot enable hitboxes when seeking.");
+                Client.LocalMessage("Cannot enable hitboxes when seeking.");
                 return;
             }
-            PropHuntClient.LocalMessage("Turning hitboxes " + (PropHuntMod.showHitboxes ? "off": "on"));
+            Client.LocalMessage("Turning hitboxes " + (PropHuntMod.showHitboxes ? "off": "on"));
             PropHuntMod.showHitboxes = !PropHuntMod.showHitboxes;
         }
     }
@@ -64,7 +66,7 @@ namespace PropHuntMod.Commands
         public string[] Aliases => new string[] { };
         public void Execute(string[] args)
         {
-            PropHuntClient.LocalMessage($"Syncing props for {PropHuntMod.playerManager.Count} players");
+            Client.LocalMessage($"Syncing props for {PropHuntMod.playerManager.Count} players");
             PlayerManager.EnsureAllPropCovers();
 
             var cover = SelfCoverManager.instance;
@@ -82,13 +84,13 @@ namespace PropHuntMod.Commands
         {
             if (args.Length < 2)
             {
-                PropHuntClient.LocalMessage("You need to provide a scene name to go to.");
+                Client.LocalMessage("You need to provide a scene name to go to.");
                 return;
             }
             
             if (!PropTesting.GoToScene(args[1]))
             {
-                PropHuntClient.LocalMessage($"I couldn't find the scene for {args[1]}.");
+                Client.LocalMessage($"I couldn't find the scene for {args[1]}.");
                 return;
             }
         }

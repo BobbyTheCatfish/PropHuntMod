@@ -1,14 +1,13 @@
-﻿using PropHuntMod.Modifications;
-using PropHuntMod.Utils.Networking.FromServer;
+﻿using PropHuntMod.Networking.Server;
+using PropHuntMod.Patches;
+using PropHuntMod.Players;
+using PropHuntMod.Props;
+using PropHuntMod.Utils;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PropHuntMod.Utils.Networking
+namespace PropHuntMod.Networking.Client
 {
     internal static class ClientErrorCorrection
     {
@@ -16,30 +15,30 @@ namespace PropHuntMod.Utils.Networking
         {
             switch (data.FixMethod)
             {
-                case CorrectionActions.None:
+                case CorrectiveActions.None:
                     break;
-                case CorrectionActions.DisableClientProp: // requires ticket
+                case CorrectiveActions.DisableClientProp: // requires ticket
                     SelfCoverManager.instance.DisableProp(false, false, data.BypassTicketID);
                     break;
-                case CorrectionActions.DisablePlayerProp:
+                case CorrectiveActions.DisablePlayerProp:
                     DisablePlayerProp(data);
                     break;
-                case CorrectionActions.PreviousScene: // requires ticket
+                case CorrectiveActions.PreviousScene: // requires ticket
                     PropHuntMod.Instance.StartCoroutine(PreviousScene(data));
                     break;
-                case CorrectionActions.ToggleHornetTrue:
+                case CorrectiveActions.ToggleHornetTrue:
                     SelfHornetManager.instance.ToggleHornet(true);
                     break;
-                case CorrectionActions.ToggleHornetFalse: // requires ticket
+                case CorrectiveActions.ToggleHornetFalse: // requires ticket
                     SelfHornetManager.instance.ToggleHornet(false, data.BypassTicketID);
                     break;
-                case CorrectionActions.RestoreLastProp:
+                case CorrectiveActions.RestoreLastProp:
                     RestoreLastProp(data);
                     break;
-                case CorrectionActions.RestoreTriggerHandler:
+                case CorrectiveActions.RestoreTriggerHandler:
                     RestoreTriggerHandler(data);
                     break;
-                case CorrectionActions.BecomeSeeker:
+                case CorrectiveActions.BecomeSeeker:
                     BecomeSeeker();
                     break;
                 default:
@@ -57,22 +56,22 @@ namespace PropHuntMod.Utils.Networking
         {
             for (int i = 0; i < 5; i++)
             {
-                if (!string.IsNullOrEmpty(PropHuntMod.PreviousScene)) break;
+                if (!string.IsNullOrEmpty(ScenePatches.PreviousScene)) break;
 
                 Log.LogInfo($"Attempt {i + 1} to find previous scene failed");
                 yield return new WaitForSeconds(1);
             }
 
-            if (string.IsNullOrEmpty(PropHuntMod.PreviousScene))
+            if (string.IsNullOrEmpty(ScenePatches.PreviousScene))
             {
                 PropHuntMod.client.ClientManager.Disconnect();
-                PropHuntClient.LocalMessage("Fatal Error: Unable to find previous scene.");
+                Client.LocalMessage("Fatal Error: Unable to find previous scene.");
                 yield break;
             }
 
             var loadInfo = new GameManager.SceneLoadInfo
             {
-                SceneName = PropHuntMod.PreviousScene,
+                SceneName = ScenePatches.PreviousScene,
                 //EntryGateName = PropHuntMod.PreviousGate,
                 PreventCameraFadeOut = true,
                 WaitForSceneTransitionCameraFade = false,
@@ -81,7 +80,7 @@ namespace PropHuntMod.Utils.Networking
                 IsFirstLevelForPlayer = false
             };
 
-            PropHuntMod.SceneTransitionTicket = data.BypassTicketID;
+            ScenePatches.SceneTransitionTicket = data.BypassTicketID;
             GameManager.instance.BeginSceneTransition(loadInfo);
         }
 
@@ -127,8 +126,8 @@ namespace PropHuntMod.Utils.Networking
         }
         static void BecomeSeeker()
         {
-            PropHuntClient.isSeeker = true;
-            if (PropHuntClient.GameState == GameState.SeekerWait)
+            Client.isSeeker = true;
+            if (Client.GameState == GameState.SeekerWait)
             {
                 SelfHornetManager.instance.SetSeekerObscure(true);
             }

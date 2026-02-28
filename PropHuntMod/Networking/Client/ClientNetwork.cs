@@ -1,12 +1,13 @@
-﻿using PropHuntMod.Modifications;
+﻿using PropHuntMod.Players;
+using PropHuntMod.Props;
+using PropHuntMod.Utils;
 using SSMP.Api.Client;
 using SSMP.Api.Client.Networking;
-using System.Reflection;
 using UnityEngine;
 
-namespace PropHuntMod.Utils.Networking
+namespace PropHuntMod.Networking.Client
 {
-    static class ClientNetwork
+    internal static class ClientNetwork
     {
         static IClientAddonNetworkSender<CustomPackets> sender;
         static IClientAddonNetworkReceiver<CustomPackets> receiver;
@@ -17,7 +18,7 @@ namespace PropHuntMod.Utils.Networking
         public static void SendPropSwap(Prop prop, int ticket = -1)
         {
             Log.LogInfo($"Sending prop swap: {prop?.name}");
-            sender.SendSingleData(CustomPackets.PropSwap, new FromClient.PropSwap
+            sender.SendSingleData(CustomPackets.PropSwap, new PropSwap
             {
                 propName = prop?.name ?? "",
                 propPath = prop?.path ?? "",
@@ -28,7 +29,7 @@ namespace PropHuntMod.Utils.Networking
         public static void SendPropLocation(Vector3 propPosition, float propRotation, float propScale)
         {
             Log.LogInfo($"Sending prop location: {propPosition}, {propRotation}, {propScale}");
-            sender.SendSingleData(CustomPackets.PropLocation, new FromClient.PropLocation
+            sender.SendSingleData(CustomPackets.PropLocation, new PropLocation
             {
                 PropPosition = propPosition,
                 PropRotation = propRotation,
@@ -39,7 +40,7 @@ namespace PropHuntMod.Utils.Networking
         public static void SendHideStatus(bool isHiding, int ticket = -1)
         {
             Log.LogInfo($"Sending hide status: {isHiding}");
-            sender.SendSingleData(CustomPackets.HideStatus, new FromClient.HideStatus
+            sender.SendSingleData(CustomPackets.HideStatus, new HideStatus
             {
                 IsHiding = isHiding,
                 TicketID = ticket
@@ -49,7 +50,7 @@ namespace PropHuntMod.Utils.Networking
         public static void SendPropFound(ushort propOwnerID)
         {
             Log.LogInfo($"Sending prop found: {propOwnerID}");
-            sender.SendSingleData(CustomPackets.PropFound, new FromClient.PropFound
+            sender.SendSingleData(CustomPackets.PropFound, new PropFound
             {
                 PropOwnerID = propOwnerID
             });
@@ -58,7 +59,7 @@ namespace PropHuntMod.Utils.Networking
         public static void SendSync(string propName, string propPath, Vector3 propPosition, float propRotation, float propScale)
         {
             Log.LogInfo($"Sending sync data: {propName}, {propPosition}, {propRotation}, {propScale}");
-            sender.SendSingleData(CustomPackets.Sync, new FromClient.Sync
+            sender.SendSingleData(CustomPackets.Sync, new Sync
             {
                 PropName = propName,
                 PropPath = propPath,
@@ -71,23 +72,23 @@ namespace PropHuntMod.Utils.Networking
         public static void Init(IClientApi clientApi, ClientAddon clientAddon)
         {
             sender = clientApi.NetClient.GetNetworkSender<CustomPackets>(clientAddon);
-            receiver = clientApi.NetClient.GetNetworkReceiver<CustomPackets>(clientAddon, FromServer.Packets.Instantiate);
+            receiver = clientApi.NetClient.GetNetworkReceiver<CustomPackets>(clientAddon, Server.Packets.Instantiate);
 
-            receiver.RegisterPacketHandler<FromServer.PropSwap>(CustomPackets.PropSwap, OnPropSwap);
-            receiver.RegisterPacketHandler<FromServer.PropLocation>(CustomPackets.PropLocation, OnPropLocation);
-            receiver.RegisterPacketHandler<FromServer.PropFound>(CustomPackets.PropFound, OnPropFound);
-            receiver.RegisterPacketHandler<FromServer.RoundStart>(CustomPackets.RoundStart, OnRoundStart);
-            receiver.RegisterPacketHandler<FromServer.GameOver>(CustomPackets.GameOver, OnGameOver);
-            receiver.RegisterPacketHandler<FromServer.SeekerStart>(CustomPackets.SeekerStart, OnSeekerStart);
-            receiver.RegisterPacketHandler<FromServer.FailedAction>(CustomPackets.FailedAction, ClientErrorCorrection.DiagnoseError);
+            receiver.RegisterPacketHandler<Server.PropSwap>(CustomPackets.PropSwap, OnPropSwap);
+            receiver.RegisterPacketHandler<Server.PropLocation>(CustomPackets.PropLocation, OnPropLocation);
+            receiver.RegisterPacketHandler<Server.PropFound>(CustomPackets.PropFound, OnPropFound);
+            receiver.RegisterPacketHandler<Server.RoundStart>(CustomPackets.RoundStart, OnRoundStart);
+            receiver.RegisterPacketHandler<Server.GameOver>(CustomPackets.GameOver, OnGameOver);
+            receiver.RegisterPacketHandler<Server.SeekerStart>(CustomPackets.SeekerStart, OnSeekerStart);
+            receiver.RegisterPacketHandler<Server.FailedAction>(CustomPackets.FailedAction, ClientErrorCorrection.DiagnoseError);
 
-            if (Config.AllowDebugFeatures) receiver.RegisterPacketHandler<FromServer.HideStatus>(CustomPackets.HideStatus, OnHideStatus);
+            if (Config.AllowDebugFeatures) receiver.RegisterPacketHandler<Server.HideStatus>(CustomPackets.HideStatus, OnHideStatus);
         }
 
         /********************
          * PACKET RECEIVERS *
          ********************/
-        static void OnPropSwap(FromServer.PropSwap data)
+        static void OnPropSwap(Server.PropSwap data)
         {
             PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
             player.SetProp(data.propName, data.propPath);
@@ -95,22 +96,22 @@ namespace PropHuntMod.Utils.Networking
             Log.LogInfo($"{data.Id} prop set to {data.propName}");
         }
 
-        static void OnRoundStart(FromServer.RoundStart data)
+        static void OnRoundStart(Server.RoundStart data)
         {
             // Set game state
             bool alreadyPlaying = data.SeekerWaitTime == 0;
-            if (alreadyPlaying) PropHuntClient.GameState = GameState.Playing;
-            else PropHuntClient.GameState = GameState.SeekerWait;
+            if (alreadyPlaying) Client.GameState = GameState.Playing;
+            else Client.GameState = GameState.SeekerWait;
 
             // Set hiding settings
-            PropHuntClient.isSeeker = data.IsSeeker;
-            PropHuntClient.propSwaps = 0;
-            PropHuntClient.maxPropSwaps = data.PropSwapLimit;
+            Client.isSeeker = data.IsSeeker;
+            Client.propSwaps = 0;
+            Client.maxPropSwaps = data.PropSwapLimit;
 
             // Display overlays and effects
             if (data.IsSeeker)
             {
-                PropHuntClient.LocalMessage("You're a seeker!");
+                Client.LocalMessage("You're a seeker!");
                 SelfCoverManager.instance.DisableProp(false);
                 if (!alreadyPlaying)
                 {
@@ -127,12 +128,12 @@ namespace PropHuntMod.Utils.Networking
             {
                 EffectsManager.SetTitle("HIDER", "", "YOUR ROLE:");
                 SelfCoverManager.instance.EnableRandomProp();
-                PropHuntClient.LocalMessage("You're hiding this round!");
+                Client.LocalMessage("You're hiding this round!");
             }
 
         }
 
-        static void OnPropLocation(FromServer.PropLocation data)
+        static void OnPropLocation(Server.PropLocation data)
         {
             PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
             player.SetPropLocation(data.PropPosition, data.PropRotation, data.PropScale);
@@ -140,7 +141,7 @@ namespace PropHuntMod.Utils.Networking
             Log.LogInfo($"{data.Id} prop moved to {data.PropPosition}, {data.PropRotation}, {data.PropScale}");
         }
 
-        static void OnHideStatus(FromServer.HideStatus data)
+        static void OnHideStatus(Server.HideStatus data)
         {
             PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
             player.SetHideStatus(data.IsHiding);
@@ -148,14 +149,14 @@ namespace PropHuntMod.Utils.Networking
             Log.LogInfo($"{data.Id} hiding status set to {data.IsHiding}");
         }
 
-        static void OnPropFound(FromServer.PropFound data)
+        static void OnPropFound(Server.PropFound data)
         {
             if (data.IsClientFound)
             {
                 Log.LogInfo("I've been found!");
                 SelfCoverManager.instance.FindProp(SelfHornetManager.instance);
                 //SelfCoverManager.instance.DisableProp();
-                if (PropHuntClient.GameState == GameState.Playing) PropHuntClient.isSeeker = true;
+                if (Client.GameState == GameState.Playing) Client.isSeeker = true;
             }
             else
             {
@@ -167,11 +168,11 @@ namespace PropHuntMod.Utils.Networking
             EffectsManager.PlayFoundSound(data.IsClientFound);
         }
 
-        static void OnGameOver(FromServer.GameOver data)
+        static void OnGameOver(Server.GameOver data)
         {
-            PropHuntClient.GameState = GameState.NotStarted;
-            PropHuntClient.isSeeker = false;
-            PropHuntClient.propSwaps = 0;
+            Client.GameState = GameState.NotStarted;
+            Client.isSeeker = false;
+            Client.propSwaps = 0;
 
             SelfHornetManager.instance.SetSeekerObscure(false);
             SelfCoverManager.instance.DisableProp();
@@ -185,11 +186,11 @@ namespace PropHuntMod.Utils.Networking
             GameManager.instance.FreezeMoment(GlobalEnums.FreezeMomentTypes.BossDeathSlow);
         }
 
-        static void OnSeekerStart(FromServer.SeekerStart data)
+        static void OnSeekerStart(Server.SeekerStart data)
         {
-            PropHuntClient.GameState = GameState.Playing;
+            Client.GameState = GameState.Playing;
 
-            if (!PropHuntClient.isSeeker) return;
+            if (!Client.isSeeker) return;
             SelfHornetManager.instance.SetSeekerObscure(false);
         }
     }

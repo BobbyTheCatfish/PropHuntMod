@@ -1,15 +1,9 @@
-﻿using NoRepeat;
-using PropHuntMod.Utils;
-using PropHuntMod.Utils.Networking;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PropHuntMod.Utils;
+using PropHuntMod.Networking.Client;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using PropHuntMod.Players;
 
-namespace PropHuntMod.Modifications
+namespace PropHuntMod.Props
 {
     enum Direction { Left, Right, Up, Down, Front, Back, Reset, RotateLeft, RotateRight, ScaleUp, ScaleDown };
     internal class SelfCoverManager : BaseCoverManager
@@ -121,9 +115,9 @@ namespace PropHuntMod.Modifications
 
             if (IsSeeker()) return;
 
-            if (PropHuntClient.maxPropSwaps > 0 && PropHuntClient.propSwaps >= PropHuntClient.maxPropSwaps)
+            if (Client.maxPropSwaps > 0 && Client.propSwaps >= Client.maxPropSwaps)
             {
-                PropHuntClient.LocalMessage($"You've reached the max number of prop swaps (${PropHuntClient.maxPropSwaps}).");
+                Client.LocalMessage($"You've reached the max number of prop swaps (${Client.maxPropSwaps}).");
                 return;
             }
 
@@ -143,7 +137,7 @@ namespace PropHuntMod.Modifications
             if (success)
             {
                 ClientNetwork.SendPropSwap(prop, ticket);
-                PropHuntClient.propSwaps++;
+                Client.propSwaps++;
             }
 
             return success;
@@ -169,9 +163,9 @@ namespace PropHuntMod.Modifications
 
         bool IsSeeker()
         {
-            if (PropHuntClient.isSeeker)
+            if (Client.isSeeker)
             {
-                PropHuntClient.LocalMessage("You're a seeker! You can't enable props right now.");
+                Client.LocalMessage("You're a seeker! You can't enable props right now.");
                 return true;
             }
             return false;

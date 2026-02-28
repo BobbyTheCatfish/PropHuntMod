@@ -1,15 +1,10 @@
-﻿using SSMP.Networking.Packet;
+﻿using PropHuntMod.Utils;
+using SSMP.Networking.Packet;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 
-namespace PropHuntMod.Utils.Networking.FromServer
+namespace PropHuntMod.Networking.Server
 {
-    public class PropSwap : FromClient.PropSwap
+    public class PropSwap : Client.PropSwap
     {
         public ushort Id { get; set; }
         public override void WriteData(IPacket packet)
@@ -44,7 +39,7 @@ namespace PropHuntMod.Utils.Networking.FromServer
             SeekerWaitTime = packet.ReadInt();
         }
     }
-    public class PropLocation : FromClient.PropLocation
+    public class PropLocation : Client.PropLocation
     {
         public ushort Id { get; set; }
         public override void WriteData(IPacket packet)
@@ -59,7 +54,7 @@ namespace PropHuntMod.Utils.Networking.FromServer
             base.ReadData(packet);
         }
     }
-    public class HideStatus : FromClient.HideStatus
+    public class HideStatus : Client.HideStatus
     {
         public ushort Id { get; set; }
         public override void WriteData(IPacket packet)
@@ -74,7 +69,7 @@ namespace PropHuntMod.Utils.Networking.FromServer
             base.ReadData(packet);
         }
     }
-    public class PropFound : FromClient.PropFound
+    public class PropFound : Client.PropFound
     {
         public bool IsClientFound { get; set; }
         public override void WriteData(IPacket packet)
@@ -129,7 +124,7 @@ namespace PropHuntMod.Utils.Networking.FromServer
         public bool IsReliable => true;
         public bool DropReliableDataIfNewerExists => true;
         public CustomPackets FailedPacket;
-        public CorrectionActions FixMethod;
+        public CorrectiveActions FixMethod;
         public ushort AffectedID;
         public int BypassTicketID;
 
@@ -144,7 +139,7 @@ namespace PropHuntMod.Utils.Networking.FromServer
         public void ReadData(IPacket packet)
         {
             FailedPacket = (CustomPackets)packet.ReadInt();
-            FixMethod = (CorrectionActions)packet.ReadInt();
+            FixMethod = (CorrectiveActions)packet.ReadInt();
             AffectedID = packet.ReadUShort();
             BypassTicketID = packet.ReadUShort();
         }

@@ -26,7 +26,7 @@ namespace PropHuntMod.Utils
         Playing
     }
 
-    public enum CorrectionActions
+    public enum CorrectiveActions
     {
         None,
         DisableClientProp,

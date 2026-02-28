@@ -1,6 +1,7 @@
 ﻿using BepInEx.Configuration;
 using UnityEngine;
-
+using PropHuntMod.Networking.Client;
+using PropHuntMod.Props;
 
 
 namespace PropHuntMod.Utils
@@ -15,7 +16,6 @@ namespace PropHuntMod.Utils
         public readonly static bool AllowDebugFeatures = false;
 
         static ConfigEntry<bool> _disableDamage;
-        //static ConfigEntry<float> _attackCooldown;
         static ConfigEntry<KeyCode> _swapPropKey;
         static ConfigEntry<KeyCode> _hideHornetKey;
         static ConfigEntry<KeyCode> _resetKey;
@@ -26,7 +26,7 @@ namespace PropHuntMod.Utils
         static ConfigEntry<int> _seekerWaitTime;
         static ConfigEntry<int> _seekerCount;
 
-        public static bool DisableDamage => _disableDamage.Value && PropHuntClient.GameState != GameState.NotStarted;
+        public static bool DisableDamage => _disableDamage.Value && Client.GameState != GameState.NotStarted;
         //public static float attackCooldown { get { return _attackCooldown.Value; } }
         public static KeyCode SwapPropKey => _swapPropKey.Value;
         public static KeyCode HideHornetKey => _hideHornetKey?.Value ?? KeyCode.H;
