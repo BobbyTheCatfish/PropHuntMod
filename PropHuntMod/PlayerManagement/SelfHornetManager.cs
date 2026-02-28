@@ -2,13 +2,16 @@
 using PropHuntMod.Networking.Client;
 using UnityEngine;
 using PropHuntMod.Props;
+using HutongGames.PlayMaker.Actions;
 
 namespace PropHuntMod.Players
 {
+    internal class InputBlocker { }
     internal class SelfHornetManager : BaseHornetManager
     {
+        static InputBlocker blocker = new InputBlocker();
         public static SelfHornetManager instance;
-        GameObject obscurance;
+        SpriteRenderer obscurance;
         public SelfHornetManager()
         {
             isRemote = false;
@@ -65,33 +68,27 @@ namespace PropHuntMod.Players
         {
             if (obscurance == null)
             {
-                var cam = GameCameras.instance.tk2dCam;
-                obscurance = new GameObject("SEEKER OBSCURANCE");
-                obscurance.transform.SetParentReset(cam.transform);
-                obscurance.transform.SetScale2D(new Vector2(100, 100));
-                obscurance.transform.SetLocalPositionZ(10);
+                var ogFader = GameCameras.instance.hudCamera.transform.Find("In-game/Screen Fader").gameObject;
+                var fader = GameObject.Instantiate(ogFader, ogFader.transform.parent);
 
-                var sprite = obscurance.AddComponent<SpriteRenderer>();
-                var copySprite = cam.transform.Find("Masker Blackout").GetComponent<SpriteRenderer>();
-                sprite.sprite = copySprite.sprite;
-                sprite.material = copySprite.material;
+                Component.Destroy(fader.GetComponent<ScreenFaderState>());
+                obscurance = fader.GetComponent<SpriteRenderer>();
 
-                obscurance.SetActive(false);
+                obscurance.sortingLayerName = "Vignette";
+                obscurance.sortingOrder = 0;
             }
             if (enabled)
             {
-                HeroController.instance.AddInputBlocker(obscurance);
-                obscurance.SetActive(true);
+                HeroController.instance.AddInputBlocker(blocker);
+                obscurance.color = new Color(0, 0, 0, 1);
+                //GameManager.instance.screenFader_fsm.SendEvent("SCENE FADE OUT INSTANT");
             }
             else
             {
-                HeroController.instance.RemoveInputBlocker(obscurance);
-                obscurance.SetActive(false);
+                HeroController.instance.RemoveInputBlocker(blocker);
+                obscurance.color = new Color(0, 0, 0, 0);
+                //GameManager.instance.screenFader_fsm.SendEvent("SCENE FADE IN");
             }
-                //if (!HornetExists()) return;
-            //    Vector3 rotation = GameCameras.instance.transform.rotation.eulerAngles;
-            //rotation.y = enabled ? 180 : 0;
-            //GameCameras.instance.transform.rotation = Quaternion.Euler(rotation);
         }
 
         public void OnDeath()
