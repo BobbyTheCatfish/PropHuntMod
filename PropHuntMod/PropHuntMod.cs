@@ -81,6 +81,7 @@ namespace PropHuntMod
 
 #if DEBUG
             showHitboxes = true;
+            TestManager.GetAllTests();
 #endif
         }
 
@@ -144,10 +145,14 @@ namespace PropHuntMod
             }
 
 #if DEBUG
+            TestManager.Update();
             // Effects testing
-            if (Input.GetKeyDown(KeyCode.O))
-            {
-                PropTesting.PropNext();
+            //if (Input.GetKeyDown(KeyCode.O))
+            //{
+                //GameManager.instance.cameraCtrl.FadeOut(GlobalEnums.CameraFadeType.JUST_FADE);
+                //GameManager.instance.screenFader_fsm.SendEvent("SCENE FADE OUT");
+                //AttackCooldownPatches.ModifySprintFSM();
+                //PropTesting.PropNext();
                 //Utils.Networking.ClientNetwork.OnPropFound(new Utils.Networking.FromServer.PropFound
                 //{
                 //    IsClientFound = true,
@@ -171,12 +176,14 @@ namespace PropHuntMod
                 //    var data = new Utils.Networking.FromServer.GameOver { IsWinner = false, WasCanceled = true, WinnerUsername = "Nobody" };
                 //    Utils.Networking.ClientNetwork.OnGameOver(data);
                 //}
-            }
+            //}
 
-            if (Input.GetKeyDown(KeyCode.U))
-            {
-                PropTesting.PropPrevious();
-            }
+            //if (Input.GetKeyDown(KeyCode.U))
+            //{
+                //GameManager.instance.cameraCtrl.FadeSceneIn();
+                //GameManager.instance.screenFader_fsm.SendEvent("SCENE FADE IN");
+                //PropTesting.PropPrevious();
+            //}
 #endif
 
             /**************
