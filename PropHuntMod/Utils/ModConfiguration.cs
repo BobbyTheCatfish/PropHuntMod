@@ -25,6 +25,7 @@ namespace PropHuntMod.Utils
 
         static ConfigEntry<int> _seekerWaitTime;
         static ConfigEntry<int> _seekerCount;
+        static ConfigEntry<float> _attackCooldown;
 
         public static bool DisableDamage => _disableDamage.Value && Client.GameState != GameState.NotStarted;
         //public static float attackCooldown { get { return _attackCooldown.Value; } }
@@ -37,6 +38,8 @@ namespace PropHuntMod.Utils
 
         public static int SeekerCountdown => _seekerWaitTime.Value;
         public static int SeekerCount => _seekerCount.Value;
+
+        public static float AttackCooldown => _attackCooldown.Value;
 
         public static void LoadConfig(ConfigFile Config)
         {
@@ -52,12 +55,12 @@ namespace PropHuntMod.Utils
 
             _seekerWaitTime = Config.Bind("Server Settings", "Seeker Wait Time", 30, "How long the seekers have to wait for before they can start seeking");
             _seekerCount = Config.Bind("Server Settings", "Seeker Count", 1, "How many seekers per round?");
+            _attackCooldown = Config.Bind("Server Settings", "AttackCooldown", 0f, "How long the seekers should have to wait between attacks");
 
             if (AllowDebugFeatures)
             {
                 _hideHornetKey = Config.Bind("General", "KeyHideHornet", KeyCode.H, "The key to hide hornet in the event that she becomes visible while hiding");
             }
-            //_attackCooldown = Config.Bind("General", "AttackCooldown", 2f, "How long the seeker should have to wait between attacks");
         }
     }
 }

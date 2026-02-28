@@ -14,6 +14,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using PropHuntMod.Props;
 using PropHuntMod.Players;
+using PropHuntMod.Tests;
 
 /**
  * FEATURE LIST
@@ -61,6 +62,8 @@ namespace PropHuntMod
 
             ClientAddon.RegisterAddon(new Client());
             ServerAddon.RegisterAddon(new Server());
+
+            HeroController.OnHeroInstanceSet += (heroController) => AttackCooldownPatches.ModifySprintFSM();
         }
         public static void Initialize(IClientApi clientApi)
         {
@@ -71,6 +74,7 @@ namespace PropHuntMod
             Harmony.CreateAndPatchAll(typeof(PropHuntMod), "prophunt");
             Harmony.CreateAndPatchAll(typeof(NoDamage), "prophunt");
             Harmony.CreateAndPatchAll(typeof(BaseCoverManager), "prophunt");
+            Harmony.CreateAndPatchAll(typeof(AttackCooldownPatches), "prophunt");
             Harmony.CreateAndPatchAll(typeof(ScenePatches), "prophunt");
             modEnabled = true;
             movement = new PropMovementControls();
