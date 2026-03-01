@@ -107,6 +107,7 @@ namespace PropHuntMod.Networking.Client
             Client.isSeeker = data.IsSeeker;
             Client.propSwaps = 0;
             Client.maxPropSwaps = data.PropSwapLimit;
+            Client.seekerAttackCooldown = data.SeekerAttackCooldown;
 
             // Display overlays and effects
             if (data.IsSeeker)

@@ -2,10 +2,9 @@
 using HarmonyLib;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
+using PropHuntMod.Networking.Client;
 using PropHuntMod.Utils;
-using System;
 using System.Collections;
-using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 
@@ -39,13 +38,14 @@ namespace PropHuntMod.Patches
     internal class AttackCooldownPatches
     {
         static bool CanAttack = true;
+        public static float AttackCooldown => Client.seekerAttackCooldown;
         static IEnumerator ResetCooldown()
         {
             CanAttack = false;
             
-            if (Config.AttackCooldown > 0)
+            if (AttackCooldown > 0 && Client.isSeeker && Client.GameState != Utils.GameState.NotStarted)
             {
-                yield return new WaitForSeconds(Config.AttackCooldown);
+                yield return new WaitForSeconds(AttackCooldown);
             }
 
             CanAttack = true;

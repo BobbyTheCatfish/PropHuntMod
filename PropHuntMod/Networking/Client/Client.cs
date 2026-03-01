@@ -22,7 +22,7 @@ namespace PropHuntMod.Networking.Client
         public static bool isSeeker = false;
         public static ushort propSwaps = 0;
         public static ushort maxPropSwaps = 0;
-
+        public static float seekerAttackCooldown = 0;
         public override void Initialize(IClientApi clientApi)
         {
             PropHuntMod.Initialize(clientApi);

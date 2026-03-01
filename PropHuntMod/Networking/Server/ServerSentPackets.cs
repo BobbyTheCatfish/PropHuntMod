@@ -26,17 +26,20 @@ namespace PropHuntMod.Networking.Server
         public bool IsSeeker;
         public ushort PropSwapLimit;
         public int SeekerWaitTime;
+        public float SeekerAttackCooldown;
         public void WriteData(IPacket packet)
         {
             packet.Write(IsSeeker);
             packet.Write(PropSwapLimit);
             packet.Write(SeekerWaitTime);
+            packet.Write(SeekerAttackCooldown);
         }
         public void ReadData(IPacket packet)
         {
             IsSeeker = packet.ReadBool();
             PropSwapLimit = packet.ReadUShort();
             SeekerWaitTime = packet.ReadInt();
+            SeekerAttackCooldown = packet.ReadFloat();
         }
     }
     public class PropLocation : Client.PropLocation

@@ -116,7 +116,8 @@ namespace PropHuntMod.Networking.Server
             {
                 IsSeeker = player.seeker,
                 PropSwapLimit = Config.MaxSwapCount,
-                SeekerWaitTime = started ? 0 : Server.instance.SeekerTimer.seconds
+                SeekerWaitTime = started ? 0 : Server.instance.SeekerTimer.seconds,
+                SeekerAttackCooldown = Config.AttackCooldown,
             };
 
             sender.SendSingleData(CustomPackets.RoundStart, data, id);

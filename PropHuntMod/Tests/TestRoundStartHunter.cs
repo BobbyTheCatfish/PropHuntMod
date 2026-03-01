@@ -25,7 +25,8 @@ namespace PropHuntMod.Tests
             {
                 IsSeeker = true,
                 PropSwapLimit = 0,
-                SeekerWaitTime = Config.SeekerCountdown
+                SeekerWaitTime = Config.SeekerCountdown,
+                SeekerAttackCooldown = Config.AttackCooldown
             };
 
             var sender = typeof(ServerNetwork).GetField("sender").GetValue(null) as IServerAddonNetworkSender<CustomPackets>;

@@ -50,12 +50,11 @@ namespace PropHuntMod.Utils
 
             _movementMethod = Config.Bind("Prop Movement", "Movement Method", MovementMethods.Numpad, "Which control style to use for prop movement");
             _movementMethod.SettingChanged += (a, b) => { PropMovementControls.MovementState = MovementState.Normal; };
-
             _propPositionReset = Config.Bind("Prop Movement", "Reset Position", KeyCode.Keypad5, "Resets the prop position");
 
             _seekerWaitTime = Config.Bind("Server Settings", "Seeker Wait Time", 30, "How long the seekers have to wait for before they can start seeking");
             _seekerCount = Config.Bind("Server Settings", "Seeker Count", 1, "How many seekers per round?");
-            _attackCooldown = Config.Bind("Server Settings", "AttackCooldown", 0f, "How long the seekers should have to wait between attacks");
+            _attackCooldown = Config.Bind("Server Settings", "Attack Cooldown", 0f, "How long the seekers should have to wait between attacks");
 
             if (AllowDebugFeatures)
             {
