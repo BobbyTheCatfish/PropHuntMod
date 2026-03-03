@@ -2,6 +2,7 @@
 using SSMP.Api.Client;
 using SSMP.Game;
 using PropHuntMod.Players;
+using PropHuntMod.Commands;
 
 namespace PropHuntMod.Networking.Client
 {
@@ -35,8 +36,9 @@ namespace PropHuntMod.Networking.Client
                 string[] helpTextCommands = new string[]
                 {
                     "Prop Hunt Commands:",
-                    "/hunt: starts a round",
-                    "/stop: stops a round",
+                    $"/ph {ServerCommands.START}: starts a round",
+                    $"/ph {ServerCommands.STOP}: stops a round",
+                    $"/ph {ServerCommands.SETTINGS}: configure server settings",
                     "/sync: syncs other player's props",
                 };
 

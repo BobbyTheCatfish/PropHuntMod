@@ -14,7 +14,10 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using PropHuntMod.Props;
 using PropHuntMod.Players;
+
+#if DEBUG
 using PropHuntMod.Tests;
+#endif
 
 /**
  * FEATURE LIST

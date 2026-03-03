@@ -8,40 +8,6 @@ using PropHuntMod.Props;
 
 namespace PropHuntMod.Commands
 {
-    internal class StartGameCommand : IServerCommand
-    {
-        public bool AuthorizedOnly => false;
-        public string Trigger => "/hunt";
-        public string[] Aliases => new string[] { };
-        public void Execute(ICommandSender sender, string[] args)
-        {
-            if (Server.GameState != Utils.GameState.NotStarted)
-            {
-                sender.SendMessage("The game has already started!");
-                return;
-            }
-
-            Server.instance.GameStart();
-        }
-    }
-
-    internal class StopGameCommand : IServerCommand
-    {
-        public bool AuthorizedOnly => false;
-        public string Trigger => "/stop";
-        public string[] Aliases => new string[] { };
-        public void Execute(ICommandSender sender, string[] args)
-        {
-            if (Server.GameState == Utils.GameState.NotStarted)
-            {
-                sender.SendMessage("The game hasn't started yet!");
-                return;
-            }
-
-            Server.instance.CheckGameOver(null, true);
-        }
-    }
-
     internal class ShowHitboxes : IClientCommand
     {
         public bool AuthorizedOnly => false;

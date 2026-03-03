@@ -1,7 +1,11 @@
 ﻿using BepInEx.Configuration;
-using UnityEngine;
+using Newtonsoft.Json;
 using PropHuntMod.Networking.Client;
 using PropHuntMod.Props;
+using System;
+using System.IO;
+using System.Reflection;
+using UnityEngine;
 
 
 namespace PropHuntMod.Utils
@@ -23,10 +27,6 @@ namespace PropHuntMod.Utils
         static ConfigEntry<KeyCode> _propPositionReset;
         static ConfigEntry<MovementMethods> _movementMethod;
 
-        static ConfigEntry<int> _seekerWaitTime;
-        static ConfigEntry<int> _seekerCount;
-        static ConfigEntry<float> _attackCooldown;
-
         public static bool DisableDamage => _disableDamage.Value && Client.GameState != GameState.NotStarted;
         //public static float attackCooldown { get { return _attackCooldown.Value; } }
         public static KeyCode SwapPropKey => _swapPropKey.Value;
@@ -36,10 +36,9 @@ namespace PropHuntMod.Utils
         public static KeyCode PropPositionReset => _propPositionReset.Value;
         public static MovementMethods MovementMethod => _movementMethod.Value;
 
-        public static int SeekerCountdown => _seekerWaitTime.Value;
-        public static int SeekerCount => _seekerCount.Value;
-
-        public static float AttackCooldown => _attackCooldown.Value;
+        public static int SeekerCountdown = 30;
+        public static int SeekerCount = 1;
+        public static float AttackCooldown = 0;
 
         public static void LoadConfig(ConfigFile Config)
         {
@@ -52,13 +51,71 @@ namespace PropHuntMod.Utils
             _movementMethod.SettingChanged += (a, b) => { PropMovementControls.MovementState = MovementState.Normal; };
             _propPositionReset = Config.Bind("Prop Movement", "Reset Position", KeyCode.Keypad5, "Resets the prop position");
 
-            _seekerWaitTime = Config.Bind("Server Settings", "Seeker Wait Time", 30, "How long the seekers have to wait for before they can start seeking");
-            _seekerCount = Config.Bind("Server Settings", "Seeker Count", 1, "How many seekers per round?");
-            _attackCooldown = Config.Bind("Server Settings", "Attack Cooldown", 0f, "How long the seekers should have to wait between attacks");
+            //_seekerWaitTime = Config.Bind("Server Settings", "Seeker Wait Time", 30, "How long the seekers have to wait for before they can start seeking");
+            //_seekerCount = Config.Bind("Server Settings", "Seeker Count", 1, "How many seekers per round?");
+            //_attackCooldown = Config.Bind("Server Settings", "Attack Cooldown", 0f, "How long the seekers should have to wait between attacks");
+            LoadServerConfig();
 
             if (AllowDebugFeatures)
             {
                 _hideHornetKey = Config.Bind("General", "KeyHideHornet", KeyCode.H, "The key to hide hornet in the event that she becomes visible while hiding");
+            }
+        }
+
+        static string filename = "server_settings.json";
+
+        class ServerSettings
+        {
+            public int SeekerCountdown = 30;
+            public int SeekerCount = 1;
+            public float AttackCooldown = 0;
+        }
+        static void LoadServerConfig()
+        {
+            var dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var filePath = Path.Combine(dirName, filename);
+
+            if (!File.Exists(filePath))
+            {
+                SaveServerConfig();
+                return;
+            }
+
+            try
+            {
+                var fileContents = File.ReadAllText(filePath);
+                var settings = JsonConvert.DeserializeObject<ServerSettings>(fileContents);
+                SeekerCountdown = settings.SeekerCountdown;
+                SeekerCount = settings.SeekerCount;
+                AttackCooldown = settings.AttackCooldown;
+            }
+            catch (Exception e)
+            {
+                Log.LogError($"Could not load server settings from file:\n{e}");
+            }
+        }
+
+        public static void SaveServerConfig()
+        {
+            var dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var filePath = Path.Combine(dirName, "server_settings.json");
+
+            var serverSettings = new ServerSettings
+            {
+                SeekerCountdown = SeekerCountdown,
+                SeekerCount = SeekerCount,
+                AttackCooldown = AttackCooldown,
+            };
+
+            var settingsJson = JsonConvert.SerializeObject(serverSettings, Formatting.Indented);
+
+            try
+            {
+                File.WriteAllText(filePath, settingsJson);
+            }
+            catch (Exception e)
+            {
+                Log.LogError($"Could not write server settings to file:\n{e}");
             }
         }
     }

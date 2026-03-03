@@ -147,9 +147,11 @@
     <Compile Include="Networking\Commands.cs" />
     <Compile Include="Patches\AttackCooldown.cs" />
     <Compile Include="Patches\ScenePatches.cs" />
-    <Compile Include="Tests\TestPropCycle.cs" />
+	<Compile Include="Tests\**\*.*" Condition="'$(Configuration)' == 'Debug'" />
+    <!--<Compile Include="Tests\TestPropCycle.cs" />
     <Compile Include="Tests\TestRoundStartHunter.cs" />
     <Compile Include="Tests\_BaseTest.cs" />
+	-->
     <Compile Include="Utils\Effects\EffectVerticalSweep.cs" />
     <Compile Include="Patches\NoDamage.cs" />
     <Compile Include="PlayerManagement\PlayerManager.cs" />

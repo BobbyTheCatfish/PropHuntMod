@@ -36,8 +36,7 @@ namespace PropHuntMod.Networking.Server
 
             ServerNetwork.Init(serverApi, this);
 
-            serverApi.CommandManager.RegisterCommand(new Commands.StartGameCommand());
-            serverApi.CommandManager.RegisterCommand(new Commands.StopGameCommand());
+            serverApi.CommandManager.RegisterCommand(new Commands.ServerCommands());
 
             serverApi.ServerManager.PlayerConnectEvent += player =>
             {
