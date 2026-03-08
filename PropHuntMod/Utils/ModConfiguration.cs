@@ -13,7 +13,7 @@ namespace PropHuntMod.Utils
     internal static class Config
     {
         public const string ModName = "Prop Hunt";
-        public const string ModVersion = "1.0.1";
+        public const string ModVersion = "1.0.2";
         public const int SSMPApiVersion = 1;
         public const int MaxSwapCount = 0;
 

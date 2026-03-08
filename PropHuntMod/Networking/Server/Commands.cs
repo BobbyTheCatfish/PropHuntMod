@@ -11,15 +11,16 @@ namespace PropHuntMod.Commands
     internal class ServerCommands : IServerCommand
     {
         public bool AuthorizedOnly => false;
-        public string Trigger => "/prophunt";
-        public string[] Aliases => new string[] { "/ph", "prop" };
+        public string Trigger => PREFIX;
+        public string[] Aliases => new string[] { "/prophunt", "/prop" };
 
         public const string START = "start";
         public const string STOP = "stop";
         public const string SETTINGS = "config";
+        public const string PREFIX = "/ph";
         public void Execute(ICommandSender sender, string[] args)
         {
-            var usage = $"Invalid Usage. /prophunt <{START}|{STOP}|{SETTINGS}>";
+            var usage = $"Invalid Usage. /{PREFIX} <{START}|{STOP}|{SETTINGS}>";
             if (args.Length < 2)
             {
                 sender.SendMessage(usage);
@@ -77,7 +78,7 @@ namespace PropHuntMod.Commands
             const string NUM_SEEKERS = "seekercount";
             const string ATTACK_COOL = "attackcooldown";
 
-            var usage = $"Invalid Usage. /prophunt set <{SEEKER_WAIT}|{NUM_SEEKERS}|{ATTACK_COOL}> <value>";
+            var usage = $"Invalid Usage. /{PREFIX} {SETTINGS} <{SEEKER_WAIT}|{NUM_SEEKERS}|{ATTACK_COOL}> <value>";
             if (args.Length < 4)
             {
                 sender.SendMessage(usage);

@@ -27,11 +27,13 @@ You can use a mod like [QuickWarp](https://thunderstore.io/c/hollow-knight-silks
 > It's worth noting that some rooms (especially memories) may not have any props, or may have very few.
 If you encounter any, please create an issue on the mod's [GitHub](https://github.com/BobbyTheCatfish/PropHuntMod/issues).
 
-Take this time before starting to establish a few rules:
-- Will seekers wait until all hiders say they're ready, or just wait for a length of time? (30 seconds by default)
+Take this time before starting to establish a few rules and configure some settings (see [commands](#commands) section):
+- How long should hiders have before the seekers start? (30 seconds by default)
 - Can hiders hide in other rooms? (Only reccomended for larger games)
+- How many seekers should there be? (1 by default)
+- Should seekers have an attack cooldown, and how many seconds should it be? (none by default)
 
-Once a round is started with [/hunt](#commands), 1 player will be selected to be the seeker, and everyone else will be a hider. 
+Once a round is started with [/ph start](#commands), at least 1 player will be selected to be the seeker, and everyone else will be a hider. 
 
 #### Hiders
 As soon as you're chosen as a hider, you'll be hidden as a random prop. You can change that prop and move it around if desired. (See [keybinds](#keybinds))
@@ -43,7 +45,7 @@ If you're the last player found, you win!
 > If you're playing with a lot of people, it may be a good idea to allow hiding in nearby rooms and sub-areas.
 
 #### Seekers
-As soon as you're chosen as a seeker, your screen will turn black for 30 seconds, and you'll be unable to move. The hiders will use this time to hide.
+As soon as you're chosen as a seeker, your screen will turn black for 30 seconds (by default), and you'll be unable to move. The hiders will use this time to hide.
 Once the waiting period is over, you can go searching for the hiders. **Attacking a prop will reveal the player underneath.**
 Once a hider is found, they become a seeker.
 
@@ -68,12 +70,13 @@ While hiding, you can move your prop in a few ways, within a few limits. There a
 #### Numpad
 ```
 7 8 9      forward         up          back
-4 5 6       left      center/reset     right
-1 2 3     rot. left       down      rot. right
+4 5 6       left      center/reset     right  
+1 2 3     rot. left       down       rot. right
+-   +     scale down                  scale up 
 ```
 
 #### Controller Left/Right Stick
-Press in the selected stick to change modes (Move in 2d space, move forward/back, rotate, stop movement), and move the stick to
+Press in the selected stick to change modes (Move in 2d space, move forward/back, rotate, scale, stop movement), and move the stick to
 move the prop. An indicator will appear near your healthbar to indicate which movement mode you're in.
 
 #### Keyboard Movement
@@ -83,8 +86,9 @@ You can switch between modes by pressing the `taunt` button.
 
 ### Commands
 These commands can be used by pressing `Y` to open the SSMP chat
-- `/hunt` (starts a round of prop hunt)
-- `/stop` (stops the current round of prop hunt)
+- `/ph start` (starts a round of prop hunt)
+- `/ph stop` (stops the current round of prop hunt)
+- `/ph config <seekerwait|seekercount|attackcooldown>` (set seeker settings)
 - `/sync` (syncs the states of other players props)
 
 
@@ -92,8 +96,6 @@ These commands can be used by pressing `Y` to open the SSMP chat
 ## Roadmap
 These are just some things that I'd like to add in the future
 - Add game configuration
-	- select number of seekers
-	- seeker wait time
 	- limit the number of prop swaps per player per round
 
 ## Reporting Issues
