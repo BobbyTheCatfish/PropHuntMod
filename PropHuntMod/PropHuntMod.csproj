@@ -144,10 +144,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Networking\Commands.cs" />
+    <Compile Include="Networking\Client\Commands.cs" />
+    <Compile Include="Networking\Server\Commands.cs" />
     <Compile Include="Patches\AttackCooldown.cs" />
+    <Compile Include="Patches\MistTest.cs" />
     <Compile Include="Patches\ScenePatches.cs" />
-	<Compile Include="Tests\**\*.*" Condition="'$(Configuration)' == 'Debug'" />
+    <Compile Include="Tests\**\*.*" Condition="'$(Configuration)' == 'Debug'" />
     <!--<Compile Include="Tests\TestPropCycle.cs" />
     <Compile Include="Tests\TestRoundStartHunter.cs" />
     <Compile Include="Tests\_BaseTest.cs" />
