@@ -30,7 +30,8 @@ namespace PropHuntMod.Networking.Server
         {
             instance = this;
             api = serverApi;
-            this.Logger.Info("Prop Hunt Loaded.");
+            Log.SetLogger(Logger);
+            Log.LogInfo("Prop Hunt Loaded.");
 
             Reset();
 

@@ -28,6 +28,7 @@ namespace PropHuntMod.Networking.Client
         {
             PropHuntMod.Initialize(clientApi);
             
+            Log.SetLogger(Logger);
             Log.LogInfo("Prop Hunt Loaded.");
             ClientNetwork.Init(clientApi, this);
 

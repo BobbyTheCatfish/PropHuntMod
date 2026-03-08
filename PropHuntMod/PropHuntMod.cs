@@ -61,7 +61,6 @@ namespace PropHuntMod
         {
             Instance = this;
             Utils.Config.LoadConfig(Config);
-            Log.SetLogger(base.Logger);
 
             ClientAddon.RegisterAddon(new Client());
             ServerAddon.RegisterAddon(new Server());

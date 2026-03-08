@@ -147,7 +147,6 @@
     <Compile Include="Networking\Client\Commands.cs" />
     <Compile Include="Networking\Server\Commands.cs" />
     <Compile Include="Patches\AttackCooldown.cs" />
-    <Compile Include="Patches\MistTest.cs" />
     <Compile Include="Patches\ScenePatches.cs" />
     <Compile Include="Tests\**\*.*" Condition="'$(Configuration)' == 'Debug'" />
     <!--<Compile Include="Tests\TestPropCycle.cs" />
