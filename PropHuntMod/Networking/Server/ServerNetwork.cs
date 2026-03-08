@@ -230,8 +230,8 @@ namespace PropHuntMod.Networking.Server
 
             if (disabling)
             {
-                player.propName = null;
-                player.propPath = null;
+                player.propName = "";
+                player.propPath = "";
             }
             else
             {
@@ -276,8 +276,8 @@ namespace PropHuntMod.Networking.Server
             }
             else
             {
-                player.propName = data.PropName;
-                player.propPath = data.PropPath;
+                player.propName = data.PropName ?? "";
+                player.propPath = data.PropPath ?? "";
                 player.propLocation = data.PropLocation;
                 player.propRotation = data.PropRotation;
                 player.propScale = data.PropRotation;
