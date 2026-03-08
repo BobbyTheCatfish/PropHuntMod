@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SSMP.Math;
 
 namespace PropHuntMod.Utils
 {
@@ -69,5 +65,9 @@ namespace PropHuntMod.Utils
 
         public const float MIN_S = 0.5f;
         public const float MAX_S = 2f;
+
+        public const float DEFAULT_ROTATION = 0;
+        public const float DEFAULT_SCALE = 1;
+        public static readonly Vector3 DEFAULT_LOCATION = new Vector3(0, 0, 0);
     }
 }

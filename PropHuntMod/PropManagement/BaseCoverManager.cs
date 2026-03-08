@@ -5,6 +5,8 @@ using GlobalEnums;
 using System;
 using PropHuntMod.Players;
 
+using Vector3 = SSMP.Math.Vector3;
+
 namespace PropHuntMod.Props
 {
     using PlayerID = UInt16;
@@ -18,10 +20,10 @@ namespace PropHuntMod.Props
         //public string currentScene;
         public PlayerID playerID;
         internal bool isRemote = true;
-        internal Vector3 Position => cover?.transform.localPosition ?? Vector3.zero;
+        internal Vector3 Position => (Vector3)cover?.transform.localPosition ?? Consts.DEFAULT_LOCATION;
         internal float Rotation => cover?.transform.GetLocalRotation2D() ?? 0;
         internal float Scale { get; private set; } = 1;
-        internal Vector2 OriginalScale { get; private set; } = Vector3.one;
+        internal Vector2 OriginalScale { get; private set; } = Vector2.one;
         public bool IsHiding => cover != null;
         public void SetPropLocation(Vector3 location)
         {
@@ -31,7 +33,7 @@ namespace PropHuntMod.Props
                 return;
             }
 
-            cover.transform.localPosition = location;
+            cover.transform.localPosition = (UnityEngine.Vector3)location;
         }
 
         public void SetPropRotation(float rotation)
@@ -54,7 +56,7 @@ namespace PropHuntMod.Props
                 return;
             }
 
-            cover.transform.SetScale2D(OriginalScale * scale);
+            cover.transform.SetScale2D((UnityEngine.Vector2)OriginalScale * scale);
         }
 
         public void SetPropLocation(Vector3 location, float rotation, float scale)
@@ -72,9 +74,9 @@ namespace PropHuntMod.Props
         }
         public static void ConstrainPropLocation(ref Vector3 location, ref float rotation, ref float scale)
         {
-            location.x = Mathf.Clamp(location.x, Consts.MIN_X, Consts.MAX_X);
-            location.y = Mathf.Clamp(location.y, Consts.MIN_Y, Consts.MAX_Y);
-            location.z = Mathf.Clamp(location.z, Consts.MIN_Z, Consts.MAX_Z);
+            location.X = Mathf.Clamp(location.X, Consts.MIN_X, Consts.MAX_X);
+            location.Y = Mathf.Clamp(location.Y, Consts.MIN_Y, Consts.MAX_Y);
+            location.Z = Mathf.Clamp(location.Z, Consts.MIN_Z, Consts.MAX_Z);
 
             rotation %= 360;
 
@@ -160,8 +162,8 @@ namespace PropHuntMod.Props
                     sprite.maskInteraction = SpriteMaskInteraction.None;
                 }
 
-                OriginalScale = (Vector2)cover.transform.lossyScale;
-                SetPropLocation(Vector3.zero, 0, 1);
+                OriginalScale = cover.transform.lossyScale;
+                SetPropLocation(Consts.DEFAULT_LOCATION, Consts.DEFAULT_ROTATION, Consts.DEFAULT_SCALE);
 
                 cover.SetActive(true);
 

@@ -5,7 +5,8 @@ using SSMP.Api.Server.Networking;
 using SSMP.Networking.Packet;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+
+using Vector3 = SSMP.Math.Vector3;
 
 namespace PropHuntMod.Networking.Server
 {
@@ -271,11 +272,7 @@ namespace PropHuntMod.Networking.Server
 
             if (player.seeker)
             {
-                player.propName = "";
-                player.propPath = "";
-                player.propLocation = Vector3.zero;
-                player.propRotation = 0;
-                player.propScale = 1;
+                player.ResetProp();
             }
             else
             {
@@ -347,10 +344,7 @@ namespace PropHuntMod.Networking.Server
                 return;
             }
 
-            owner.propName = null;
-            owner.propLocation = Vector3.zero;
-            owner.propRotation = 0;
-            owner.propScale = 1;
+            owner.ResetProp();
 
             ForwardPropFound(id, data.PropOwnerID);
 

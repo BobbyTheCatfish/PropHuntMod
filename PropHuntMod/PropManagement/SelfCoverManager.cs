@@ -3,6 +3,8 @@ using PropHuntMod.Networking.Client;
 using UnityEngine;
 using PropHuntMod.Players;
 
+using Vector3 = SSMP.Math.Vector3;
+
 namespace PropHuntMod.Props
 {
     enum Direction { Left, Right, Up, Down, Front, Back, Reset, RotateLeft, RotateRight, ScaleUp, ScaleDown };
@@ -36,9 +38,9 @@ namespace PropHuntMod.Props
                 return;
             }
 
-            var x = Position.x;
-            var y = Position.y;
-            var z = Position.z;
+            var x = Position.X;
+            var y = Position.Y;
+            var z = Position.Z;
             var rotation = Rotation;
             var scale = Scale;
 
@@ -74,11 +76,11 @@ namespace PropHuntMod.Props
             }
             else if (direction == Direction.Reset)
             {
-                x = 0;
-                y = 0;
-                z = 0;
-                rotation = 0;
-                scale = 1;
+                x = Consts.DEFAULT_LOCATION.X;
+                y = Consts.DEFAULT_LOCATION.Y;
+                z = Consts.DEFAULT_LOCATION.Z;
+                rotation = Consts.DEFAULT_ROTATION;
+                scale = Consts.DEFAULT_SCALE;
             }
             else
             {

@@ -3,7 +3,8 @@ using PropHuntMod.Props;
 using PropHuntMod.Utils;
 using SSMP.Api.Client;
 using SSMP.Api.Client.Networking;
-using UnityEngine;
+
+using Vector3 = SSMP.Math.Vector3;
 
 namespace PropHuntMod.Networking.Client
 {

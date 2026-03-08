@@ -4,6 +4,7 @@ using SSMP.Api.Client;
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Vector3 = SSMP.Math.Vector3;
 
 namespace PropHuntMod.Players
 {
@@ -16,9 +17,9 @@ namespace PropHuntMod.Players
         public IClientPlayer PlayerAvatar => PropHuntMod.client.ClientManager.GetPlayer(playerID);
         public string currentCoverObjName = "";
         public string currentCoverObjPath = "";
-        public Vector3 currentCoverObjLocation = Vector3.zero;
-        public float currentCoverObjRotation = 0;
-        public float currentCoverObjScale = 1;
+        public Vector3 currentCoverObjLocation = Consts.DEFAULT_LOCATION;
+        public float currentCoverObjRotation = Consts.DEFAULT_ROTATION;
+        public float currentCoverObjScale = Consts.DEFAULT_SCALE;
         public bool currentHideState = false;
         public PlayerID playerID;
 
@@ -157,7 +158,7 @@ namespace PropHuntMod.Players
 
         public void ResetCoverPosition()
         {
-            SetPropLocation(Vector3.zero, 0, 1);
+            SetPropLocation(Consts.DEFAULT_LOCATION, Consts.DEFAULT_ROTATION, Consts.DEFAULT_SCALE);
         }
 
         public static void EnsureAllPropCovers()

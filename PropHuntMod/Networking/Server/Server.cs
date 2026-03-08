@@ -135,12 +135,9 @@ namespace PropHuntMod.Networking.Server
             foreach (var player in players.Values)
             {
                 player.seeker = false;
-                player.swapCount = 0;
-                player.propName = "";
-                player.propRotation = 0;
-                player.propScale = 1;
-                player.propLocation = Vector3.zero;
                 player.hidden = false;
+                player.swapCount = 0;
+                player.ResetProp();
             }
         }
         public void GameStart()

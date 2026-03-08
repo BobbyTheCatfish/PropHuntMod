@@ -1,11 +1,8 @@
 ﻿using PropHuntMod.Utils;
 using SSMP.Networking.Packet;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+
+using Vector3 = SSMP.Math.Vector3;
 
 namespace PropHuntMod.Networking.Client
 {
@@ -38,9 +35,7 @@ namespace PropHuntMod.Networking.Client
         public float PropScale { get; set; }
         public virtual void WriteData(IPacket packet)
         {
-            packet.Write(PropPosition.x);
-            packet.Write(PropPosition.y);
-            packet.Write(PropPosition.z);
+            packet.Write(PropPosition);
 
             packet.Write(PropRotation);
             packet.Write(PropScale);
@@ -48,7 +43,7 @@ namespace PropHuntMod.Networking.Client
 
         public virtual void ReadData(IPacket packet)
         {
-            PropPosition = new Vector3(packet.ReadFloat(), packet.ReadFloat(), packet.ReadFloat());
+            PropPosition = packet.ReadVector3();
             PropRotation = packet.ReadFloat();
             PropScale = packet.ReadFloat();
         }
@@ -101,9 +96,7 @@ namespace PropHuntMod.Networking.Client
             packet.Write(PropName);
             packet.Write(PropPath);
 
-            packet.Write(PropLocation.x);
-            packet.Write(PropLocation.y);
-            packet.Write(PropLocation.z);
+            packet.Write(PropLocation);
             
             packet.Write(PropRotation);
             packet.Write(PropScale);
@@ -114,7 +107,7 @@ namespace PropHuntMod.Networking.Client
             PropName = packet.ReadString();
             PropPath = packet.ReadString();
 
-            PropLocation = new Vector3(packet.ReadFloat(), packet.ReadFloat(), packet.ReadFloat());
+            PropLocation = packet.ReadVector3();
             PropRotation = packet.ReadFloat();
             PropScale = packet.ReadFloat();
         }
