@@ -1,7 +1,7 @@
 {
   "name": "Prop_Hunt",
   "description": "Play hide and seek with your friends as you hide as objects scattered around the map. Almost every room has a wide variety of props to hide as, so may the best bug win!",
-  "version_number": "1.0.1",
+  "version_number": "1.0.2",
   "dependencies": [
     "BepInEx-BepInExPack_Silksong-5.4.2304",
     "SSMP-SSMP-0.1.0"
