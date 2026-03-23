@@ -6,34 +6,41 @@ using Vector3 = SSMP.Math.Vector3;
 
 namespace PropHuntMod.Networking.Client
 {
-    public class PropSwap : IPacketData
+    public class Packet : IPacketData
     {
         public bool IsReliable => true;
-        public bool DropReliableDataIfNewerExists => true;
+
+        public virtual bool DropReliableDataIfNewerExists => true;
+
+        public virtual void ReadData(IPacket packet) { }
+
+        public virtual void WriteData(IPacket packet) { }
+    }
+
+    public class PropSwap : Packet
+    {
         public string propName = "";
         public string propPath = "";
         public int TicketID = -1;
-        public virtual void WriteData(IPacket packet)
+        public override void WriteData(IPacket packet)
         {
             packet.Write(propName);
             packet.Write(propPath);
             packet.Write(TicketID);
         }
-        public virtual void ReadData(IPacket packet)
+        public override void ReadData(IPacket packet)
         {
             propName = packet.ReadString();
             propPath = packet.ReadString();
             TicketID = packet.ReadInt();
         }
     }
-    public class PropLocation : IPacketData
+    public class PropLocation : Packet
     {
-        public bool IsReliable => true;
-        public bool DropReliableDataIfNewerExists => true;
         public Vector3 PropPosition { get; set; }
         public float PropRotation { get; set; }
         public float PropScale { get; set; }
-        public virtual void WriteData(IPacket packet)
+        public override void WriteData(IPacket packet)
         {
             packet.Write(PropPosition);
 
@@ -41,57 +48,52 @@ namespace PropHuntMod.Networking.Client
             packet.Write(PropScale);
         }
 
-        public virtual void ReadData(IPacket packet)
+        public override void ReadData(IPacket packet)
         {
             PropPosition = packet.ReadVector3();
             PropRotation = packet.ReadFloat();
             PropScale = packet.ReadFloat();
         }
     }
-    public class HideStatus : IPacketData
+    public class HideStatus : Packet
     {
-        public bool IsReliable => true;
-        public bool DropReliableDataIfNewerExists => true;
         public bool IsHiding { get; set; }
         public int TicketID = -1;
-        public virtual void WriteData(IPacket packet)
+        public override void WriteData(IPacket packet)
         {
             packet.Write(IsHiding);
             packet.Write(TicketID);
         }
 
-        public virtual void ReadData(IPacket packet)
+        public override void ReadData(IPacket packet)
         {
             IsHiding = packet.ReadBool();
             TicketID = packet.ReadInt();
         }
     }
-    public class PropFound : IPacketData
+    public class PropFound : Packet
     {
-        public bool IsReliable => true;
-        public bool DropReliableDataIfNewerExists => true;
+        public override bool DropReliableDataIfNewerExists => false;
         public ushort PropOwnerID { get; set; }
-        public virtual void WriteData(IPacket packet)
+        public override void WriteData(IPacket packet)
         {
             packet.Write(PropOwnerID);
         }
-        public virtual void ReadData(IPacket packet)
+        public override void ReadData(IPacket packet)
         {
             PropOwnerID = packet.ReadUShort();
         }
     }
 
-    public class Sync : IPacketData
+    public class Sync : Packet
     {
-        public bool IsReliable => true;
-        public bool DropReliableDataIfNewerExists => true;
         public string PropName { get; set; }
         public string PropPath { get; set; }
         public Vector3 PropLocation { get; set; }
         public float PropRotation { get; set; }
         public float PropScale { get; set; }
 
-        public virtual void WriteData(IPacket packet)
+        public override void WriteData(IPacket packet)
         {
             packet.Write(PropName);
             packet.Write(PropPath);
@@ -102,7 +104,7 @@ namespace PropHuntMod.Networking.Client
             packet.Write(PropScale);
         }
 
-        public virtual void ReadData(IPacket packet)
+        public override void ReadData(IPacket packet)
         {
             PropName = packet.ReadString();
             PropPath = packet.ReadString();

@@ -55,13 +55,14 @@ namespace PropHuntMod.Networking.Server
             return true;
         }
 
-        public static void Broadcast(ushort senderID, CustomPackets packetID, IPacketData data)
+        public static void Broadcast(ushort senderID, CustomPackets packetID, Client.Packet data, bool collection)
         {
             foreach (var player in Server.api.ServerManager.Players)
             {
                 if (player.Id == senderID) continue;
 
-                sender.SendSingleData(packetID, data, player.Id);
+                if (collection) sender.SendCollectionData(packetID, data, player.Id);
+                else sender.SendSingleData(packetID, data, player.Id);
             }
         }
 
@@ -78,7 +79,7 @@ namespace PropHuntMod.Networking.Server
                 ticketId = GenerateTicket(senderID, fix).Id;
             }
 
-            sender.SendSingleData(CustomPackets.FailedAction, new FailedAction
+            sender.SendCollectionData(CustomPackets.FailedAction, new FailedAction
             {
                 AffectedID = affectedID,
                 FailedPacket = packetType,
@@ -98,7 +99,7 @@ namespace PropHuntMod.Networking.Server
                 Id = id,
                 propName = propName,
                 propPath = propPath
-            });
+            }, true);
         }
 
         public static void BroadcastRoundStart()
@@ -136,7 +137,7 @@ namespace PropHuntMod.Networking.Server
                 PropPosition = propPosition,
                 PropRotation = propRotation,
                 PropScale = propScale
-            });
+            }, true);
         }
 
         public static void ForwardHideStatus(ushort id, bool isHiding)
@@ -146,7 +147,7 @@ namespace PropHuntMod.Networking.Server
             {
                 Id = id,
                 IsHiding = isHiding
-            });
+            }, true);
         }
 
         public static void ForwardPropFound(ushort id, ushort propOwnerID)
@@ -160,7 +161,7 @@ namespace PropHuntMod.Networking.Server
                     PropOwnerID = propOwnerID,
                 };
 
-                sender.SendSingleData(CustomPackets.PropFound, sendData, player.Id);
+                sender.SendCollectionData(CustomPackets.PropFound, sendData, player.Id);
             }
         }
 
