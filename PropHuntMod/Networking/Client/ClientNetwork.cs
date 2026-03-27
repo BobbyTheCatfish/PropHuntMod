@@ -3,23 +3,41 @@ using PropHuntMod.Props;
 using PropHuntMod.Utils;
 using SSMP.Api.Client;
 using SSMP.Api.Client.Networking;
-
+using SSMP.Networking.Packet;
 using Vector3 = SSMP.Math.Vector3;
 
 namespace PropHuntMod.Networking.Client
 {
     internal static class ClientNetwork
     {
+        static IClientApi api;
         static IClientAddonNetworkSender<CustomPackets> sender;
         static IClientAddonNetworkReceiver<CustomPackets> receiver;
 
         /******************
          * PACKET SENDERS *
          ******************/
+
+        static void SendData(CustomPackets packetId, IPacketData data)
+        {
+            if (api.NetClient.IsConnected && sender != null)
+            {
+                sender.SendSingleData(packetId, data);
+            }
+        }
+
+        static void SendCollectionData(CustomPackets packetId, Packet data)
+        {
+            if (api.NetClient.IsConnected && sender != null)
+            {
+                sender.SendCollectionData(packetId, data);
+            }
+        }
+
         public static void SendPropSwap(Prop prop, int ticket = -1)
         {
             Log.LogInfo($"Sending prop swap: {prop?.name}");
-            sender.SendSingleData(CustomPackets.PropSwap, new PropSwap
+            SendData(CustomPackets.PropSwap, new PropSwap
             {
                 propName = prop?.name ?? "",
                 propPath = prop?.path ?? "",
@@ -30,7 +48,7 @@ namespace PropHuntMod.Networking.Client
         public static void SendPropLocation(Vector3 propPosition, float propRotation, float propScale)
         {
             Log.LogInfo($"Sending prop location: {propPosition}, {propRotation}, {propScale}");
-            sender.SendSingleData(CustomPackets.PropLocation, new PropLocation
+            SendData(CustomPackets.PropLocation, new PropLocation
             {
                 PropPosition = propPosition,
                 PropRotation = propRotation,
@@ -41,7 +59,7 @@ namespace PropHuntMod.Networking.Client
         public static void SendHideStatus(bool isHiding, int ticket = -1)
         {
             Log.LogInfo($"Sending hide status: {isHiding}");
-            sender.SendSingleData(CustomPackets.HideStatus, new HideStatus
+            SendData(CustomPackets.HideStatus, new HideStatus
             {
                 IsHiding = isHiding,
                 TicketID = ticket
@@ -51,7 +69,7 @@ namespace PropHuntMod.Networking.Client
         public static void SendPropFound(ushort propOwnerID)
         {
             Log.LogInfo($"Sending prop found: {propOwnerID}");
-            sender.SendSingleData(CustomPackets.PropFound, new PropFound
+            SendCollectionData(CustomPackets.PropFound, new PropFound
             {
                 PropOwnerID = propOwnerID
             });
@@ -60,7 +78,7 @@ namespace PropHuntMod.Networking.Client
         public static void SendSync(string propName, string propPath, Vector3 propPosition, float propRotation, float propScale)
         {
             Log.LogInfo($"Sending sync data: {propName}, {propPosition}, {propRotation}, {propScale}");
-            sender.SendSingleData(CustomPackets.Sync, new Sync
+            SendData(CustomPackets.Sync, new Sync
             {
                 PropName = propName,
                 PropPath = propPath,
@@ -72,6 +90,7 @@ namespace PropHuntMod.Networking.Client
 
         public static void Init(IClientApi clientApi, ClientAddon clientAddon)
         {
+            api = clientApi;
             sender = clientApi.NetClient.GetNetworkSender<CustomPackets>(clientAddon);
             receiver = clientApi.NetClient.GetNetworkReceiver<CustomPackets>(clientAddon, Server.Packets.Instantiate);
 

@@ -1,5 +1,6 @@
 ﻿using PropHuntMod.Utils;
 using SSMP.Networking.Packet;
+using SSMP.Networking.Packet.Data;
 using System;
 
 using Vector3 = SSMP.Math.Vector3;
@@ -128,7 +129,7 @@ namespace PropHuntMod.Networking.Client
                 case CustomPackets.HideStatus:
                     return new HideStatus();
                 case CustomPackets.PropFound:
-                    return new PropFound();
+                    return new PacketDataCollection<PropFound>();
                 case CustomPackets.Sync:
                     return new Sync();
                 default:
