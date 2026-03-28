@@ -36,7 +36,7 @@ namespace PropHuntMod.Networking.Client
 
         public static void SendPropSwap(Prop prop, int ticket = -1)
         {
-            Log.LogInfo($"Sending prop swap: {prop?.name}");
+            Log.LogDebug($"Sending prop swap: {prop?.name}");
             SendData(CustomPackets.PropSwap, new PropSwap
             {
                 propName = prop?.name ?? "",
@@ -47,7 +47,7 @@ namespace PropHuntMod.Networking.Client
 
         public static void SendPropLocation(Vector3 propPosition, float propRotation, float propScale)
         {
-            Log.LogInfo($"Sending prop location: {propPosition}, {propRotation}, {propScale}");
+            Log.LogDebug($"Sending prop location: {propPosition}, {propRotation}, {propScale}");
             SendData(CustomPackets.PropLocation, new PropLocation
             {
                 PropPosition = propPosition,
@@ -58,7 +58,7 @@ namespace PropHuntMod.Networking.Client
 
         public static void SendHideStatus(bool isHiding, int ticket = -1)
         {
-            Log.LogInfo($"Sending hide status: {isHiding}");
+            Log.LogDebug($"Sending hide status: {isHiding}");
             SendData(CustomPackets.HideStatus, new HideStatus
             {
                 IsHiding = isHiding,
@@ -68,7 +68,7 @@ namespace PropHuntMod.Networking.Client
 
         public static void SendPropFound(ushort propOwnerID)
         {
-            Log.LogInfo($"Sending prop found: {propOwnerID}");
+            Log.LogDebug($"Sending prop found: {propOwnerID}");
             SendCollectionData(CustomPackets.PropFound, new PropFound
             {
                 PropOwnerID = propOwnerID
@@ -77,7 +77,7 @@ namespace PropHuntMod.Networking.Client
 
         public static void SendSync(string propName, string propPath, Vector3 propPosition, float propRotation, float propScale)
         {
-            Log.LogInfo($"Sending sync data: {propName}, {propPosition}, {propRotation}, {propScale}");
+            Log.LogDebug($"Sending sync data: {propName}, {propPosition}, {propRotation}, {propScale}");
             SendData(CustomPackets.Sync, new Sync
             {
                 PropName = propName,
@@ -113,7 +113,7 @@ namespace PropHuntMod.Networking.Client
             PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
             player.SetProp(data.propName, data.propPath);
 
-            Log.LogInfo($"{data.Id} prop set to {data.propName}");
+            Log.LogDebug($"{data.Id} prop set to {data.propName}");
         }
 
         static void OnRoundStart(Server.RoundStart data)
@@ -159,7 +159,7 @@ namespace PropHuntMod.Networking.Client
             PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
             player.SetPropLocation(data.PropPosition, data.PropRotation, data.PropScale);
 
-            Log.LogInfo($"{data.Id} prop moved to {data.PropPosition}, {data.PropRotation}, {data.PropScale}");
+            Log.LogDebug($"{data.Id} prop moved to {data.PropPosition}, {data.PropRotation}, {data.PropScale}");
         }
 
         static void OnHideStatus(Server.HideStatus data)
@@ -167,14 +167,14 @@ namespace PropHuntMod.Networking.Client
             PlayerManager player = PlayerManager.GetPlayerManager(data.Id);
             player.SetHideStatus(data.IsHiding);
 
-            Log.LogInfo($"{data.Id} hiding status set to {data.IsHiding}");
+            Log.LogDebug($"{data.Id} hiding status set to {data.IsHiding}");
         }
 
         static void OnPropFound(Server.PropFound data)
         {
             if (data.IsClientFound)
             {
-                Log.LogInfo("I've been found!");
+                Log.LogDebug("I've been found!");
                 SelfCoverManager.instance.FindProp(SelfHornetManager.instance);
                 //SelfCoverManager.instance.DisableProp();
                 if (Client.GameState == GameState.Playing) Client.isSeeker = true;
@@ -184,7 +184,7 @@ namespace PropHuntMod.Networking.Client
                 var player = PlayerManager.GetPlayerManager(data.PropOwnerID);
                 player.coverManager.FindProp(player.hornetManager);
                 player.SetProp("", "");
-                Log.LogInfo($"{player.PlayerAvatar.Username} has been found");
+                Log.LogDebug($"{player.PlayerAvatar.Username} has been found");
             }
             EffectsManager.PlayFoundSound(data.IsClientFound);
         }

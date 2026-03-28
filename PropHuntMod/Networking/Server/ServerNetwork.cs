@@ -93,7 +93,7 @@ namespace PropHuntMod.Networking.Server
          ******************/
         public static void ForwardPropSwap(ushort id, string propName, string propPath)
         {
-            Log.LogInfo($"Broadcasting prop swap from {id}: {propName}");
+            Log.LogDebug($"Broadcasting prop swap from {id}: {propName}");
             Broadcast(id, CustomPackets.PropSwap, new PropSwap
             {
                 Id = id,
@@ -104,7 +104,7 @@ namespace PropHuntMod.Networking.Server
 
         public static void BroadcastRoundStart()
         {
-            Log.LogInfo("Broadcasting round start");
+            Log.LogDebug("Broadcasting round start");
             foreach (var player in Server.api.ServerManager.Players)
             {
                 SendRoundStart(player.Id);
@@ -128,7 +128,7 @@ namespace PropHuntMod.Networking.Server
 
         public static void ForwardPropLocation(ushort id, Vector3 propPosition, float propRotation, float propScale)
         {
-            Log.LogInfo($"Broadcasting prop location from {id}: {propPosition}, {propRotation}, {propScale}");
+            Log.LogDebug($"Broadcasting prop location from {id}: {propPosition}, {propRotation}, {propScale}");
 
             BaseCoverManager.ConstrainPropLocation(ref propPosition, ref propRotation, ref propScale);
             Broadcast(id, CustomPackets.PropLocation, new PropLocation
@@ -142,7 +142,7 @@ namespace PropHuntMod.Networking.Server
 
         public static void ForwardHideStatus(ushort id, bool isHiding)
         {
-            Log.LogInfo($"Broadcasting hide status from {id}: {isHiding}");
+            Log.LogDebug($"Broadcasting hide status from {id}: {isHiding}");
             Broadcast(id, CustomPackets.HideStatus, new HideStatus
             {
                 Id = id,
@@ -152,7 +152,7 @@ namespace PropHuntMod.Networking.Server
 
         public static void ForwardPropFound(ushort id, ushort propOwnerID)
         {
-            Log.LogInfo($"Broadcasting prop found from {id}: {propOwnerID}");
+            Log.LogDebug($"Broadcasting prop found from {id}: {propOwnerID}");
             foreach (var player in Server.api.ServerManager.Players)
             {
                 PropFound sendData = new PropFound
@@ -167,7 +167,7 @@ namespace PropHuntMod.Networking.Server
 
         public static void BroadcastGameOver(IServerPlayer winner, bool canceled)
         {
-            Log.LogInfo("Broadcasting game over");
+            Log.LogDebug("Broadcasting game over");
             foreach (var player in Server.api.ServerManager.Players)
             {
                 var data = new GameOver
@@ -182,7 +182,7 @@ namespace PropHuntMod.Networking.Server
 
         public static void BroadcastSeekerStart()
         {
-            Log.LogInfo("Broadcasting seeker start");
+            Log.LogDebug("Broadcasting seeker start");
             sender.BroadcastSingleData(CustomPackets.SeekerStart, new SeekerStart());
         }
 

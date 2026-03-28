@@ -17,7 +17,7 @@ namespace PropHuntMod.Players
         {
             if (!HornetExists()) return false;
 
-            Log.LogInfo($"Toggling Hornet: {show}");
+            Log.LogDebug($"Toggling Hornet: {show}");
 
             //var render = hornet.GetComponent<MeshRenderer>();
             render.enabled = show;
@@ -44,7 +44,7 @@ namespace PropHuntMod.Players
 
         public virtual void SetHornet()
         {
-            Log.LogInfo($"Setting hornet for {playerID}");
+            Log.LogDebug($"Setting hornet for {playerID}");
             var player = PlayerManager.GetPlayerManager(playerID)?.PlayerAvatar;
 
             if (player?.PlayerObject == null)
@@ -73,7 +73,7 @@ namespace PropHuntMod.Players
             if (hornet.transform.parent) nametag = hornet.transform.parent.Find("Username");
             else nametag = hornet.transform.Find("Username");
 
-            Log.LogInfo($"Nametag: {nametag}, setting to {show}");
+            Log.LogDebug($"Nametag: {nametag}, setting to {show}");
             nametag?.gameObject.SetActive(show);
         }
     }

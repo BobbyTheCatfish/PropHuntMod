@@ -45,7 +45,7 @@ namespace PropHuntMod.Props
                 }
             }
 
-            Log.LogInfo("Proceeding with extra prop loading");
+            Log.LogDebug("Proceeding with extra prop loading");
 
             // load json file
             var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ExtraProps.json");
@@ -53,10 +53,8 @@ namespace PropHuntMod.Props
             var json = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(jsonFile);
 
             scenePrefixes = json.Keys.ToArray();
-            Log.LogInfo("Prefixes:", string.Join(", ", scenePrefixes));
 
             var key = json.Keys.FirstOrDefault(s => scene.StartsWith(s));
-            Log.LogInfo("Key: " + key);
 
             global = json["GLOBAL"];
 
@@ -69,7 +67,7 @@ namespace PropHuntMod.Props
             }
 
             sceneProps = json[key];
-            Log.LogInfo("Props:", string.Join(", ", sceneProps));
+            //Log.LogInfo("Props:", string.Join(", ", sceneProps));
             scenePrefix = key;
 
             banned = json["BANNED"];

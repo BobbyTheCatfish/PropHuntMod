@@ -109,14 +109,13 @@ namespace PropHuntMod
 
             return false;
         }
-        int logged = 0;
+        
         private void Update()
         {
             if (!modEnabled) return;
 
             if (_nextFrames.Count > 0)
             {
-                Log.LogInfo($"Executing {_nextFrames.Count} late actions");
                 foreach (var action in _nextFrames)
                 {
                     action.Invoke();
@@ -136,14 +135,7 @@ namespace PropHuntMod
             // No keybinds if inputs are blocked
             if (IsInputDisabled())
             {
-                if (logged == 0) Log.LogInfo("Input blocked");
-                logged = 1;
                 return;
-            }
-            else if (logged == 1)
-            {
-                Log.LogInfo("Input restored");
-                logged = 0;
             }
 
 #if DEBUG
@@ -212,7 +204,6 @@ namespace PropHuntMod
         {
             if (nextFrameActions.Count > 0)
             {
-                Log.LogInfo($"Adding {nextFrameActions.Count} actions");
                 _nextFrames = nextFrameActions.ToList();
                 nextFrameActions.Clear();
             }

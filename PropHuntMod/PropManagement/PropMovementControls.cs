@@ -232,10 +232,10 @@ namespace PropHuntMod.Props
             var bundle = AssetBundle.LoadFromFile(Path.Combine(dir, "prophunt.bundle"));
             var assets = bundle.LoadAllAssets<Sprite>();
 
-            foreach (var asset in assets)
-            {
-                Log.LogInfo(asset.name, asset);
-            }
+            //foreach (var asset in assets)
+            //{
+            //    Log.LogInfo(asset.name, asset);
+            //}
 
 
             MoveXY = assets.First(a => a.name == "MoveXY");

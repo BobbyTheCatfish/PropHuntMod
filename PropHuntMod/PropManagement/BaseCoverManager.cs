@@ -91,7 +91,7 @@ namespace PropHuntMod.Props
                 return false;
             }
 
-            Log.LogInfo($"Destroying prop {cover}");
+            Log.LogDebug($"Destroying prop {cover}");
             GameObject.Destroy(cover);
             cover = null;
             //coverOGName = "";
@@ -144,7 +144,7 @@ namespace PropHuntMod.Props
 
             try
             {
-                Log.LogInfo("Creating prop");
+                Log.LogDebug("Creating prop");
 
                 if (PrevCoverPath == null)
                 {
@@ -180,14 +180,14 @@ namespace PropHuntMod.Props
                 Log.LogError(e);
             }
 
-            Log.LogInfo($"{this.cover.name} - {this.cover.layer} - {this.cover.activeInHierarchy}");
+            //Log.LogDebug($"{this.cover.name} - {this.cover.layer} - {this.cover.activeInHierarchy}");
             return true;
         }
 
         public virtual void OnHit(TriggerHandler handler)
         {
             //DisableProp(PlayerManager.GetPlayerManager(playerID).hornetManager);
-            Log.LogInfo($"Found {playerID}");
+            Log.LogDebug($"Found {playerID}");
 
             Component.Destroy(handler);
             ClientNetwork.SendPropFound(playerID);

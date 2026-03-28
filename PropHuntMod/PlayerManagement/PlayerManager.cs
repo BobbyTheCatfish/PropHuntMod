@@ -64,8 +64,8 @@ namespace PropHuntMod.Players
             //bool result = scene == SceneManager.GetActiveScene().name;
             bool result = PlayerAvatar.IsInLocalScene;
 
-            if (result) Log.LogInfo($"{playerID} is in the same room");
-            else Log.LogInfo($"{playerID} is in another room, you are in {SceneManager.GetActiveScene().name}");
+            if (result) Log.LogDebug($"{playerID} is in the same room");
+            else Log.LogDebug($"{playerID} is in another room, you are in {SceneManager.GetActiveScene().name}");
 
             return result;
         }

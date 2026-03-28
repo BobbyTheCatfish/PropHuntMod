@@ -31,7 +31,7 @@ namespace PropHuntMod.Networking.Server
             instance = this;
             api = serverApi;
             Log.SetLogger(Logger);
-            Log.LogInfo("Prop Hunt Loaded.");
+            Log.LogInfo("Prop Hunt Server Loaded.");
 
             Reset();
 
@@ -51,7 +51,6 @@ namespace PropHuntMod.Networking.Server
 
             serverApi.ServerManager.PlayerDisconnectEvent += player =>
             {
-                Log.LogInfo($"Player {player} disconnected");
                 players.Remove(player.Id);
 
                 CheckGameOver(player);
@@ -90,12 +89,12 @@ namespace PropHuntMod.Networking.Server
 
         public void Announce(string announcement)
         {
-            Log.LogInfo($"Announcement: {announcement}");
+            Log.LogDebug($"Announcement: {announcement}");
             api.ServerManager.BroadcastMessage(announcement);
         }
         public void Message(ushort recipientID, string message)
         {
-            Log.LogInfo($"Message to {recipientID}: {message}");
+            Log.LogDebug($"Message to {recipientID}: {message}");
             api.ServerManager.SendMessage(recipientID, message);
         }
         public string DetermineWinner()
@@ -115,13 +114,13 @@ namespace PropHuntMod.Networking.Server
         void PickSeekers()
         {
             var count = Mathf.Clamp(Config.SeekerCount, 1, players.Count - 1);
-            Log.LogInfo($"Choosing {count} seekers");
+            Log.LogDebug($"Choosing {count} seekers");
             for (int i = 0; i < count; i++)
             {
                 var validSeekers = players.Values.Where(p => p.seeker == false).ToList();
                 if (validSeekers.Count == 0)
                 {
-                    Log.LogInfo($"Ran out of seekers to choose (Picked {i}/{count})");
+                    Log.LogDebug($"Ran out of seekers to choose (Picked {i}/{count})");
                     return;
                 }
 

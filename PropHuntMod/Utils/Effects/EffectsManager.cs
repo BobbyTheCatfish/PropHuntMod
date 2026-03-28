@@ -39,7 +39,7 @@ namespace PropHuntMod.Utils
 
         static void PlaySound(AudioClip audio)
         {
-            Log.LogInfo($"Playing {audio.name}");
+            Log.LogDebug($"Playing {audio.name}");
 
             var source = HeroController.instance.GetComponent<AudioSource>();
             source.PlayOneShot(audio);
@@ -96,7 +96,7 @@ namespace PropHuntMod.Utils
             bool unload = false;
             if (bundle == null)
             {
-                Log.LogInfo("Bundle not loaded. Loading now.");
+                Log.LogDebug("Bundle not loaded. Loading now.");
                 var bundlePath = Path.Combine(bundleFile);
                 bundle = AssetBundle.LoadFromFile(bundlePath);
                 unload = true;
@@ -123,7 +123,7 @@ namespace PropHuntMod.Utils
 
             if (bundle == null)
             {
-                Log.LogInfo("Couldn't load audio bundle");
+                Log.LogWarning("Couldn't load audio bundle");
                 return;
             }
 
@@ -135,7 +135,7 @@ namespace PropHuntMod.Utils
             bundle = loadedBundles.First(b => b.name == "48a0f4259d782cbbf6fb20cdcc4f4e5f.bundle");
             gameOverSound = bundle.LoadAllAssets<AudioClip>().FirstOrDefault(a => a.name == "slow_motion_effect_tone_with_texture");
 
-            Log.LogInfo("Audio loaded");
+            Log.LogDebug("Audio loaded");
 
             //Alternate game over sounds
             //audioBundle = loadedBundles.First(b => b.name == "45160b0885b9207aade8da6c49b4c729.bundle");
@@ -169,7 +169,7 @@ namespace PropHuntMod.Utils
             }
             SweepShader = shader;
 
-            Log.LogInfo("Sweep shader loaded");
+            Log.LogDebug("Sweep shader loaded");
 
 
             /**************************
@@ -193,21 +193,20 @@ namespace PropHuntMod.Utils
             bool unload = false;
             if (bundle == null)
             {
-                Log.LogInfo("Bundle not loaded. Loading now.");
+                Log.LogDebug("Bundle not loaded. Loading now.");
                 var bundlePath = Path.Combine(BepInEx.Paths.ManagedPath, "../", "StreamingAssets", "aa", "StandaloneWindows64", "materials_assets_areaaqueductsprintmaster.bundle");
                 bundle = AssetBundle.LoadFromFile(bundlePath);
                 unload = true;
             }
 
-            Log.LogInfo("bundle loaded");
+            Log.LogDebug("bundle loaded");
 
             var mat = bundle.LoadAsset<Material>("Assets/Materials/Particles/Confetti Particle.mat");
             //var mat = materials.First(a => a.name.ToLower() == "confetti particle");
-            Log.LogInfo(mat.name);
             confettiGO.GetComponent<ParticleSystemRenderer>().material = mat;
 
             if (unload) bundle.Unload(false);
-            Log.LogInfo("Confetti loaded");
+            Log.LogDebug("Confetti loaded");
         }
     }
 }

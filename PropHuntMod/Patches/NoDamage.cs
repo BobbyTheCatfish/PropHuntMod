@@ -64,7 +64,7 @@ namespace PropHuntMod.Patches
         [HarmonyPatch(typeof(CogMultiHitter), "OnTriggerEnter2D")]
         public static bool CogDamage(CogMultiHitter __instance, Collider2D other)
         {
-            Log.LogInfo("Cog doing damage");
+            Log.LogDebug("Cog doing damage");
             if (other.GetComponent<TriggerHandler>()) return false;
 
             return true;

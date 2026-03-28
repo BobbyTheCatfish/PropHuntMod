@@ -30,7 +30,7 @@ namespace NoRepeat
             {
                 inputValues.AddRange(used);
                 used = new List<T>();
-                Log.LogInfo("Resetting NoRepeat");
+                Log.LogDebug("Resetting NoRepeat");
             }
             used.Add(element);
 

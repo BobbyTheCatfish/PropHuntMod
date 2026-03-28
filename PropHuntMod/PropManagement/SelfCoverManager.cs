@@ -126,15 +126,15 @@ namespace PropHuntMod.Props
             var newCover = PropValidation.currentSceneObjects.GetRandom();
             EnableProp(newCover);
 
-            Log.LogInfo(newCover.path);
-            Log.LogInfo(PropValidation.FindGameObject(newCover.path));
+            Log.LogDebug(newCover.path);
+            Log.LogDebug(PropValidation.FindGameObject(newCover.path));
         }
 
         public bool EnableProp(Prop prop, int ticket = -1)
         {
             if (IsSeeker()) return false;
 
-            Log.LogInfo("Enabling prop");
+            Log.LogDebug("Enabling prop");
             var success = base.EnableProp(SelfHornetManager.instance, prop);
             if (success)
             {

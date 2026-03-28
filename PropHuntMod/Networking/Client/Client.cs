@@ -29,7 +29,7 @@ namespace PropHuntMod.Networking.Client
             PropHuntMod.Initialize(clientApi);
             
             Log.SetLogger(Logger);
-            Log.LogInfo("Prop Hunt Loaded.");
+            Log.LogInfo("Prop Hunt Client Loaded.");
             ClientNetwork.Init(clientApi, this);
 
             clientApi.ClientManager.ConnectEvent += () =>
@@ -60,20 +60,16 @@ namespace PropHuntMod.Networking.Client
             // Handle connects and disconnects
             clientApi.ClientManager.PlayerConnectEvent += player =>
             {
-                Log.LogInfo($"Player {player.Username} connected");
                 PlayerManager.GetPlayerManager(player.Id);
             };
 
             clientApi.ClientManager.PlayerDisconnectEvent += player =>
             {
-                Log.LogInfo($"Player {player.Username} disconnected");
                 PropHuntMod.playerManager.Remove(player.Id);
             };
 
             clientApi.ClientManager.PlayerEnterSceneEvent += player =>
             {
-                Log.LogInfo($"Player {player.Username} entered your scene");
-
                 var manager = PlayerManager.GetPlayerManager(player.Id);
                 manager.hornetManager.SetHornet();
                 manager.EnsurePropCover();

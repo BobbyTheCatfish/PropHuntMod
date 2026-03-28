@@ -49,7 +49,7 @@ namespace PropHuntMod.Props
                     var transition = Warp.GetTransitionNames(scene).FirstOrDefault();
                     if (transition == null)
                     {
-                        Log.LogInfo($"No transition for {area} {scene}");
+                        //Log.LogInfo($"No transition for {area} {scene}");
                         continue;
                     }
 

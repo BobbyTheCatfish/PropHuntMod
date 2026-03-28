@@ -128,7 +128,7 @@ namespace PropHuntMod.Props
 
                 if (oldObjRenderer?.sprite == null || newObjRenderer?.sprite == null)
                 {
-                    Log.LogInfo($"{newObjRenderer.name} not duplicate, a sprite was null");
+                    //Log.LogInfo($"{newObjRenderer.name} not duplicate, a sprite was null");
                     return false;
                 }
 
@@ -165,7 +165,7 @@ namespace PropHuntMod.Props
         {
             string scene = SceneManager.GetActiveScene().name;
 
-            Log.LogInfo($"Preparing all props for scene {scene}");
+            Log.LogDebug($"Preparing all props for scene {scene}");
 
             GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
             List<GameObject> props = new List<GameObject>();
@@ -300,7 +300,7 @@ namespace PropHuntMod.Props
 
             if (!AddPropHitbox(cover))
             {
-                Log.LogInfo($"Couldn't add hitbox for {prop.name}");
+                Log.LogError($"Couldn't add hitbox for {prop.name}");
                 GameObject.Destroy(cover);
                 return null;
             }
@@ -333,7 +333,6 @@ namespace PropHuntMod.Props
             foreach (var r in renderers)
             {
                 var name = r.name.ToLower();
-                if (prop.name == "Active") Log.LogInfo(name, r.bounds.size);
                 if (
                     name.StartsWith("haze") || name.StartsWith("light") || name.StartsWith("vignette") ||
                     name.EndsWith("fader") || name.EndsWith("glow") || name.EndsWith("cutout") ||
@@ -406,7 +405,7 @@ namespace PropHuntMod.Props
         }
         public static void ResetProps()
         {
-            Log.LogInfo("Resetting props");
+            Log.LogDebug("Resetting props");
             currentSceneObjects = null;
         }
 

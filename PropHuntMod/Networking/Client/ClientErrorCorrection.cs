@@ -58,7 +58,7 @@ namespace PropHuntMod.Networking.Client
             {
                 if (!string.IsNullOrEmpty(ScenePatches.PreviousScene)) break;
 
-                Log.LogInfo($"Attempt {i + 1} to find previous scene failed");
+                Log.LogWarning($"Attempt {i + 1} to find previous scene failed");
                 yield return new WaitForSeconds(1);
             }
 
@@ -116,7 +116,7 @@ namespace PropHuntMod.Networking.Client
                 }
                 else
                 {
-                    Log.LogInfo($"Player {data.AffectedID} still had their TriggerHandler. Not restoring.");
+                    Log.LogDebug($"Player {data.AffectedID} still had their TriggerHandler. Not restoring.");
                 }
             }
             else
