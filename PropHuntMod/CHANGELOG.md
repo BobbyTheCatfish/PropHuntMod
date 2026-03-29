@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.0.3
+- Better networking
+- Removed unneeded logs
+- Prevent errors when playing in singleplayer
+
 ### 1.0.2
 - Adds configuration for seekers
 	- Wait time

@@ -38,7 +38,7 @@ namespace PropHuntMod
     using PlayerID = UInt16;
 
     [BepInPlugin("com.bobbythecatfish.prophunt", Utils.Config.ModName, Utils.Config.ModVersion)]
-    [BepInDependency("ssmp")]
+    [BepInDependency("ssmp", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("io.github.flibber-hk.filteredlogs", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInProcess("Hollow Knight Silksong.exe")]
     public class PropHuntMod : BaseUnityPlugin
